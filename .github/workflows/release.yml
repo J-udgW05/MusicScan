@@ -29,7 +29,7 @@ jobs:
       - name: Забрать исходники
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # нужна вся история, чтобы собрать список изменений
+          fetch-depth: 1
 
       - name: Определить версию
         id: version
@@ -165,34 +165,37 @@ jobs:
         id: notes
         shell: pwsh
         run: |
-          $notes = @'
+          $repo = '${{ github.repository }}'
+          $tag = 'v${{ steps.version.outputs.version }}'
+
+          $notes = @"
           ## Music Scan Integrity ${{ steps.version.outputs.version }}
 
-          Проверка музыкальной коллекции на повреждённые файлы.
+          Проверка музыкальной коллекции на повреждённые аудиофайлы.
 
           ### Установка
 
-          Два способа, файлы внутри одни и те же.
+          | Файл | Способ |
+          |---|---|
+          | ``Music_Scan_Integrity-${{ steps.version.outputs.version }}-setup.exe`` | Установка в Program Files, ярлыки в меню «Пуск» и на рабочем столе, удаление через «Приложения и возможности» |
+          | ``Music_Scan_Integrity-${{ steps.version.outputs.version }}-win-x64.zip`` | Распаковка в произвольную папку, установка не требуется |
 
-          **Установщик** `Music_Scan_Integrity-${{ steps.version.outputs.version }}-setup.exe` —
-          обычная установка в «Program Files», значки в меню Пуск и на рабочем столе,
-          удаление через «Приложения и возможности».
+          Оба файла содержат идентичную сборку. Наличие .NET на целевой системе не требуется.
 
-          **Переносимая версия** `Music_Scan_Integrity-${{ steps.version.outputs.version }}-win-x64.zip` —
-          распакуйте в любую папку и запустите `Music_Scan_Integrity.exe`. Ничего
-          не устанавливается, папку можно унести на флешке.
+          ### Требования
 
-          .NET на компьютере не нужен ни в том, ни в другом случае — всё лежит внутри.
+          Windows 10 или 11, 64-бит.
 
-          > При первом запуске Windows покажет «Неизвестный издатель»: сборка не подписана
-          > цифровым сертификатом. Нажмите «Подробнее» → «Выполнить в любом случае».
+          > Сборка не подписана цифровым сертификатом. При первом запуске Windows SmartScreen
+          > покажет предупреждение «Неизвестный издатель» — выберите «Подробнее» →
+          > «Выполнить в любом случае».
 
-          ### Что внутри
+          ### Состав
 
-          Windows 10/11 64-бит. Библиотеки декодирования BASS (© un4seen developments)
-          входят в сборку и распространяются по условиям их лицензии: бесплатно
-          для некоммерческого использования.
-          '@
+          В сборку входят библиотеки декодирования BASS (© un4seen developments),
+          распространяемые на условиях их лицензии — бесплатно для некоммерческого
+          использования. Подробности: [THIRD-PARTY-NOTICES.md](https://github.com/$repo/blob/$tag/THIRD-PARTY-NOTICES.md).
+          "@
 
           $notes | Out-File 'artifacts/notes.md' -Encoding utf8
           Write-Host $notes
@@ -236,8 +239,7 @@ jobs:
                   'release', 'create', $tag
               ) + $assets + @(
                   '--title', 'Music Scan Integrity ${{ steps.version.outputs.version }}',
-                  '--notes-file', 'artifacts/notes.md',
-                  '--generate-notes'
+                  '--notes-file', 'artifacts/notes.md'
               )
 
               if ('${{ github.event_name }}' -eq 'workflow_dispatch' -and '${{ inputs.prerelease }}' -eq 'true') {
