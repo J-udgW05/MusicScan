@@ -1,30 +1,31 @@
-# Сторонние компоненты
+# Third-Party Notices
 
-Music Scan Integrity распространяется по лицензии [BSD 3-Clause](LICENSE.txt).
-Эта лицензия покрывает только код самой программы. Перечисленные ниже
-компоненты входят в готовые сборки и распространяются их правообладателями
-на своих условиях.
+Music Scan Integrity is distributed under the [BSD 3-Clause license](LICENSE.txt).
+That license covers the program's own code only. The components listed below
+are bundled into the release builds and are distributed by their respective
+rights holders under their own terms.
 
 ## BASS, (c) un4seen developments
 
-Декодирование аудио: `bass.dll` и плагины к ней в подпапке `bass\` рядом
-с программой.
+Audio decoding: `bass.dll` and its plugins, in the `bass\` subfolder next to
+the program.
 
-**Лицензией BSD 3-Clause не покрыта.** BASS бесплатна только для
-некоммерческого использования; для коммерческого нужна лицензия
-un4seen developments. Действующие условия — на [www.un4seen.com](https://www.un4seen.com/).
+**Not covered by the BSD 3-Clause license.** BASS is free for
+non-commercial use only; commercial use requires a license from
+un4seen developments. Current terms: [www.un4seen.com](https://www.un4seen.com/).
 
-Это относится и к готовым сборкам из раздела Releases: сама программа
-свободна, вложенные в неё библиотеки BASS — нет.
+This also applies to the prebuilt binaries in the Releases section: the
+program itself is free software, the bundled BASS libraries are not.
 
-## Остальные компоненты
+## Other components
 
-| Компонент | Назначение | Лицензия |
+| Component | Purpose | License |
 |---|---|---|
-| [ManagedBass](https://github.com/ManagedBass/ManagedBass) | Обёртка над BASS для .NET | MIT |
-| [TagLib#](https://github.com/mono/taglib-sharp) | Чтение тегов | LGPL-2.1 |
-| [WPF-UI](https://github.com/lepoco/wpfui) | Оформление в стиле Fluent | MIT |
+| [ManagedBass](https://github.com/ManagedBass/ManagedBass) | .NET wrapper around BASS | MIT |
+| [TagLib#](https://github.com/mono/taglib-sharp) | Tag reading | LGPL-2.1 |
+| [WPF-UI](https://github.com/lepoco/wpfui) | Fluent-style theming | MIT |
 | [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) | MVVM | MIT |
-| [.NET](https://github.com/dotnet/runtime) | Среда выполнения, вложена в сборку | MIT |
+| [.NET](https://github.com/dotnet/runtime) | Runtime, bundled into the build | MIT |
 
-Тексты лицензий MIT и LGPL-2.1 — в репозиториях соответствующих проектов.
+Full license texts for MIT and LGPL-2.1 are available in the respective
+project repositories.
