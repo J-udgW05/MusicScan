@@ -1,0 +1,81 @@
+<#
+.SYNOPSIS
+    Собирает установщик из готовой переносимой сборки.
+
+.DESCRIPTION
+    Установщик заворачивает то, что уже лежит в artifacts\publish, — значит
+    установленная и переносимая версии это заведомо одни и те же файлы.
+    Сначала выполните tools\publish.ps1.
+
+.EXAMPLE
+    pwsh tools\make-setup.ps1
+#>
+[CmdletBinding()]
+param(
+    [string]$Version,
+    [string]$Iscc
+)
+
+$ErrorActionPreference = 'Stop'
+
+$repo = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$publish = Join-Path $repo 'artifacts\publish'
+$script = Join-Path $repo 'installer\MusicScanIntegrity.iss'
+
+if (-not (Test-Path (Join-Path $publish 'Music_Scan_Integrity.exe'))) {
+    throw "Переносимой сборки нет. Сначала выполните: pwsh tools\publish.ps1"
+}
+
+if (-not $Version) {
+    $props = Get-Content (Join-Path $repo 'Directory.Build.props') -Raw
+    if ($props -notmatch '<Version>([^<]+)</Version>') {
+        throw 'Не удалось прочитать версию из Directory.Build.props.'
+    }
+    $Version = $Matches[1]
+}
+
+# Компилятор ищется там, где Inno Setup оказывается чаще всего; путь можно
+# задать и вручную — установить его могли куда угодно.
+if (-not $Iscc) {
+    $candidates = @(
+        "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+        "$env:ProgramFiles\Inno Setup 7\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 7\ISCC.exe"
+    )
+
+    # Ещё вариант — путь из записи об установке в реестре.
+    $keys = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    Get-ItemProperty $keys -ErrorAction SilentlyContinue |
+        Where-Object { $_.DisplayName -like 'Inno Setup*' -and $_.InstallLocation } |
+        ForEach-Object { $candidates += (Join-Path $_.InstallLocation 'ISCC.exe') }
+
+    $Iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+}
+
+if (-not $Iscc -or -not (Test-Path $Iscc)) {
+    throw 'ISCC.exe не найден. Установите Inno Setup или укажите путь: -Iscc <путь>'
+}
+
+Write-Host "Inno Setup: $Iscc" -ForegroundColor Cyan
+Write-Host "Версия: $Version" -ForegroundColor Cyan
+
+& $Iscc "/DAppVersion=$Version" $script
+if ($LASTEXITCODE -ne 0) {
+    throw 'Установщик не собрался.'
+}
+
+$setup = Join-Path $repo "artifacts\Music_Scan_Integrity-$Version-setup.exe"
+if (-not (Test-Path $setup)) {
+    throw "Установщик не найден там, где ожидался: $setup"
+}
+
+$size = (Get-Item $setup).Length / 1MB
+$hash = (Get-FileHash $setup -Algorithm SHA256).Hash
+
+Write-Host ''
+Write-Host "Готово: $setup" -ForegroundColor Green
+Write-Host ("  размер: {0:N1} МБ" -f $size)
+Write-Host "  SHA-256: $hash"

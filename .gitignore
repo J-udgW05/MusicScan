@@ -1,0 +1,78 @@
+## .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]64/
+artifacts/
+publish/
+*.dll
+*.exe
+*.pdb
+*.cache
+
+## Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+
+## Test / coverage
+[Tt]est[Rr]esult*/
+coverage*
+*.coverage
+*.trx
+BenchmarkDotNet.Artifacts/
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+project.lock.json
+project.fragment.lock.json
+
+## Native / BASS libraries (redistributables, not sources)
+*.lib
+*.so
+*.dylib
+
+## Logs, reports, temp
+*.log
+*.tmp
+[Tt]emp/
+*.bak
+
+## OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+## Secrets / local config
+*.env
+.env.*
+appsettings.*.Local.json
+secrets.json
+
+
+## Native-библиотеки BASS: распространяются по лицензии un4seen,
+## подтягиваются скриптом tools/fetch-bass.ps1
+native/bass/
+
+## Служебное внутри папки с референсами: превью дизайн-редактора и его копии
+## документов ТЗ (сами документы лежат в docs/)
+Референсы и дизайн/.thumbnail
+Референсы и дизайн/uploads/
+
+## Снимки экрана и отчёты, сделанные при разработке
+artifacts/
+
+## Настройки инструментов разработки (не относятся к программе)
+.claude/

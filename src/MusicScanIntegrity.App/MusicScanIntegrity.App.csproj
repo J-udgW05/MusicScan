@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>MusicScanIntegrity.App</RootNamespace>
+    <AssemblyName>Music_Scan_Integrity</AssemblyName>
+    <AssemblyTitle>Music Scan Integrity</AssemblyTitle>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Только Windows x64: зафиксировано в 01_SPECIFICATION.md, раздел 10. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+
+    <!-- Переносимая сборка без установщика: один каталог, который можно скопировать. -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- Тримминг отключён намеренно: WPF активно использует рефлексию XAML. -->
+    <PublishTrimmed>false</PublishTrimmed>
+
+    <SatelliteResourceLanguages>ru;en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="WPF-UI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicScanIntegrity.Core\MusicScanIntegrity.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Знак программы. Собирается из assets\icon.png скриптом tools\make-icon.ps1.
+       Файл один: Windows берёт из него значок программы, а окна — кадр нужного
+       размера через Controls\AppMark.cs. -->
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <!-- Native-библиотеки BASS кладутся рядом с exe в подпапку bass\.
+       Их скачивает tools\fetch-bass.ps1 (в репозиторий они не коммитятся:
+       распространяются по лицензии un4seen, см. README). -->
+  <ItemGroup>
+    <None Include="..\..\native\bass\x64\**\*.dll"
+          Condition="Exists('..\..\native\bass\x64')"
+          Link="bass\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Лицензия требует прилагать её текст к двоичным сборкам, а условия BASS
+       нужно донести до того, кто скачал готовый архив: вкладываем оба файла
+       рядом с программой. -->
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt;..\..\THIRD-PARTY-NOTICES.md"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,90 @@
+﻿<!--
+    Светлая тема. Значения перенесены 1:1 из UI_SPEC.md, раздел 1.
+    Имена ресурсов совпадают с именами CSS-переменных макета, чтобы
+    сверять разметку с референсом можно было построчно.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Поверхности -->
+    <Color x:Key="Color.Bg">#FFF3F3F3</Color>
+    <Color x:Key="Color.Mica">#FFF9F9FB</Color>
+    <Color x:Key="Color.TitleBar">#FFF9F9FB</Color>
+    <Color x:Key="Color.Card">#FFFFFFFF</Color>
+    <Color x:Key="Color.Card2">#FFFBFBFD</Color>
+    <Color x:Key="Color.Flyout">#FFFBFBFD</Color>
+
+    <!-- Границы -->
+    <Color x:Key="Color.Bd">#FFE3E3E6</Color>
+    <Color x:Key="Color.Bd2">#FFECECEF</Color>
+
+    <!-- Текст -->
+    <Color x:Key="Color.Fg">#FF1A1A1C</Color>
+    <Color x:Key="Color.Fg2">#FF5C5C62</Color>
+    <Color x:Key="Color.Fg3">#FF8B8B92</Color>
+
+    <!-- Акцент -->
+    <Color x:Key="Color.Acc">#FF2F6FD0</Color>
+    <!-- Кромка акцентной заливки: тон между заливкой и фоном.
+         Без неё край прыгает с фона сразу на заливку, и на скруглении
+         это видно лесенкой. Доля подмешивания фона — 30 %. -->
+    <Color x:Key="Color.AccBorder">#FF6A97DA</Color>
+    <Color x:Key="Color.AccFg">#FFFFFFFF</Color>
+    <Color x:Key="Color.AccSoft">#FFEAF1FC</Color>
+    <Color x:Key="Color.AccSoftHover">#FFDCE8FA</Color>
+
+    <!-- Пилюля-фильтр без рамки: в светлой теме она темнее фона страницы.
+         Белая на #F3F3F3 без рамки почти не видна. -->
+    <Color x:Key="Color.Chip">#FFE7E7EA</Color>
+    <Color x:Key="Color.ChipHover">#FFDBDBE0</Color>
+
+    <!-- Статусы -->
+    <Color x:Key="Color.Ok">#FF0F7B3F</Color>
+    <Color x:Key="Color.OkBg">#FFE8F6ED</Color>
+    <Color x:Key="Color.Err">#FFC42B2F</Color>
+    <Color x:Key="Color.ErrBg">#FFFDECEC</Color>
+    <Color x:Key="Color.Warn">#FF8A5A06</Color>
+    <Color x:Key="Color.WarnBg">#FFFDF3E2</Color>
+    <Color x:Key="Color.Skip">#FF6F6F76</Color>
+    <Color x:Key="Color.SkipBg">#FFEFEFF1</Color>
+
+    <!-- Кисти. Отдельно от цветов: пользовательские цвета статусов
+         подменяются в App.Resources именно на уровне кистей. -->
+    <SolidColorBrush x:Key="Brush.Bg" Color="{StaticResource Color.Bg}" />
+    <SolidColorBrush x:Key="Brush.Mica" Color="{StaticResource Color.Mica}" />
+    <!-- Оправа окна: заголовок, панель инструментов и линия под ними.
+         Отдельные кисти нужны, чтобы подложка Mica могла обнулить их,
+         не трогая разделители строк в таблице. -->
+    <SolidColorBrush x:Key="Brush.Chrome" Color="{StaticResource Color.TitleBar}" />
+    <SolidColorBrush x:Key="Brush.ChromeLine" Color="{StaticResource Color.Bd2}" />
+    <SolidColorBrush x:Key="Brush.TitleBar" Color="{StaticResource Color.TitleBar}" />
+    <SolidColorBrush x:Key="Brush.Card" Color="{StaticResource Color.Card}" />
+    <SolidColorBrush x:Key="Brush.Card2" Color="{StaticResource Color.Card2}" />
+
+    <!-- Поверхность всплывающих окон: выпадающие списки, меню. Подложка Mica
+         на них не распространяется — в Windows 11 материал окна под меню не
+         просвечивает, иначе читать список поверх обоев невозможно. Поэтому
+         цвет непрозрачный и ThemeService его не разбавляет. -->
+    <SolidColorBrush x:Key="Brush.Flyout" Color="{StaticResource Color.Flyout}" />
+    <SolidColorBrush x:Key="Brush.Bd" Color="{StaticResource Color.Bd}" />
+    <SolidColorBrush x:Key="Brush.Bd2" Color="{StaticResource Color.Bd2}" />
+    <SolidColorBrush x:Key="Brush.Fg" Color="{StaticResource Color.Fg}" />
+    <SolidColorBrush x:Key="Brush.Fg2" Color="{StaticResource Color.Fg2}" />
+    <SolidColorBrush x:Key="Brush.Fg3" Color="{StaticResource Color.Fg3}" />
+    <SolidColorBrush x:Key="Brush.Acc" Color="{StaticResource Color.Acc}" />
+    <SolidColorBrush x:Key="Brush.AccBorder" Color="{StaticResource Color.AccBorder}" />
+    <SolidColorBrush x:Key="Brush.AccFg" Color="{StaticResource Color.AccFg}" />
+    <SolidColorBrush x:Key="Brush.AccSoft" Color="{StaticResource Color.AccSoft}" />
+    <SolidColorBrush x:Key="Brush.AccSoftHover" Color="{StaticResource Color.AccSoftHover}" />
+    <SolidColorBrush x:Key="Brush.Chip" Color="{StaticResource Color.Chip}" />
+    <SolidColorBrush x:Key="Brush.ChipHover" Color="{StaticResource Color.ChipHover}" />
+    <SolidColorBrush x:Key="Brush.Ok" Color="{StaticResource Color.Ok}" />
+    <SolidColorBrush x:Key="Brush.OkBg" Color="{StaticResource Color.OkBg}" />
+    <SolidColorBrush x:Key="Brush.Err" Color="{StaticResource Color.Err}" />
+    <SolidColorBrush x:Key="Brush.ErrBg" Color="{StaticResource Color.ErrBg}" />
+    <SolidColorBrush x:Key="Brush.Warn" Color="{StaticResource Color.Warn}" />
+    <SolidColorBrush x:Key="Brush.WarnBg" Color="{StaticResource Color.WarnBg}" />
+    <SolidColorBrush x:Key="Brush.Skip" Color="{StaticResource Color.Skip}" />
+    <SolidColorBrush x:Key="Brush.SkipBg" Color="{StaticResource Color.SkipBg}" />
+
+</ResourceDictionary>

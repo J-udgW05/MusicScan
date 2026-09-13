@@ -1,0 +1,37 @@
+﻿<Application x:Class="MusicScanIntegrity.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:MusicScanIntegrity.App.Converters"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Шаблоны окна и подложка Mica из WPF-UI. -->
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+
+                <!-- Токены темы подставляет ThemeService при запуске:
+                     он же переключает их при смене темы без перезапуска. -->
+                <ResourceDictionary Source="Resources/Tokens.Light.xaml" />
+                <ResourceDictionary Source="Resources/Typography.xaml" />
+                <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary Source="Resources/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:NotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
+            <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <conv:EqualsConverter x:Key="Equals" />
+            <conv:SizeConverter x:Key="SizeFormat" />
+            <conv:NumberConverter x:Key="NumberFormat" />
+            <conv:ShareToWidthConverter x:Key="ShareToWidth" />
+            <conv:HexToBrushConverter x:Key="HexToBrush" />
+            <conv:InvertBoolConverter x:Key="InvertBool" />
+            <conv:EnumDisplayConverter x:Key="EnumDisplay" />
+
+            <!-- Значения перечислений в списках показываются по-русски. -->
+            <DataTemplate x:Key="EnumItemTemplate">
+                <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}" />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

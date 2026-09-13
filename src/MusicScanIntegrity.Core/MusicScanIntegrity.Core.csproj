@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>MusicScanIntegrity.Core</RootNamespace>
+    <AssemblyName>MusicScanIntegrity.Core</AssemblyName>
+    <UseWindowsForms>false</UseWindowsForms>
+    <UseWPF>false</UseWPF>
+    <!-- Ядро не зависит от WPF: его целиком можно покрыть модульными тестами.
+         TFM windows нужен только для Restart Manager (P/Invoke в RstrtMgr.dll). -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ManagedBass" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="System.IO.Hashing" />
+    <PackageReference Include="TagLibSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="MusicScanIntegrity.Core.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,571 @@
+﻿<UserControl x:Class="MusicScanIntegrity.App.Views.ResultsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
+             xmlns:vm="clr-namespace:MusicScanIntegrity.App.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:MainViewModel}"
+             Background="{DynamicResource Brush.Bg}"
+             c:Motion.Entrance="True">
+
+    <UserControl.Resources>
+        <!-- Ширины колонок таблицы: 24 · 2.15* · 3* · 72 · 92 · 148, зазор 14
+             (UI_SPEC.md, раздел 12). Заголовок и строки используют одну и ту же
+             раскладку, поэтому колонки гарантированно совпадают. -->
+        <GridLength x:Key="Col.Icon">24</GridLength>
+        <GridLength x:Key="Col.Format">72</GridLength>
+        <GridLength x:Key="Col.Size">92</GridLength>
+        <GridLength x:Key="Col.Status">148</GridLength>
+
+        <!-- Заголовок колонки — кнопка: щелчок сортирует, повторный щелчок
+             разворачивает порядок. Раньше стрелка в шапке была нарисована
+             для вида и ничего не делала. -->
+        <Style x:Key="Column.Header" TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Fg3}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="0,2">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Fg}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стрелка направления: вниз — по убыванию. -->
+        <Style x:Key="Sort.Arrow" TargetType="c:MsIcon">
+            <Setter Property="Kind" Value="sort" />
+            <Setter Property="Size" Value="12" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Fg2}" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SortAscending}" Value="False">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleY="-1" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Цвета статуса раздаются триггерами с DynamicResource, а не
+             конвертером. Конвертер отдаёт готовую кисть один раз и при смене
+             темы не пересчитывается: карточка подробностей так и оставалась
+             тёмной после переключения на светлую тему.
+             Значку и тексту цвет не задаётся — он достаётся им по наследству
+             через TextElement.Foreground родителя. -->
+        <Style x:Key="Status.Square" TargetType="Border">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Card2}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Fg2}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="Ok">
+                    <Setter Property="Background" Value="{DynamicResource Brush.OkBg}" />
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Ok}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Warning">
+                    <Setter Property="Background" Value="{DynamicResource Brush.WarnBg}" />
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Warn}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Corrupted">
+                    <Setter Property="Background" Value="{DynamicResource Brush.ErrBg}" />
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Err}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Skipped">
+                    <Setter Property="Background" Value="{DynamicResource Brush.SkipBg}" />
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Skip}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="Status.Pill" TargetType="Border" BasedOn="{StaticResource Status.Square}">
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="CornerRadius" Value="11.5" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Карточка подробностей смотрит на выбранную строку: пока ничего
+             не выбрано, статуса нет и карточка остаётся обычной. -->
+        <Style x:Key="Details.Card" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="16,14" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd}" />
+            <Setter Property="Background" Value="{DynamicResource Brush.Card}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Selected.Status}" Value="Ok">
+                    <Setter Property="Background" Value="{DynamicResource Brush.OkBg}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Selected.Status}" Value="Warning">
+                    <Setter Property="Background" Value="{DynamicResource Brush.WarnBg}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Selected.Status}" Value="Corrupted">
+                    <Setter Property="Background" Value="{DynamicResource Brush.ErrBg}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Selected.Status}" Value="Skipped">
+                    <Setter Property="Background" Value="{DynamicResource Brush.SkipBg}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="22" DataContext="{Binding Results}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ══ Поиск и фильтры ═══════════════════════════════════════════ -->
+        <Grid Grid.Row="0">
+            <!-- Тянется колонка с пилюлями, а не поиск. Поле поиска шире 240
+                 точек не становится полезнее, а пилюлям место нужно: только
+                 в тянущейся колонке они знают свою ширину и переносятся.
+                 Раньше колонка была Auto — WrapPanel мерился в бесконечной
+                 ширине, никогда не переносил и вылезал за край окна вместе
+                 с выбором формата. -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="*" MinWidth="120" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Поиск по имени файла -->
+            <Border Grid.Column="0" VerticalAlignment="Top"
+                    Background="{DynamicResource Brush.Card}"
+                    BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1"
+                    CornerRadius="{StaticResource Radius.Control}" Padding="12,9">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <c:MsIcon Grid.Column="0" Kind="search" Size="16" VerticalAlignment="Center"
+                              Foreground="{DynamicResource Brush.Fg3}" />
+
+                    <Grid Grid.Column="1" Margin="9,0,0,0">
+                        <TextBlock Text="Поиск по имени файла" VerticalAlignment="Center"
+                                   FontSize="{StaticResource Size.Body}"
+                                   Foreground="{DynamicResource Brush.Fg3}"
+                                   Visibility="{Binding SearchText, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}" />
+                        <TextBox Style="{StaticResource TextBox.Bare}" Margin="0,0,22,0"
+                                 AutomationProperties.Name="Поиск по имени файла"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" />
+
+                        <!-- Крестик появляется только когда есть что стирать:
+                             без него запрос приходилось вычищать вручную. -->
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Style="{StaticResource Button.Ghost}" Padding="3"
+                                AutomationProperties.Name="Очистить поиск"
+                                ToolTip="Очистить поиск"
+                                Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibility}}"
+                                Command="{Binding ClearSearchCommand}">
+                            <c:MsIcon Kind="mark-broken" Size="13" StrokeWeight="1.8"
+                                      Foreground="{DynamicResource Brush.Fg3}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Пилюли-фильтры со счётчиками по статусам.
+                 На узком окне переносятся, а не уезжают за край. -->
+            <ItemsControl Grid.Column="1" Margin="10,0,10,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ToggleButton Style="{StaticResource Pill}" Margin="0,0,8,6"
+                              IsChecked="{Binding IsAllSelected, Mode=OneWay}"
+                              Command="{Binding FilterByStatusCommand}" CommandParameter="All">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Все" Foreground="{DynamicResource Brush.Acc}" />
+                        <TextBlock Text="{Binding TotalCount, Converter={StaticResource NumberFormat}}"
+                                   Margin="7,0,0,0" Opacity="0.62"
+                                   FontWeight="{StaticResource Weight.Medium}"
+                                   Foreground="{DynamicResource Brush.Acc}" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <ToggleButton Style="{StaticResource Pill}" Margin="0,0,8,6"
+                              IsChecked="{Binding IsOkSelected, Mode=OneWay}"
+                              Command="{Binding FilterByStatusCommand}" CommandParameter="Ok">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="mark-ok" Size="13" StrokeWeight="1.9" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource Brush.Ok}" />
+                        <TextBlock Text="В порядке" Margin="7,0,0,0" Foreground="{DynamicResource Brush.Ok}" />
+                        <TextBlock Text="{Binding OkCount, Converter={StaticResource NumberFormat}}"
+                                   Margin="7,0,0,0" Opacity="0.62"
+                                   FontWeight="{StaticResource Weight.Medium}"
+                                   Foreground="{DynamicResource Brush.Ok}" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <ToggleButton Style="{StaticResource Pill}" Margin="0,0,8,6"
+                              IsChecked="{Binding IsCorruptedSelected, Mode=OneWay}"
+                              Command="{Binding FilterByStatusCommand}" CommandParameter="Corrupted">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="mark-broken" Size="13" StrokeWeight="1.9" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource Brush.Err}" />
+                        <TextBlock Text="Повреждено" Margin="7,0,0,0" Foreground="{DynamicResource Brush.Err}" />
+                        <TextBlock Text="{Binding CorruptedCount, Converter={StaticResource NumberFormat}}"
+                                   Margin="7,0,0,0" Opacity="0.62"
+                                   FontWeight="{StaticResource Weight.Medium}"
+                                   Foreground="{DynamicResource Brush.Err}" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <ToggleButton Style="{StaticResource Pill}" Margin="0,0,8,6"
+                              IsChecked="{Binding IsWarningSelected, Mode=OneWay}"
+                              Command="{Binding FilterByStatusCommand}" CommandParameter="Warning">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="mark-warning" Size="13" StrokeWeight="1.9" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource Brush.Warn}" />
+                        <TextBlock Text="Предупреждения" Margin="7,0,0,0" Foreground="{DynamicResource Brush.Warn}" />
+                        <TextBlock Text="{Binding WarningCount, Converter={StaticResource NumberFormat}}"
+                                   Margin="7,0,0,0" Opacity="0.62"
+                                   FontWeight="{StaticResource Weight.Medium}"
+                                   Foreground="{DynamicResource Brush.Warn}" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <ToggleButton Style="{StaticResource Pill}" Margin="0,0,8,6"
+                              IsChecked="{Binding IsSkippedSelected, Mode=OneWay}"
+                              Command="{Binding FilterByStatusCommand}" CommandParameter="Skipped">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="mark-skipped" Size="13" StrokeWeight="1.9" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource Brush.Skip}" />
+                        <TextBlock Text="Пропущено" Margin="7,0,0,0" Foreground="{DynamicResource Brush.Skip}" />
+                        <TextBlock Text="{Binding SkippedCount, Converter={StaticResource NumberFormat}}"
+                                   Margin="7,0,0,0" Opacity="0.62"
+                                   FontWeight="{StaticResource Weight.Medium}"
+                                   Foreground="{DynamicResource Brush.Skip}" />
+                    </StackPanel>
+                </ToggleButton>
+            </ItemsControl>
+
+            <ComboBox Grid.Column="2" Style="{StaticResource ComboBox.Pill}"
+                      VerticalAlignment="Top" Padding="12,8" MinWidth="126"
+                      ItemsSource="{Binding Formats}" SelectedItem="{Binding FormatFilter}" />
+        </Grid>
+
+        <!-- ══ Таблица ═══════════════════════════════════════════════════ -->
+        <Border Grid.Row="2" Style="{StaticResource Card}" ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Шапка -->
+                <Border Grid.Row="0" Background="{DynamicResource Brush.Card2}"
+                        BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="0,0,0,1"
+                        Padding="{StaticResource Grid.RowPadding}">
+                    <Grid Margin="0,0,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource Col.Icon}" />
+                            <ColumnDefinition Width="2.15*" />
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="{StaticResource Col.Format}" />
+                            <ColumnDefinition Width="{StaticResource Col.Size}" />
+                            <ColumnDefinition Width="{StaticResource Col.Status}" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="1" Style="{StaticResource Column.Header}"
+                                Margin="{StaticResource Grid.CellGap}"
+                                AutomationProperties.Name="Сортировать по имени"
+                                Command="{Binding SortByCommand}" CommandParameter="Name">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ИМЯ"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <c:MsIcon Style="{StaticResource Sort.Arrow}"
+                                          Visibility="{Binding IsSortedByName, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="2" Style="{StaticResource Column.Header}"
+                                Margin="{StaticResource Grid.CellGap}"
+                                AutomationProperties.Name="Сортировать по пути"
+                                Command="{Binding SortByCommand}" CommandParameter="Path">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПУТЬ"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <c:MsIcon Style="{StaticResource Sort.Arrow}"
+                                          Visibility="{Binding IsSortedByPath, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="3" Style="{StaticResource Column.Header}"
+                                Margin="{StaticResource Grid.CellGap}"
+                                AutomationProperties.Name="Сортировать по формату"
+                                Command="{Binding SortByCommand}" CommandParameter="Format">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ФОРМАТ"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <c:MsIcon Style="{StaticResource Sort.Arrow}"
+                                          Visibility="{Binding IsSortedByFormat, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="4" Style="{StaticResource Column.Header}"
+                                Margin="{StaticResource Grid.CellGap}"
+                                HorizontalContentAlignment="Right"
+                                AutomationProperties.Name="Сортировать по размеру"
+                                Command="{Binding SortByCommand}" CommandParameter="Size">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Text.Eyebrow}" Text="РАЗМЕР"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <c:MsIcon Style="{StaticResource Sort.Arrow}"
+                                          Visibility="{Binding IsSortedBySize, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="5" Style="{StaticResource Column.Header}"
+                                AutomationProperties.Name="Сортировать по статусу"
+                                Command="{Binding SortByCommand}" CommandParameter="Status">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Text.Eyebrow}" Text="СТАТУС"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                                <c:MsIcon Style="{StaticResource Sort.Arrow}"
+                                          Visibility="{Binding IsSortedByStatus, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Строки. Виртуализация обязательна: коллекции бывают
+                     в сотни тысяч файлов (02_ARCHITECTURE.md, раздел 2). -->
+                <!-- Tag держит модель окна. Меню лежит вне визуального дерева
+                     и добирается до данных только через PlacementTarget, а у
+                     самого списка DataContext — модель вкладки, где команд нет. -->
+                <ListBox x:Name="Rows" Grid.Row="1"
+                         ItemsSource="{Binding View}"
+                         SelectedItem="{Binding Selected}"
+                         SelectionMode="Extended"
+                         Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                         PreviewMouseRightButtonDown="OnRowRightClick"
+                         Background="Transparent" BorderThickness="0"
+                         HorizontalContentAlignment="Stretch"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="True"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         VirtualizingPanel.ScrollUnit="Pixel"
+                         VirtualizingPanel.CacheLengthUnit="Page"
+                         MouseDoubleClick="OnRowDoubleClick">
+                    <!-- Меню висит на списке, а не на строке: только так до
+                         команд доходит весь набор выделенных строк
+                         (PlacementTarget.SelectedItems). -->
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Открыть файл"
+                                      Command="{Binding PlacementTarget.Tag.OpenResultCommand,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.SelectedItem,
+                                                                 RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Открыть папку файла"
+                                      Command="{Binding PlacementTarget.Tag.RevealResultCommand,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.SelectedItem,
+                                                                 RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <Separator />
+                            <MenuItem Header="Копировать путь"
+                                      Command="{Binding PlacementTarget.Tag.CopyResultPathsCommand,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      CommandParameter="{Binding PlacementTarget.SelectedItems,
+                                                                 RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <!-- Имя строки читает контейнер, а не содержимое
+                                 шаблона: без этого диктор произносит имя класса
+                                 модели вместо имени файла и его статуса. -->
+                            <Setter Property="AutomationProperties.Name" Value="{Binding DetailsTitle}" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Root" Background="Transparent"
+                                                BorderBrush="{DynamicResource Brush.Bd2}"
+                                                BorderThickness="0,0,0,1">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Root" Property="Background"
+                                                        Value="{DynamicResource Brush.Card2}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Root" Property="Background"
+                                                        Value="{DynamicResource Brush.AccSoft}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:FileResultViewModel}">
+                            <Grid Margin="{Binding DataContext.Settings.RowPadding, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource Col.Icon}" />
+                                    <ColumnDefinition Width="2.15*" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="{StaticResource Col.Format}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Size}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Status}" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Значок статуса: контур 14px внутри цветного
+                                     квадрата 20×20 с радиусом 5 (UI_SPEC.md, раздел 10). -->
+                                <Border Grid.Column="0" Style="{StaticResource Status.Square}"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <c:MsIcon Size="14" StrokeWeight="1.8"
+                                              Kind="{Binding StatusIcon}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              ToolTip="{Binding StatusLabel}" />
+                                </Border>
+
+                                <TextBlock Grid.Column="1" Style="{StaticResource Text.Base}"
+                                           Margin="{StaticResource Grid.CellGap}"
+                                           VerticalAlignment="Center"
+                                           FontWeight="{StaticResource Weight.Medium}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding FileName}" ToolTip="{Binding FullPath}" />
+
+                                <TextBlock Grid.Column="2" Style="{StaticResource Text.Mono}"
+                                           Margin="{StaticResource Grid.CellGap}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding DirectoryPath}" />
+
+                                <TextBlock Grid.Column="3" Style="{StaticResource Text.Base}"
+                                           Margin="{StaticResource Grid.CellGap}"
+                                           VerticalAlignment="Center" FontSize="12"
+                                           Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{Binding Format}" />
+
+                                <TextBlock Grid.Column="4" Style="{StaticResource Text.Number}"
+                                           Margin="{StaticResource Grid.CellGap}"
+                                           VerticalAlignment="Center" FontSize="12"
+                                           TextAlignment="Right"
+                                           Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{Binding Size}" />
+
+                                <!-- Статус: плашка со словом. Значок статуса стоит
+                                     в первой колонке строки, поэтому дублировать его
+                                     внутри плашки не нужно (макет, раздел «Результаты»). -->
+                                <Border Grid.Column="5" Style="{StaticResource Status.Pill}">
+                                    <TextBlock Text="{Binding StatusLabel}"
+                                               FontSize="11.5"
+                                               FontWeight="{StaticResource Weight.Semi}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Пустое состояние -->
+                <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding TotalCount, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}">
+                    <c:MsIcon Kind="table" Size="32" HorizontalAlignment="Center"
+                              Foreground="{DynamicResource Brush.Fg3}" />
+                    <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,14,0,0"
+                               HorizontalAlignment="Center"
+                               Text="Результатов пока нет — выберите папку и начните проверку." />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══ Подробности и плейлисты ═══════════════════════════════════ -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Подробности выбранного файла: человеческая формулировка,
+                 техническая причина — второй строкой (UI_SPEC.md, раздел 9). -->
+            <Border Grid.Column="0" Style="{StaticResource Details.Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПОДРОБНОСТИ ВЫБРАННОГО ФАЙЛА" />
+
+                    <TextBlock Style="{StaticResource Text.Base}" Margin="0,7,0,0"
+                               FontSize="13.5" FontWeight="{StaticResource Weight.Semi}"
+                               TextTrimming="CharacterEllipsis"
+                               Text="{Binding Selected.DetailsTitle, FallbackValue='Файл не выбран'}" />
+
+                    <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,5,0,0"
+                               TextWrapping="Wrap"
+                               Text="{Binding Selected.Description, FallbackValue='Выберите строку в таблице, чтобы увидеть, что именно с файлом не так. Двойной клик открывает папку файла.'}" />
+
+                    <TextBlock Style="{StaticResource Text.Mono}" Margin="0,6,0,0"
+                               TextWrapping="Wrap"
+                               Text="{Binding Selected.TechnicalDetail}"
+                               Visibility="{Binding Selected.TechnicalDetail, Converter={StaticResource NotEmptyToVisibility}}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Сводка по плейлистам -->
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="16,14">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПЛЕЙЛИСТЫ" />
+
+                    <DockPanel LastChildFill="False" Margin="0,8,0,0">
+                        <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Text="Найдено" />
+                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                   FontWeight="{StaticResource Weight.Semi}"
+                                   Text="{Binding PlaylistCount, Converter={StaticResource NumberFormat}}" />
+                    </DockPanel>
+
+                    <DockPanel LastChildFill="False" Margin="0,5,0,0">
+                        <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                   Foreground="{DynamicResource Brush.Fg2}" Text="Битых ссылок" />
+                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                   FontWeight="{StaticResource Weight.Semi}"
+                                   Foreground="{DynamicResource Brush.Err}"
+                                   Text="{Binding PlaylistMissingCount, Converter={StaticResource NumberFormat}}" />
+                    </DockPanel>
+
+                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,10,0,0" TextWrapping="Wrap"
+                               Text="Файл, который встретился и в папке, и в плейлисте, показан одной строкой с одним статусом."
+                               Visibility="{Binding PlaylistCount, Converter={StaticResource NotEmptyToVisibility}}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

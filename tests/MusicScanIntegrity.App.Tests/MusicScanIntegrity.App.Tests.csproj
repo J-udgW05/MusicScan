@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>MusicScanIntegrity.App.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!-- WPF нужен по существу: здесь проверяется поведение свойств зависимостей
+         и анимаций, а его без самого WPF не воспроизвести. -->
+    <UseWPF>true</UseWPF>
+
+    <!-- Приложение собирается только под win-x64 и самодостаточным; тесты
+         ссылаются на него, поэтому платформа должна совпадать. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MusicScanIntegrity.App\MusicScanIntegrity.App.csproj" />
+  </ItemGroup>
+
+  <!-- Словари токенов берутся из исходников как есть: проверять надо тот же
+       файл, который попадает в программу, а не его пересказ. Разобрать его
+       из ресурсов сборки нельзя — адреса pack:// требуют живого Application,
+       которого в тестах нет. -->
+  <ItemGroup>
+    <Content Include="..\..\src\MusicScanIntegrity.App\Resources\Tokens.*.xaml"
+             Link="Tokens\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

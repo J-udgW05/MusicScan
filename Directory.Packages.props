@@ -1,0 +1,41 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Приложение">
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+    <PackageVersion Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Аудио и метаданные">
+    <!-- ManagedBass — управляемая обёртка над native BASS (bass.dll и плагины
+         скачиваются отдельно скриптом tools/fetch-bass.ps1, см. README). -->
+    <PackageVersion Include="ManagedBass" Version="4.0.2" />
+    <PackageVersion Include="TagLibSharp" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="История проверок">
+    <!-- SQLite для базы истории: файл лежит рядом с программой, переносимость
+         сохраняется. System.IO.Hashing — быстрый XxHash3, он в разы шустрее
+         SHA-256, а от хеша здесь нужна только сверка «изменилось или нет». -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+
+    <!-- Явно поднятая native-часть SQLite: та, что тянется по умолчанию
+         (2.1.11), помечена как уязвимая (GHSA-2m69-gcr7-jv3q), и сборка
+         на этом ругается. Пин держит в архиве заведомо свежую библиотеку. -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.core" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup Label="Тесты">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+  </ItemGroup>
+</Project>

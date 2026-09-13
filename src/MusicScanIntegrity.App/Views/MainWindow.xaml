@@ -1,0 +1,237 @@
+﻿<!--
+    Главное окно: заголовок, панель инструментов, вкладки, статусная строка.
+
+    Окно открывается на 880 точках — это же и минимальная ширина. Меньше
+    нельзя: при 880 строка фильтров на вкладке «Результаты» уже занимает две
+    строки, а таблица результатов подходит к пределу читаемости. Больше по
+    умолчанию тоже незачем — вёрстка тянется, и на широком экране окно
+    растягивают сами.
+-->
+<ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
+                 xmlns:v="clr-namespace:MusicScanIntegrity.App.Views"
+                 xmlns:vm="clr-namespace:MusicScanIntegrity.App.ViewModels"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance vm:MainViewModel}"
+                 Title="Music Scan Integrity"
+                 Width="880" Height="760" MinWidth="880" MinHeight="560"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="None"
+                 WindowCornerPreference="Round"
+                 AllowDrop="True"
+                 FontFamily="{StaticResource Font.Ui}"
+                 Background="{DynamicResource Brush.Bg}"
+                 Foreground="{DynamicResource Brush.Fg}"
+                 Drop="OnDrop" DragOver="OnDragOver" DragLeave="OnDragLeave"
+                 Closing="OnClosing">
+
+    <ui:FluentWindow.InputBindings>
+        <!-- Горячие клавиши из раздела справки. -->
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding PickFolderCommand}" />
+        <KeyBinding Key="F5" Command="{Binding StartCommand}" />
+        <KeyBinding Key="R" Modifiers="Control" Command="{Binding RescanCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CloseSettingsCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="OemComma" Modifiers="Control" Command="{Binding OpenSettingsCommand}" />
+    </ui:FluentWindow.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ── Заголовок окна: 44px, название слева ──────────────────────
+             Знака здесь нет намеренно: он уже стоит в панели задач и на
+             кнопке переключения окон, а в заголовке только дублировался. -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Chrome}"
+                BorderBrush="{DynamicResource Brush.ChromeLine}" BorderThickness="0,0,0,1">
+            <ui:TitleBar Height="44" ButtonsForeground="{DynamicResource Brush.Fg2}" ShowMaximize="True" ShowMinimize="True" ShowClose="True">
+                <ui:TitleBar.Header>
+                    <TextBlock Text="Music Scan Integrity"
+                               Margin="14,0,0,0" VerticalAlignment="Center"
+                               FontSize="{StaticResource Size.TitleBar}"
+                               Foreground="{DynamicResource Brush.Fg2}" />
+                </ui:TitleBar.Header>
+            </ui:TitleBar>
+        </Border>
+
+        <!-- ── Панель инструментов ───────────────────────────────────────── -->
+        <Border Grid.Row="1" Background="{DynamicResource Brush.Chrome}"
+                BorderBrush="{DynamicResource Brush.ChromeLine}" BorderThickness="0,0,0,1"
+                Padding="14,10">
+            <DockPanel LastChildFill="False">
+                <Button DockPanel.Dock="Left" Style="{StaticResource Button.Accent}"
+                        Command="{Binding PickFolderCommand}" Margin="0,0,8,0"
+                        AutomationProperties.Name="Выбрать папку"
+                        ToolTip="Выбрать папку с музыкой (Ctrl+O)">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="folder" Size="16" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Выбрать папку" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Повторная проверка той же папки: содержимое могло
+                     измениться, а заново выбирать путь незачем. -->
+                <!-- Экспорт отсюда убран: он живёт на вкладке «Отчёт», рядом
+                     с тем, что будет сохранено, и вызывается сочетанием Ctrl+S. -->
+                <Button DockPanel.Dock="Left" Style="{StaticResource Button.Outline}"
+                        Command="{Binding RescanCommand}"
+                        AutomationProperties.Name="Проверить заново"
+                        ToolTip="Проверить ту же папку ещё раз (Ctrl+R)">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="retry" Size="16" Margin="0,0,7,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Проверить заново" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Ghost}"
+                        Command="{Binding ShowAboutCommand}"
+                        AutomationProperties.Name="О программе">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="info" Size="16" Margin="0,0,7,0" VerticalAlignment="Center" />
+                        <TextBlock Text="О программе" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Ghost}"
+                        Command="{Binding ShowHelpCommand}"
+                        AutomationProperties.Name="Справка">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="help" Size="16" Margin="0,0,7,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Справка" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Настройки открываются окном, как справка и «О программе»,
+                     поэтому кнопка стоит с ними, а не среди рабочих действий. -->
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Ghost}"
+                        Command="{Binding OpenSettingsCommand}"
+                        AutomationProperties.Name="Настройки"
+                        ToolTip="Настройки (Ctrl+,)">
+                    <StackPanel Orientation="Horizontal">
+                        <c:MsIcon Kind="settings" Size="16" Margin="0,0,7,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Настройки" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Вкладки ───────────────────────────────────────────────────── -->
+        <!-- Обрезка по границам: анимация появления сдвигает содержимое
+             преобразованием, а оно само по себе ничем не ограничено —
+             сдвинутый экран нарисовался бы поверх панели инструментов. -->
+        <TabControl Grid.Row="2" Style="{StaticResource Tabs}"
+                    ClipToBounds="True"
+                    SelectedIndex="{Binding SelectedTab, Mode=TwoWay}"
+                    Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}">
+
+            <TabItem Style="{StaticResource Tab}" Header="Проверка">
+                <v:ScanView />
+            </TabItem>
+
+            <TabItem Style="{StaticResource Tab}" AutomationProperties.Name="Результаты">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Результаты" />
+                        <TextBlock Text="{Binding Results.TotalLabel}" Margin="6,0,0,0"
+                                   Opacity="0.6" FontWeight="{StaticResource Weight.Medium}"
+                                   Visibility="{Binding Results.TotalCount, Converter={StaticResource NotEmptyToVisibility}}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <v:ResultsView />
+            </TabItem>
+
+            <TabItem Style="{StaticResource Tab}" Header="Отчёт">
+                <v:ReportView />
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ── Экран настроек: вместо вкладок, со стрелкой назад ─────────────
+             Вкладки на это время прячутся, а не закрываются фоном: с подложкой
+             Mica фон страницы прозрачен, и закрывать им нечего. -->
+        <Border Grid.Row="2" Background="{DynamicResource Brush.Bg}" ClipToBounds="True"
+                Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{DynamicResource Brush.Chrome}"
+                        BorderBrush="{DynamicResource Brush.ChromeLine}" BorderThickness="0,0,0,1"
+                        Padding="14,10">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource Button.Ghost}" Padding="8,6"
+                                AutomationProperties.Name="Назад"
+                                ToolTip="Вернуться к работе (Esc)"
+                                Command="{Binding CloseSettingsCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <!-- Стрелки назад в наборе нет, поэтому берётся
+                                     та же «галочка» списка, повёрнутая влево. -->
+                                <c:MsIcon Kind="chevron-down" Size="16" VerticalAlignment="Center"
+                                          RenderTransformOrigin="0.5,0.5">
+                                    <c:MsIcon.RenderTransform>
+                                        <RotateTransform Angle="90" />
+                                    </c:MsIcon.RenderTransform>
+                                </c:MsIcon>
+                                <TextBlock Text="Назад" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="Настройки" Margin="14,0,0,0" VerticalAlignment="Center"
+                                   FontSize="{StaticResource Size.CardTitle}"
+                                   FontWeight="{StaticResource Weight.Semi}" />
+                    </StackPanel>
+                </Border>
+
+                <v:SettingsView Grid.Row="1" />
+            </Grid>
+        </Border>
+
+        <!-- ── Статусная строка ──────────────────────────────────────────── -->
+        <Border Grid.Row="3" Background="{DynamicResource Brush.Mica}"
+                BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="0,1,0,0"
+                Padding="16,9"
+                Visibility="{Binding Settings.ShowStatusBar, Converter={StaticResource BoolToVisibility}}">
+            <!-- Путь идёт последним и заполняет всю оставшуюся ширину:
+                 он длиннее остального и должен обрезаться как можно позже. -->
+            <DockPanel LastChildFill="True">
+                <TextBlock DockPanel.Dock="Left" Text="{Binding StatusCounts}" VerticalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource Brush.Fg2}" />
+
+                <TextBlock DockPanel.Dock="Left" Text="|" Margin="14,0"
+                           Foreground="{DynamicResource Brush.Bd}" VerticalAlignment="Center"
+                           Visibility="{Binding FolderPath, Converter={StaticResource NotEmptyToVisibility}}" />
+
+                <TextBlock Text="{Binding FolderPath}" VerticalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource Brush.Fg2}"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding FolderPath}" />
+            </DockPanel>
+        </Border>
+
+        <!-- Подсветка окна при перетаскивании папки. -->
+        <Border x:Name="DropOverlay" Grid.Row="0" Grid.RowSpan="4"
+                Background="{DynamicResource Brush.AccSoft}" Opacity="0.92"
+                Visibility="Collapsed" IsHitTestVisible="False">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <c:MsIcon Kind="folder" Size="36" StrokeWeight="1.5" HorizontalAlignment="Center"
+                          Foreground="{DynamicResource Brush.Acc}" />
+                <TextBlock Text="Отпустите папку — подсчёт начнётся сразу"
+                           Margin="0,14,0,0" FontSize="15"
+                           FontWeight="{StaticResource Weight.Semi}"
+                           Foreground="{DynamicResource Brush.Acc}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</ui:FluentWindow>

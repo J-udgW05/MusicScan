@@ -1,0 +1,249 @@
+﻿name: Релиз
+
+# Релиз выпускается по тегу вида v1.2.3 либо вручную с указанием версии.
+#   git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версия без префикса v, например 1.0.1'
+        required: true
+        type: string
+      prerelease:
+        description: 'Пометить как предварительный выпуск'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Собрать и опубликовать
+    runs-on: windows-latest
+
+    steps:
+      - name: Забрать исходники
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # нужна вся история, чтобы собрать список изменений
+
+      - name: Определить версию
+        id: version
+        shell: pwsh
+        run: |
+          $version = if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+              '${{ inputs.version }}'
+          } else {
+              '${{ github.ref_name }}'.TrimStart('v')
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+              throw "Версия «$version» не похожа на 1.2.3"
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=v$version"    >> $env:GITHUB_OUTPUT
+          Write-Host "Версия релиза: $version"
+
+      - name: Поставить .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Восстановить пакеты
+        run: dotnet restore MusicScanIntegrity.sln
+
+      # Для релиза библиотеки BASS обязательны: без них программа не проверит
+      # ни одного файла, и выкладывать такую сборку нельзя.
+      - name: Скачать библиотеки BASS
+        run: pwsh tools/fetch-bass.ps1
+
+      - name: Убедиться, что BASS на месте
+        shell: pwsh
+        run: |
+          $dlls = Get-ChildItem 'native/bass/x64' -Filter *.dll -ErrorAction SilentlyContinue
+          if (-not (Test-Path 'native/bass/x64/bass.dll')) {
+              throw 'Не скачалась bass.dll — релиз без декодера бессмысленен.'
+          }
+          Write-Host "Библиотек BASS: $($dlls.Count)"
+          $dlls | ForEach-Object { "  $($_.Name)" }
+
+      - name: Прогнать тесты
+        run: dotnet test MusicScanIntegrity.sln -c Release --nologo
+
+      - name: Собрать переносимую версию
+        shell: pwsh
+        run: |
+          dotnet publish src/MusicScanIntegrity.App/MusicScanIntegrity.App.csproj `
+            -c Release -r win-x64 --self-contained true `
+            -p:Version=${{ steps.version.outputs.version }} `
+            -o artifacts/publish --nologo
+
+          # Отладочные символы в переносимой сборке ни к чему.
+          Get-ChildItem artifacts/publish -Filter *.pdb -Recurse | Remove-Item -Force
+
+      - name: Проверить состав сборки
+        shell: pwsh
+        run: |
+          $required = @(
+              'Music_Scan_Integrity.exe',
+              'MusicScanIntegrity.Core.dll',
+              'bass/bass.dll'
+          )
+
+          foreach ($item in $required) {
+              if (-not (Test-Path "artifacts/publish/$item")) {
+                  throw "В сборке нет обязательного файла: $item"
+              }
+          }
+
+          $size = (Get-ChildItem artifacts/publish -Recurse -File | Measure-Object Length -Sum).Sum / 1MB
+          Write-Host ("Размер сборки: {0:N0} МБ" -f $size)
+
+      - name: Упаковать
+        id: package
+        shell: pwsh
+        run: |
+          # Имя архива — по имени самой программы, как её видно в системе.
+          $name = "Music_Scan_Integrity-${{ steps.version.outputs.version }}-win-x64"
+          $zip = "artifacts/$name.zip"
+
+          Compress-Archive -Path 'artifacts/publish/*' -DestinationPath $zip -CompressionLevel Optimal
+
+          # Сумму считаем только для журнала сборки: рядом с каждым файлом
+          # выпуска GitHub показывает свою, и отдельный файл с ней дублировал
+          # бы то, что и так на виду.
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+
+          "zip=$zip"     >> $env:GITHUB_OUTPUT
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Архив: $zip"
+          Write-Host "SHA-256: $hash"
+
+      - name: Собрать установщик
+        id: setup
+        shell: pwsh
+        run: |
+          # На образе windows-latest Inno Setup обычно уже стоит; если нет —
+          # ставим. Проверять наличие дешевле, чем ставить каждый раз.
+          $iscc = Get-ChildItem 'C:\Program Files (x86)\Inno Setup*', 'C:\Program Files\Inno Setup*' `
+              -Filter 'ISCC.exe' -Recurse -ErrorAction SilentlyContinue |
+              Select-Object -First 1 -ExpandProperty FullName
+
+          if (-not $iscc) {
+              Write-Host 'Inno Setup не найден — устанавливаем.'
+              choco install innosetup --no-progress -y
+              $iscc = Get-ChildItem 'C:\Program Files (x86)\Inno Setup*', 'C:\Program Files\Inno Setup*' `
+                  -Filter 'ISCC.exe' -Recurse -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+          }
+
+          if (-not $iscc) { throw 'ISCC.exe не найден и не установился.' }
+          Write-Host "Inno Setup: $iscc"
+
+          & $iscc "/DAppVersion=${{ steps.version.outputs.version }}" installer/MusicScanIntegrity.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Установщик не собрался.' }
+
+          $name = "Music_Scan_Integrity-${{ steps.version.outputs.version }}-setup"
+          $exe = "artifacts/$name.exe"
+          if (-not (Test-Path $exe)) { throw "Установщик не найден: $exe" }
+
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash
+
+          "exe=$exe"     >> $env:GITHUB_OUTPUT
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+
+          Write-Host ("Установщик: {0} ({1:N1} МБ)" -f $exe, ((Get-Item $exe).Length / 1MB))
+          Write-Host "SHA-256: $hash"
+
+      - name: Составить описание выпуска
+        id: notes
+        shell: pwsh
+        run: |
+          $notes = @'
+          ## Music Scan Integrity ${{ steps.version.outputs.version }}
+
+          Проверка музыкальной коллекции на повреждённые файлы.
+
+          ### Установка
+
+          Два способа, файлы внутри одни и те же.
+
+          **Установщик** `Music_Scan_Integrity-${{ steps.version.outputs.version }}-setup.exe` —
+          обычная установка в «Program Files», значки в меню Пуск и на рабочем столе,
+          удаление через «Приложения и возможности».
+
+          **Переносимая версия** `Music_Scan_Integrity-${{ steps.version.outputs.version }}-win-x64.zip` —
+          распакуйте в любую папку и запустите `Music_Scan_Integrity.exe`. Ничего
+          не устанавливается, папку можно унести на флешке.
+
+          .NET на компьютере не нужен ни в том, ни в другом случае — всё лежит внутри.
+
+          > При первом запуске Windows покажет «Неизвестный издатель»: сборка не подписана
+          > цифровым сертификатом. Нажмите «Подробнее» → «Выполнить в любом случае».
+
+          ### Что внутри
+
+          Windows 10/11 64-бит. Библиотеки декодирования BASS (© un4seen developments)
+          входят в сборку и распространяются по условиям их лицензии: бесплатно
+          для некоммерческого использования.
+          '@
+
+          $notes | Out-File 'artifacts/notes.md' -Encoding utf8
+          Write-Host $notes
+
+      - name: Опубликовать выпуск
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ steps.version.outputs.tag }}'
+
+          # Ручной запуск может идти без тега — создаём его на текущем коммите.
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+              git tag $tag
+              git push origin $tag
+          }
+
+          $assets = @(
+              '${{ steps.setup.outputs.exe }}',
+              '${{ steps.package.outputs.zip }}'
+          )
+
+          # Выпуск под этим тегом мог быть создан заранее — например руками.
+          # Тогда файлы докладываются в него, а не создаётся второй.
+          gh release view $tag *> $null
+          $exists = $LASTEXITCODE -eq 0
+
+          if ($exists) {
+              Write-Host "Выпуск $tag уже есть — обновляем файлы и описание."
+
+              & gh release edit $tag `
+                  --title "Music Scan Integrity ${{ steps.version.outputs.version }}" `
+                  --notes-file 'artifacts/notes.md'
+              if ($LASTEXITCODE -ne 0) { throw 'Не удалось обновить описание выпуска.' }
+
+              & gh release upload $tag @assets --clobber
+              if ($LASTEXITCODE -ne 0) { throw 'Не удалось приложить файлы к выпуску.' }
+          }
+          else {
+              $arguments = @(
+                  'release', 'create', $tag
+              ) + $assets + @(
+                  '--title', 'Music Scan Integrity ${{ steps.version.outputs.version }}',
+                  '--notes-file', 'artifacts/notes.md',
+                  '--generate-notes'
+              )
+
+              if ('${{ github.event_name }}' -eq 'workflow_dispatch' -and '${{ inputs.prerelease }}' -eq 'true') {
+                  $arguments += '--prerelease'
+              }
+
+              & gh @arguments
+              if ($LASTEXITCODE -ne 0) { throw 'Не удалось опубликовать выпуск.' }
+          }

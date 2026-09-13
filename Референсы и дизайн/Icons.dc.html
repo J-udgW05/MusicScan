@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#8f8f93; font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#2f6fd0; } a:hover { color:#1d4f9e; }
+</style>
+</helmet>
+
+<div style="--bg:#f3f3f3;--mica:#f9f9fb;--card:#ffffff;--card2:#fbfbfd;--bd:#e3e3e6;--bd2:#ececef;--fg:#1a1a1c;--fg2:#5c5c62;--fg3:#8b8b92;--acc:#2f6fd0;--accfg:#ffffff;--accsoft:#eaf1fc;--ok:#0f7b3f;--okbg:#e8f6ed;--err:#c42b2f;--errbg:#fdecec;--warn:#8a5a06;--warnbg:#fdf3e2;--skip:#6f6f76;--skipbg:#efeff1;--desk:#8f8f93;--shadow:0 12px 40px rgba(0,0,0,.28);--grid:rgba(0,0,0,.09);--gridb:rgba(0,0,0,.18); {{ themeVars }} min-height:100%;padding:44px;box-sizing:border-box;display:flex;justify-content:center;background:var(--desk)">
+  <div style="width:1240px;max-width:100%">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72);font-weight:600">MusicScan · библиотека иконок</div>
+        <div style="font-size:30px;font-weight:650;color:#fff;letter-spacing:-.02em;margin-top:6px">Иконки — референс и правила построения</div>
+      </div>
+      <div style="display:flex;gap:8px;background:rgba(255,255,255,.16);padding:5px;border-radius:999px">
+        <div onClick="{{ setLight }}" style="padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;color:#fff; {{ lightBtn }}">Светлая</div>
+        <div onClick="{{ setDark }}" style="padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;color:#fff; {{ darkBtn }}">Тёмная</div>
+      </div>
+    </div>
+
+    <!-- Правила построения -->
+    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--shadow);padding:24px;display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;margin-bottom:22px">
+      <div>
+        <svg width="228" height="228" viewBox="0 0 20 20" style="display:block;background:var(--card);border:1px solid var(--bd);border-radius:10px">
+          <g stroke="var(--grid)" stroke-width="0.08">
+            <path d="M2 0v20M4 0v20M6 0v20M8 0v20M10 0v20M12 0v20M14 0v20M16 0v20M18 0v20"></path>
+            <path d="M0 2h20M0 4h20M0 6h20M0 8h20M0 10h20M0 12h20M0 14h20M0 16h20M0 18h20"></path>
+          </g>
+          <rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="var(--gridb)" stroke-width="0.1" stroke-dasharray="0.6 0.4"></rect>
+          <circle cx="10" cy="10" r="7" fill="none" stroke="var(--gridb)" stroke-width="0.1" stroke-dasharray="0.6 0.4"></circle>
+          <g fill="none" stroke="var(--acc)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10" cy="10" r="6.75"></circle>
+            <path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path>
+          </g>
+        </svg>
+        <div style="font-size:11.5px;color:var(--fg3);margin-top:10px;line-height:1.5">Сетка 20×20 · живая область 17×17 · окружность-ориентир Ø 13,5</div>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:650;color:var(--fg)">Правила</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+          <sc-for list="{{ rules }}" as="r" hint-placeholder-count="8">
+            <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:13px 15px">
+              <div style="font-size:12.5px;font-weight:650;color:var(--fg)">{{ r.t }}</div>
+              <div style="font-size:12px;color:var(--fg2);margin-top:4px;line-height:1.5">{{ r.d }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:22px;margin-top:16px;background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px 16px;flex-wrap:wrap">
+          <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Размеры</div>
+          <div style="display:flex;align-items:flex-end;gap:20px;color:var(--fg)">
+            <div style="text-align:center"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg><div style="font-size:11px;color:var(--fg3);margin-top:5px">16 · строки</div></div>
+            <div style="text-align:center"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg><div style="font-size:11px;color:var(--fg3);margin-top:5px">20 · панели</div></div>
+            <div style="text-align:center"><svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg><div style="font-size:11px;color:var(--fg3);margin-top:5px">24 · диалоги</div></div>
+            <div style="text-align:center"><svg width="32" height="32" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg><div style="font-size:11px;color:var(--fg3);margin-top:5px">32 · пустые состояния</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Наборы -->
+    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--shadow);overflow:hidden">
+
+      <!-- Приложение и панель инструментов -->
+      <div style="padding:20px 24px 8px">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Приложение и панель инструментов</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:8px 24px 22px">
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.75 5.75c0-.55.45-1 1-1h3.15c.3 0 .58.13.77.36L9 6.75h7.25c.55 0 1 .45 1 1v6.5c0 .55-.45 1-1 1H3.75c-.55 0-1-.45-1-1z"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">folder</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Выбрать папку</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.75h3.4M11.4 6.75h5.6M3 13.25h5.6M13.6 13.25H17"></path><circle cx="8.9" cy="6.75" r="2"></circle><circle cx="11.1" cy="13.25" r="2"></circle></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">settings</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Настройки</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5v8.25m0 0 3.1-3.1M10 11.75 6.9 8.65"></path><path d="M3.75 13v2.5c0 .55.45 1 1 1h10.5c.55 0 1-.45 1-1V13"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">export</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Экспорт отчёта</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="M8.1 8.05a1.95 1.95 0 1 1 2.75 1.85c-.55.24-.85.6-.85 1.15v.35"></path><path d="M10 14.05h.01"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">help</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Справка</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="M10 9.4v4"></path><path d="M10 6.6h.01"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">info</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">О программе</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.9" cy="8.9" r="4.9"></circle><path d="m12.6 12.6 3.9 3.9"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">search</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Поиск</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.25 8.6v2.8M7.5 5.6v8.8M10.75 3.5v13M14 6.6v6.8M17.25 8.9v2.2"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">waveform</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Знак приложения</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5v7.5m0 0 2.9-2.9M10 11 7.1 8.1"></path><path d="M3.75 12.25v3.25c0 .55.45 1 1 1h10.5c.55 0 1-.45 1-1v-3.25"></path><path d="M6.5 6.25 3.75 3.5M13.5 6.25l2.75-2.75"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">drop-zone</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Перетащите папку</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25h13M3.5 10h13M3.5 14.75h9"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">menu</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Меню, «ещё»</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.25h13l-5.1 6.05v4.6l-2.8-1.7v-2.9z"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">filter</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Фильтры результатов</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7.25" y="3.75" width="9" height="9" rx="1.1"></rect><path d="M12.75 15.25v1c0 .55-.45 1-1 1H4.75c-.55 0-1-.45-1-1V8.25c0-.55.45-1 1-1h1"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">copy</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Скопировать путь, лог</div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.25 6.25h11.5"></path><path d="M7.75 6.25V5c0-.5.4-.9.9-.9h2.7c.5 0 .9.4.9.9v1.25"></path><path d="m5.9 6.25.65 8.85c.04.53.48.9 1 .9h4.9c.52 0 .96-.37 1-.9l.65-8.85"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">clear</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Очистить лог</div>
+        </div>
+      </div>
+
+      <!-- Вкладки -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Вкладки и разделы</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:8px 24px 22px">
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.75 5.75c0-.55.45-1 1-1h3.15c.3 0 .58.13.77.36L9 6.75h3.1"></path><path d="M2.75 5.75v8.5c0 .55.45 1 1 1h5.5"></path><circle cx="13.4" cy="11.4" r="3.4"></circle><path d="m15.9 13.9 1.6 1.6"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">scan</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Проверка</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="4.25" width="13.5" height="11.5" rx="1"></rect><path d="M3.25 8.1h13.5M8.1 8.1v7.65M3.25 11.95h13.5"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">table</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Результаты</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.25 3.75h5.9l3.6 3.6v7.9c0 .55-.45 1-1 1H6.25c-.55 0-1-.45-1-1V4.75c0-.55.45-1 1-1z"></path><path d="M11.05 3.75v3.7h3.7"></path><path d="M7.75 12.75v-2M10 12.75v-3.5M12.25 12.75v-1.25"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">report</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Отчёт</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="4.25" width="13.5" height="11.5" rx="1"></rect><path d="m6.4 8.1 1.85 1.85L6.4 11.8M10.4 11.9h3.4"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">logs</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Логи</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.25 3.75v12.5M14.75 3.75v12.5"></path><path d="M5.25 7.4h2.6M12.15 12.6h2.6"></path><circle cx="9.9" cy="7.4" r="2.05"></circle><circle cx="10.1" cy="12.6" r="2.05"></circle></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">tune</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Параметры проверки</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.25 15.75V9.5M8.9 15.75V4.25M13.55 15.75v-4.5M17.5 15.75v-8.5"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">stats</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Сводка, распределение</div>
+        </div>
+      </div>
+
+      <!-- Управление проверкой -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Управление проверкой</div>
+        <div style="font-size:12px;color:var(--fg3);margin-top:4px">Единственная группа с заливкой: элементы управления воспроизведением традиционно сплошные</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:8px 24px 22px">
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="var(--fg)" stroke="none"><path d="M7.2 5.1a.9.9 0 0 1 1.36-.78l6.1 3.9a.9.9 0 0 1 0 1.56l-6.1 3.9A.9.9 0 0 1 7.2 12.9z"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">play</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Начать</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="var(--fg)" stroke="none"><rect x="6.1" y="4.6" width="2.9" height="10.8" rx="1"></rect><rect x="11" y="4.6" width="2.9" height="10.8" rx="1"></rect></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">pause</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Пауза</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="var(--err)" stroke="none"><rect x="5.4" y="5.4" width="9.2" height="9.2" rx="1.4"></rect></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">stop</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Остановить</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.4 10.3a6.4 6.4 0 1 1-2.1-4.75"></path><path d="M16.5 3.4v2.9h-2.9"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">retry</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Повторить</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.75"></circle><path d="M10 6.3V10l2.7 1.6"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">clock</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Таймаут, осталось времени</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8.4 6.4 3.6 3.6-3.6 3.6"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">current</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Текущий файл в строке</div>
+        </div>
+      </div>
+
+      <!-- Статусы -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Статусы</div>
+        <div style="font-size:12px;color:var(--fg3);margin-top:4px">Форма силуэта различима без цвета: галочка, крест, треугольник, тире</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 24px 22px">
+        <div style="background:var(--okbg);border:1px solid var(--bd);border-radius:9px;padding:16px;display:flex;align-items:center;gap:13px">
+          <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="var(--ok)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg>
+          <div><div style="font-size:12.5px;font-weight:650;color:var(--fg)">status-ok</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">В порядке</div></div>
+        </div>
+        <div style="background:var(--errbg);border:1px solid var(--bd);border-radius:9px;padding:16px;display:flex;align-items:center;gap:13px">
+          <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="var(--err)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="m7.5 7.5 5 5M12.5 7.5l-5 5"></path></svg>
+          <div><div style="font-size:12.5px;font-weight:650;color:var(--fg)">status-broken</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">Повреждён</div></div>
+        </div>
+        <div style="background:var(--warnbg);border:1px solid var(--bd);border-radius:9px;padding:16px;display:flex;align-items:center;gap:13px">
+          <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="var(--warn)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10.9 3.85l6.05 10.85c.37.67-.11 1.5-.88 1.5H3.93c-.77 0-1.25-.83-.88-1.5L9.1 3.85a1 1 0 0 1 1.8 0z"></path><path d="M10 8.1v3.3M10 13.7h.01"></path></svg>
+          <div><div style="font-size:12.5px;font-weight:650;color:var(--fg)">status-warning</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">Предупреждение</div></div>
+        </div>
+        <div style="background:var(--skipbg);border:1px solid var(--bd);border-radius:9px;padding:16px;display:flex;align-items:center;gap:13px">
+          <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="var(--skip)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="M6.9 10h6.2"></path></svg>
+          <div><div style="font-size:12.5px;font-weight:650;color:var(--fg)">status-skipped</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">Пропущен</div></div>
+        </div>
+      </div>
+
+      <!-- Файлы и объекты -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Файлы и объекты</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:8px 24px 22px">
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.1 4.6v7.75"></path><circle cx="10.5" cy="12.6" r="2.6"></circle><path d="M13.1 4.6 16.5 5.6"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">audio-file</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Аудиофайл</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.25 5.5h8.5M3.25 9.4h6M3.25 13.3h4.75"></path><path d="M16.5 7.35v5.2"></path><circle cx="14.4" cy="13.9" r="2.1"></circle></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">playlist</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Плейлист M3U, PLS, CUE</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.9"></circle><circle cx="10" cy="10" r="2.2"></circle></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">disc-image</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">ISO, SACD</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.75 10.55V5.4c0-.5.4-.9.9-.9h5.1c.24 0 .47.1.64.27l4.5 4.5c.35.35.35.92 0 1.27l-4.7 4.7a.9.9 0 0 1-1.27 0l-4.9-4.9z"></path><path d="M7.85 7.85h.01"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">tags</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Метаданные</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="4.5" width="13.5" height="11" rx="1"></rect><path d="M3.25 11.25h13.5"></path><path d="M6 13.6h.01"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">drive</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Диск, сетевая папка</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4.6" y="9.1" width="10.8" height="6.9" rx="1.1"></rect><path d="M7.3 9.1V7.35a2.7 2.7 0 0 1 5.4 0V9.1"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">busy-file</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Файл занят, нет доступа</div>
+        </div>
+      </div>
+
+      <!-- Интерфейс и тема -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">Интерфейс и тема</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:8px 24px 24px">
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5.6 8.2 4.4 4.4 4.4-4.4"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">chevron-down</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Выпадающий список</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15.75V4.25m0 0 3.5 3.5M10 4.25 6.5 7.75"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">sort</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Сортировка столбца</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.6 4.4h4v4M15.6 4.4 9.9 10.1"></path><path d="M14.1 11.8v2.9c0 .55-.45 1-1 1H5.4c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h2.9"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">open-external</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Открыть в проводнике</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="3.4"></circle><path d="M10 2.6v2M10 15.4v2M2.6 10h2M15.4 10h2M4.75 4.75l1.4 1.4M13.85 13.85l1.4 1.4M15.25 4.75l-1.4 1.4M6.15 13.85l-1.4 1.4"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">theme-light</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Светлая тема</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.9 12.35A6.4 6.4 0 0 1 7.65 4.1a6.75 6.75 0 1 0 8.25 8.25z"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">theme-dark</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Тёмная тема</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:14px;text-align:center">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.75" y="4.25" width="14.5" height="9.5" rx="1"></rect><path d="M7.5 16.5h5"></path></svg>
+          <div style="font-size:12px;font-weight:650;color:var(--fg);margin-top:9px">theme-system</div>
+          <div style="font-size:11px;color:var(--fg3);margin-top:2px">Как в системе</div>
+        </div>
+      </div>
+
+      <!-- В контексте -->
+      <div style="padding:16px 24px 8px;border-top:1px solid var(--bd)">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);font-weight:650">В контексте</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;padding:8px 24px 26px;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--acc);color:var(--accfg);padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.75 5.75c0-.55.45-1 1-1h3.15c.3 0 .58.13.77.36L9 6.75h7.25c.55 0 1 .45 1 1v6.5c0 .55-.45 1-1 1H3.75c-.55 0-1-.45-1-1z"></path></svg>
+          Выбрать папку
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--bd);color:var(--fg);padding:8px 13px;border-radius:6px;font-size:13px">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 6.75h3.4M11.4 6.75h5.6M3 13.25h5.6M13.6 13.25H17"></path><circle cx="8.9" cy="6.75" r="2"></circle><circle cx="11.1" cy="13.25" r="2"></circle></svg>
+          Настройки
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--okbg);color:var(--ok);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:650">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="m6.75 10.25 2.4 2.4 4.6-5.1"></path></svg>
+          В порядке
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--errbg);color:var(--err);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:650">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="m7.5 7.5 5 5M12.5 7.5l-5 5"></path></svg>
+          Повреждён
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--warnbg);color:var(--warn);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:650">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10.9 3.85l6.05 10.85c.37.67-.11 1.5-.88 1.5H3.93c-.77 0-1.25-.83-.88-1.5L9.1 3.85a1 1 0 0 1 1.8 0z"></path><path d="M10 8.1v3.3M10 13.7h.01"></path></svg>
+          Нет тегов
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--skipbg);color:var(--skip);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:650">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="10" cy="10" r="6.75"></circle><path d="M6.9 10h6.2"></path></svg>
+          Пропущен
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--fg3);min-width:220px">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="8.9" cy="8.9" r="4.9"></circle><path d="m12.6 12.6 3.9 3.9"></path></svg>
+          Поиск по имени файла
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.72);text-align:center">Все иконки — обводка currentColor, единый viewBox 0 0 20 20 · разметка берётся из этого файла как есть</div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;\&quot;light\&quot; | \&quot;dark\&quot;&quot;}}">
+const DARK = "--bg:#1c1c1e;--mica:#202022;--card:#26262a;--card2:#2c2c31;--bd:#38383e;--bd2:#303036;--fg:#f2f2f4;--fg2:#b0b0b8;--fg3:#84848d;--acc:#5b9bf3;--accfg:#10233c;--accsoft:#1e2b3d;--ok:#5ec27f;--okbg:#1c3227;--err:#ff7075;--errbg:#3a2024;--warn:#f0b429;--warnbg:#372c15;--skip:#9a9aa2;--skipbg:#2b2b30;--desk:#0f0f11;--grid:rgba(255,255,255,.08);--gridb:rgba(255,255,255,.2);--shadow:0 18px 50px rgba(0,0,0,.55);";
+
+class Component extends DCLogic {
+  state = { theme: null };
+  renderVals() {
+    const t = this.state.theme || this.props.theme || "light";
+    const on = "background:rgba(255,255,255,.28);";
+    return {
+      themeVars: t === "dark" ? DARK : "",
+      lightBtn: t === "light" ? on : "", darkBtn: t === "dark" ? on : "",
+      setLight: () => this.setState({ theme: "light" }), setDark: () => this.setState({ theme: "dark" }),
+      rules: [
+        { t: "Сетка 20×20", d: "Единый viewBox 0 0 20 20 для всех иконок. Координаты кратны 0,25 — линии не размываются." },
+        { t: "Живая область 17×17", d: "Отступ 1,5 по краям. Оптический баланс важнее формального центра." },
+        { t: "Обводка 1,5", d: "На 16 px — 1,6; на 24 px — 1,5; на 32 px — 1,4. Так вес линии выглядит одинаково." },
+        { t: "Скругления", d: "Круглые концы и стыки линий, радиус углов прямоугольников 1–1,4." },
+        { t: "Только обводка", d: "Заливка допускается лишь у play, pause и stop — иначе набор распадается." },
+        { t: "currentColor", d: "Цвет наследуется от текста рядом. Отдельных цветных версий иконок нет." },
+        { t: "Один смысл — одна иконка", d: "Иконка не переиспользуется для другого действия, даже если подходит по форме." },
+        { t: "Не тоньше 1,5 и не мельче 16", d: "В строках таблицы 16 px, в диалогах 24 px, в пустых состояниях 32 px." }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>
