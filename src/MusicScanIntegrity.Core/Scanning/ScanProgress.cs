@@ -2,38 +2,35 @@ using MusicScanIntegrity.Core.Models;
 
 namespace MusicScanIntegrity.Core.Scanning;
 
-/// <summary>Состояние проверки.</summary>
+/// <summary>Scan state.</summary>
 public enum ScanState
 {
-    /// <summary>Проверка не запускалась.</summary>
+    /// <summary>Never started.</summary>
     Idle,
 
-    /// <summary>Идёт быстрый обход папки.</summary>
+    /// <summary>Walking the folder.</summary>
     Discovering,
 
-    /// <summary>Идёт проверка файлов.</summary>
+    /// <summary>Checking files.</summary>
     Running,
 
-    /// <summary>Пауза: начатые файлы дорабатываются, новые не берутся.</summary>
+    /// <summary>Paused: files in flight finish, no new ones are taken.</summary>
     Paused,
 
-    /// <summary>Проверка завершена.</summary>
+    /// <summary>Finished.</summary>
     Completed,
 
-    /// <summary>Проверка остановлена пользователем.</summary>
+    /// <summary>Stopped by the user.</summary>
     Stopped,
 
-    /// <summary>Проверка прервана критическим сбоем декодера.</summary>
+    /// <summary>Aborted by a critical decoder failure.</summary>
     Failed,
 }
 
-/// <summary>Снимок хода проверки для интерфейса.</summary>
-/// <param name="State">Состояние.</param>
-/// <param name="Counters">Счётчики.</param>
-/// <param name="CurrentFile">Файл, который проверяется прямо сейчас.</param>
-/// <param name="Elapsed">Сколько времени идёт проверка.</param>
-/// <param name="Parallelism">Сколько файлов проверяется одновременно.</param>
-/// <param name="PendingLockedQuestions">Сколько вопросов о занятых файлах ждёт ответа.</param>
+/// <summary>Snapshot of scan progress for the UI.</summary>
+/// <param name="CurrentFile">File being checked right now.</param>
+/// <param name="Parallelism">How many files are checked at once.</param>
+/// <param name="PendingLockedQuestions">Locked-file questions awaiting an answer.</param>
 public readonly record struct ScanProgress(
     ScanState State,
     ScanCounters Counters,
@@ -43,10 +40,7 @@ public readonly record struct ScanProgress(
     int PendingLockedQuestions);
 
 /// <summary>
-/// Предупреждение, которое показывается прямо по ходу проверки, а не только в конце
-/// (01_SPECIFICATION.md, раздел 2, пункт 5).
+/// A warning surfaced while the scan runs rather than only at the end.
 /// </summary>
-/// <param name="Title">Человеческая формулировка.</param>
-/// <param name="Path">Файл, к которому относится предупреждение.</param>
-/// <param name="Code">Код замечания.</param>
+/// <param name="Title">Human wording.</param>
 public sealed record LiveWarning(string Title, string Path, IssueCode Code);

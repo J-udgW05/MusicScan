@@ -8,37 +8,37 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Scanning;
 
-/// <summary>Движок проверки: параллельность, пауза, остановка, порционная отдача результатов.</summary>
+/// <summary>Scan engine: parallelism, pause, stop and batched result delivery.</summary>
 public interface IScanEngine
 {
-    /// <summary>Текущее состояние.</summary>
+    /// <summary>Current state.</summary>
     ScanState State { get; }
 
-    /// <summary>Готовые результаты приходят порциями, а не по одному.</summary>
+    /// <summary>Results arrive in batches rather than one at a time.</summary>
     event EventHandler<IReadOnlyList<FileCheckResult>>? ResultsReady;
 
-    /// <summary>Плейлисты проверены.</summary>
+    /// <summary>Playlists have been checked.</summary>
     event EventHandler<IReadOnlyList<PlaylistCheckResult>>? PlaylistsReady;
 
-    /// <summary>Обновление счётчиков и прогресса.</summary>
+    /// <summary>Counters and progress updated.</summary>
     event EventHandler<ScanProgress>? ProgressChanged;
 
-    /// <summary>Предупреждение по ходу проверки.</summary>
+    /// <summary>A warning raised during the scan.</summary>
     event EventHandler<LiveWarning>? WarningRaised;
 
-    /// <summary>Проверка завершилась (успешно, остановлена или прервана сбоем).</summary>
+    /// <summary>The scan ended: finished, stopped or aborted.</summary>
     event EventHandler<ScanSummary>? Finished;
 
-    /// <summary>Запускает проверку по результатам быстрого обхода.</summary>
+    /// <summary>Starts a scan from the results of the folder walk.</summary>
     Task RunAsync(DiscoveryResult discovery, AppSettings settings, CancellationToken cancellationToken = default);
 
-    /// <summary>Ставит проверку на паузу.</summary>
+    /// <summary>Pauses the scan.</summary>
     void Pause();
 
-    /// <summary>Продолжает проверку после паузы.</summary>
+    /// <summary>Resumes after a pause.</summary>
     void Resume();
 
-    /// <summary>Полностью прерывает проверку; уже полученные результаты сохраняются.</summary>
+    /// <summary>Aborts the scan; results already gathered are kept.</summary>
     void Stop();
 }
 
@@ -46,13 +46,12 @@ public interface IScanEngine
 public sealed class ScanEngine : IScanEngine, IDisposable
 {
     /// <summary>
-    /// Как часто отдавать накопленные результаты в интерфейс.
-    /// Отдавать каждый результат по отдельности на коллекции в сотни тысяч файлов —
-    /// верный способ подвесить интерфейс (03_IMPLEMENTATION_GUIDE.md, раздел 2).
+    /// How often gathered results are handed to the UI. Delivering them one by
+    /// one would freeze the UI on a collection of hundreds of thousands.
     /// </summary>
     private static readonly TimeSpan FlushInterval = TimeSpan.FromMilliseconds(200);
 
-    /// <summary>Максимальный размер порции результатов.</summary>
+    /// <summary>Largest result batch.</summary>
     private const int MaxBatchSize = 250;
 
     private readonly IFileChecker _fileChecker;
@@ -62,14 +61,13 @@ public sealed class ScanEngine : IScanEngine, IDisposable
     private readonly ConcurrentQueue<FileCheckResult> _pending = new();
 
     /// <summary>
-    /// Статус каждого проверенного файла. Заполняется сразу при получении
-    /// результата: сводка и проверка плейлистов должны видеть все файлы,
-    /// а не только последнюю порцию.
+    /// Status of every checked file, filled as results arrive: the summary and
+    /// the playlist check must see all files, not just the last batch.
     /// </summary>
     private readonly ConcurrentDictionary<string, CheckStatus> _statuses = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Длительности проверенных файлов: по ним сверяются метки дорожек в cue-листах.
+    /// Durations of checked files, used to validate cue sheet track marks.
     /// </summary>
     private readonly ConcurrentDictionary<string, double> _durations = new(StringComparer.OrdinalIgnoreCase);
     private readonly Lock _countersLock = new();
@@ -81,7 +79,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
     private volatile string? _currentFile;
     private volatile bool _stopRequested;
 
-    /// <summary>Создаёт движок проверки.</summary>
+    /// <summary>Creates the scan engine.</summary>
     public ScanEngine(
         IFileChecker fileChecker,
         IPlaylistService playlistService,
@@ -145,8 +143,8 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         State = ScanState.Running;
         DateTimeOffset startedAt = DateTimeOffset.Now;
         Stopwatch stopwatch = Stopwatch.StartNew();
-        // Число потоков зависит не только от настроек: на диске с подвижной
-        // головкой параллельные чтения мешают друг другу.
+        // The thread count is not settings alone: on a spinning disk parallel
+        // reads get in each other's way.
         int parallelism = ParallelismPlanner.Resolve(
             settings,
             settings.RespectDriveType ? StorageTypeDetector.Detect(discovery.RootPath) : StorageType.Unknown);
@@ -170,7 +168,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
                 },
                 async (item, token) =>
                 {
-                    // Пауза действует только на новые файлы; уже начатые доработают.
+                    // Pausing affects new files only; those in flight finish.
                     await _pause.WaitWhilePausedAsync(token).ConfigureAwait(false);
                     token.ThrowIfCancellationRequested();
 
@@ -193,8 +191,8 @@ public sealed class ScanEngine : IScanEngine, IDisposable
                     RaiseWarningsFor(result);
                 }).ConfigureAwait(false);
 
-            // Плейлисты проверяются после файлов: так известны статусы из основного
-            // сканирования и один файл не получит два разных результата.
+            // Playlists come after the files so the main scan statuses are
+            // known and no file ends up with two different results.
             if (settings.CheckPlaylists && discovery.Playlists.Count > 0)
             {
                 Flush();
@@ -210,8 +208,8 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         }
         catch (AudioEngineFailureException ex)
         {
-            // Критический сбой: проверка останавливается, программа продолжает работать,
-            // всё накопленное сохраняется (02_ARCHITECTURE.md, раздел 4).
+            // Critical failure: the scan stops, the application keeps running
+            // and everything gathered so far is kept.
             State = ScanState.Failed;
             criticalFailure = ex.Message;
         }
@@ -230,10 +228,10 @@ public sealed class ScanEngine : IScanEngine, IDisposable
             }
             catch (OperationCanceledException)
             {
-                // Ожидаемо: цикл отдачи результатов остановлен вместе с проверкой.
+                // Expected: the delivery loop stops along with the scan.
             }
 
-            // Отдаём всё, что осталось в очереди, и последний раз обновляем прогресс.
+            // Drain whatever is left and publish progress one last time.
             Flush();
 
             stopwatch.Stop();
@@ -280,9 +278,8 @@ public sealed class ScanEngine : IScanEngine, IDisposable
 
         _stopRequested = true;
 
-        // Снимаем паузу перед остановкой: иначе потоки, ждущие снятия паузы,
-        // не увидят запрос на отмену. Кнопка «Стоп» должна работать всегда,
-        // в том числе когда проверка стоит на паузе.
+        // Lift the pause before stopping, or threads waiting on it never see
+        // the cancellation. Stop has to work while paused too.
         _pause?.Resume();
         _stop?.Cancel();
     }
@@ -332,7 +329,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         return results;
     }
 
-    /// <summary>Периодически отдаёт накопленные результаты и обновляет прогресс.</summary>
+    /// <summary>Periodically publishes gathered results and progress.</summary>
     private async Task RunFlushLoopAsync(Stopwatch stopwatch, int parallelism, CancellationToken cancellationToken)
     {
         using PeriodicTimer timer = new(FlushInterval);
@@ -347,14 +344,14 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         }
         catch (OperationCanceledException)
         {
-            // Штатное завершение цикла вместе с проверкой.
+            // Normal shutdown of the loop along with the scan.
         }
     }
 
     /// <summary>
-    /// Отдаёт всё накопленное порциями не больше <see cref="MaxBatchSize"/>.
-    /// Опустошать очередь нужно целиком: одной порции не хватит, если за интервал
-    /// успело накопиться больше результатов, чем помещается в порцию.
+    /// Publishes everything queued in batches of at most
+    /// <see cref="MaxBatchSize"/>. The queue must be drained fully: one batch
+    /// is not enough when more results arrived during the interval.
     /// </summary>
     private void Flush()
     {
@@ -402,7 +399,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
     {
         foreach (CheckIssue issue in result.Issues)
         {
-            // О большом файле уже сообщили до начала его проверки.
+            // The large file was already reported before checking started.
             if (issue.Code is IssueCode.LargeFile or IssueCode.None)
             {
                 continue;

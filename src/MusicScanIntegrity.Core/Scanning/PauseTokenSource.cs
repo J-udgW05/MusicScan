@@ -1,29 +1,28 @@
 namespace MusicScanIntegrity.Core.Scanning;
 
 /// <summary>
-/// Пауза, которая не обрывает уже начатые проверки.
+/// A pause that does not abort checks already in flight.
 /// </summary>
 /// <remarks>
-/// 02_ARCHITECTURE.md, раздел 3: пауза не прерывает идущие в моменте проверки —
-/// они докручиваются до результата, — но новые файлы из очереди не берутся,
-/// пока не нажато «продолжить».
+/// Files being checked run to a result; no new ones are taken from the queue
+/// until the scan is resumed.
 /// </remarks>
 public sealed class PauseTokenSource : IDisposable
 {
-    // Установленное событие означает «идём дальше»; сброшенное — «стоим на паузе».
+    // A set event means "carry on"; a reset one means "paused".
     private readonly ManualResetEventSlim _gate = new(initialState: true);
 
-    /// <summary>Проверка сейчас на паузе.</summary>
+    /// <summary>The scan is currently paused.</summary>
     public bool IsPaused => !_gate.IsSet;
 
-    /// <summary>Ставит на паузу.</summary>
+    /// <summary>Pauses.</summary>
     public void Pause() => _gate.Reset();
 
-    /// <summary>Снимает с паузы.</summary>
+    /// <summary>Resumes.</summary>
     public void Resume() => _gate.Set();
 
     /// <summary>
-    /// Ждёт снятия паузы. Вызывается перед тем, как взять в работу новый файл.
+    /// Waits for the pause to lift; called before taking the next file.
     /// </summary>
     public async Task WaitWhilePausedAsync(CancellationToken cancellationToken)
     {
@@ -32,7 +31,7 @@ public sealed class PauseTokenSource : IDisposable
             return;
         }
 
-        // Ждём в пуле потоков, чтобы не занимать поток проверки блокирующим ожиданием.
+        // Wait on the thread pool so a scan thread is not blocked.
         await Task.Run(() => _gate.Wait(cancellationToken), cancellationToken).ConfigureAwait(false);
     }
 

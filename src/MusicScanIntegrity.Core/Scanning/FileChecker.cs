@@ -9,20 +9,17 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Scanning;
 
-/// <summary>Проверка одного файла целиком: доступ, декодирование, теги, расширение.</summary>
+/// <summary>Checks one file end to end: access, decoding, tags, extension.</summary>
 public interface IFileChecker
 {
     /// <summary>
-    /// Выполняет весь порядок проверки одного файла из
-    /// 02_ARCHITECTURE.md, раздел 1.
+    /// Runs the whole check sequence for one file.
     /// </summary>
     Task<FileCheckResult> CheckAsync(ScanItem item, FileCheckContext context, CancellationToken cancellationToken);
 }
 
-/// <summary>Что нужно проверке файла помимо самого файла.</summary>
-/// <param name="Settings">Текущие настройки.</param>
-/// <param name="LockedQuestions">Очередь вопросов о занятых файлах.</param>
-/// <param name="OnLargeFile">Уведомление о большом файле — показывается по ходу проверки.</param>
+/// <summary>What the file check needs besides the file itself.</summary>
+/// <param name="OnLargeFile">Notification raised while the scan runs.</param>
 public sealed record FileCheckContext(
     AppSettings Settings,
     LockedFileQuestionQueue? LockedQuestions,
@@ -37,38 +34,38 @@ public sealed class FileChecker(
     IContainerIntegrityChecker integrityChecker,
     IScanHistory history) : IFileChecker
 {
-    /// <summary>С какой длины провал в тишину считается потерянным куском.</summary>
+    /// <summary>Silent gap length that counts as lost data.</summary>
     private const double DropoutSeconds = 1.0;
 
-    /// <summary>Ниже этой средней громкости трек считается тихим, и провалы в нём не ищутся.</summary>
+    /// <summary>Below this mean level a track counts as quiet and dropouts are not sought.</summary>
     private const double QuietRms = 0.01;
 
-    /// <summary>Доля отсчётов на пределе шкалы, после которой это уже перегрузка.</summary>
+    /// <summary>Share of samples at full scale that counts as clipping.</summary>
     private const double ClippedShareThreshold = 0.001;
 
-    /// <summary>Постоянная составляющая, после которой стоит предупредить.</summary>
+    /// <summary>DC offset worth warning about.</summary>
     private const double DcOffsetThreshold = 0.02;
 
     /// <summary>
-    /// Граница спектра, ниже которой «лослесс» вызывает подозрение.
+    /// Spectral edge below which a lossless file becomes suspicious.
     /// </summary>
     /// <remarks>
-    /// 320 кбит/с обрезает примерно на 20 кГц, 192 — около 19, 128 — около 16.
-    /// Порог 17,5 кГц оставляет запас: настоящий лослесс ниже него опускается
-    /// редко, а вот собранный из MP3 — почти всегда.
+    /// 320 kbps cuts around 20 kHz, 192 near 19, 128 near 16. A 17.5 kHz
+    /// threshold leaves room: genuine lossless rarely falls below it, while
+    /// something built from MP3 almost always does.
     /// </remarks>
     private const double LosslessCutoffHz = 17_500;
 
-    /// <summary>Граница спектра, ниже которой подозрителен уже высокий битрейт.</summary>
+    /// <summary>Spectral edge that makes even a high bitrate suspicious.</summary>
     private const double HighBitrateCutoffHz = 16_500;
 
-    /// <summary>С какого битрейта ждём широкой полосы.</summary>
+    /// <summary>Bitrate from which a wide band is expected.</summary>
     private const int HighBitrateKbps = 256;
 
-    /// <summary>Ниже этой частоты дискретизации о полосе говорить нечего.</summary>
+    /// <summary>Below this sample rate bandwidth says nothing.</summary>
     private const int SpectrumMinSampleRate = 44_100;
 
-    /// <summary>Форматы, которые хранят звук без потерь.</summary>
+    /// <summary>Formats that store audio losslessly.</summary>
     private static readonly HashSet<string> LosslessFormats = new(StringComparer.OrdinalIgnoreCase)
     {
         "FLAC", "WAV", "AIFF", "WV", "APE", "ALAC", "MP4", "DSD",
@@ -89,7 +86,7 @@ public sealed class FileChecker(
 
         try
         {
-            // 1. Файл мог исчезнуть уже после того, как попал в список.
+            // 1. The file may have gone since the walk listed it.
             FileInfo file = new(item.FullPath);
             if (!file.Exists)
             {
@@ -103,7 +100,7 @@ public sealed class FileChecker(
 
             long size = TryGetLength(file, item.SizeBytes);
 
-            // 2. Большой файл — предупреждаем заранее, но проверяем всё равно.
+            // 2. Large file: warn up front, but check it anyway.
             if (settings.LargeFileThresholdBytes is { } threshold && size > threshold)
             {
                 if (settings.WarnAboutLargeFiles)
@@ -116,7 +113,7 @@ public sealed class FileChecker(
                 }
             }
 
-            // 3. Доступ к файлу; если занят — действуем по правилам пользователя.
+            // 3. Access; if locked, follow the user's rule.
             LockResolution lockResolution = await ResolveAccessAsync(item, size, context, issues, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -133,7 +130,7 @@ public sealed class FileChecker(
                 return FileCheckResult.From(item, issues, stopwatch.Elapsed, format, actualSize: size);
             }
 
-            // 4. Пустой файл — отдельная, понятная причина, а не «ошибка декодера».
+            // 4. An empty file is its own clear cause, not a decoder error.
             if (size == 0)
             {
                 issues.Add(new CheckIssue(
@@ -144,17 +141,17 @@ public sealed class FileChecker(
                 return FileCheckResult.From(item, issues, stopwatch.Elapsed, format, actualSize: size);
             }
 
-            // 5. История: отпечаток содержимого. Он и ловит тихую порчу —
-            // случай, когда байты изменились, а размер и дата остались прежними.
+            // 5. History: the content fingerprint, which is what catches
+            // silent corruption — bytes changed, size and date unchanged.
             HistoryOutcome historyOutcome = await Task.Run(
                 () => UseHistory(item.FullPath, file, size, settings, issues, cancellationToken),
                 cancellationToken).ConfigureAwait(false);
 
             if (historyOutcome.Unchanged)
             {
-                // Файл совпал с прошлой проверкой по отпечатку: перепроверять
-                // нечего, содержимое то же самое. Статус берётся прошлый, но
-                // замечания этой проверки (например, о размере) остаются.
+                // Fingerprint matches the previous scan, so there is nothing
+                // to re-check. The old status is reused, but findings from this
+                // run — the size warning, say — still apply.
                 CheckStatus carried = historyOutcome.PreviousStatus;
                 foreach (CheckIssue issue in issues)
                 {
@@ -176,8 +173,8 @@ public sealed class FileChecker(
                 };
             }
 
-            // 6. Декодирование с таймаутом именно на этот файл. Глубина —
-            // из настроек: только начало, выборочные окна или весь файл.
+            // 6. Decoding under this file's own timeout. The depth comes from
+            // settings: start only, sampled windows or the whole file.
             using CancellationTokenSource fileTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             fileTimeout.CancelAfter(settings.FileTimeout);
 
@@ -192,7 +189,7 @@ public sealed class FileChecker(
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
-                // Сработал таймаут по этому файлу — остальные проверяются дальше.
+                // This file timed out; the rest carry on.
                 timedOut = true;
                 probe = new AudioProbeResult(AudioProbeOutcome.Ok);
             }
@@ -210,16 +207,16 @@ public sealed class FileChecker(
 
                 if (probe.Outcome == AudioProbeOutcome.EngineFailure)
                 {
-                    // Критический сбой декодера — движок остановит проверку целиком.
+                    // Critical decoder failure; the engine stops the scan.
                     throw new AudioEngineFailureException(probe.Message ?? "Механизм декодирования отказал.", probe.TechnicalDetail);
                 }
             }
 
             bool decoded = !timedOut && probe.Outcome == AudioProbeOutcome.Ok;
 
-            // 7. Проверка файла его собственными средствами: контрольные суммы
-            // формата и целостность контейнера. Она не зависит от декодера и
-            // отвечает точно там, где он отвечает лишь «открылось».
+            // 7. Validation against the file's own format: checksums and
+            // container integrity. Independent of the decoder, and definite
+            // where the decoder only answers "it opened".
             ContainerValidation? integrity = null;
 
             if (settings.VerifyContainerIntegrity && !timedOut)
@@ -237,9 +234,9 @@ public sealed class FileChecker(
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
-                    // Таймаут по файлу пришёлся на разбор контейнера: сам файл
-                    // от этого не становится повреждённым, но и проверенным
-                    // называть его нельзя.
+                    // The timeout landed during container parsing. That does
+                    // not make the file damaged, but it cannot be called
+                    // checked either.
                     timedOut = true;
                     integrity = null;
                     issues.Add(new CheckIssue(
@@ -249,9 +246,9 @@ public sealed class FileChecker(
                 }
             }
 
-            // Звук закончился раньше, чем обещает заголовок, — файл недокачан
-            // или обрезан. Проверяется после разбора структуры: тот часто
-            // говорит то же самое, и второе такое же замечание было бы шумом.
+            // Audio ended before the header promised: truncated or a partial
+            // download. Checked after the structure pass, which often says the
+            // same thing, so a second identical finding would be noise.
             if (probe.Truncated && !issues.Any(i => i.Code == IssueCode.Truncated))
             {
                 issues.Add(new CheckIssue(
@@ -260,8 +257,8 @@ public sealed class FileChecker(
                     $"Заявлено {probe.DeclaredSeconds:0.#} с, прочитано {probe.DecodedSeconds:0.#} с"));
             }
 
-            // 8. Что слышно в самих отсчётах. Считается по данным, которые уже
-            // прошли через декодер, поэтому второго чтения диска не требует.
+            // 8. What the samples themselves show. Computed from data the
+            // decoder already produced, so no second disk read.
             if (decoded && probe.Stats is { Samples: > 0 } stats)
             {
                 AddSoundIssues(issues, stats, settings, ToScope(settings.CheckDepth));
@@ -272,7 +269,7 @@ public sealed class FileChecker(
                 }
             }
 
-            // 9. Сверка расширения с содержимым — только если файл вообще читается.
+            // 9. Extension against contents, only if the file reads at all.
             if (settings.VerifyExtensionMatchesContent && decoded)
             {
                 string? actual = probe.DetectedFormat ?? ContentTypeSniffer.DetectFromFile(pathToProbe);
@@ -286,7 +283,7 @@ public sealed class FileChecker(
                 }
             }
 
-            // 10. Теги. Отсутствие тегов — мягкое замечание, а не повреждение.
+            // 10. Tags. Missing tags are a warning, not damage.
             TrackMetadata? metadata = null;
             if (settings.CheckMetadata && decoded)
             {
@@ -350,8 +347,8 @@ public sealed class FileChecker(
         }
         catch (Exception ex)
         {
-            // Непредвиденная ошибка на одном файле — это строка в результатах,
-            // а не остановка всей проверки (02_ARCHITECTURE.md, раздел 4).
+            // An unexpected error on one file is a row in the results, not a
+            // reason to stop the scan.
             issues.Add(new CheckIssue(
                 IssueCode.UnexpectedError,
                 "Проверить файл не удалось из-за непредвиденной ошибки.",
@@ -362,12 +359,12 @@ public sealed class FileChecker(
     }
 
     /// <summary>
-    /// Добавляет замечания, видные по самим отсчётам.
+    /// Adds findings visible in the samples themselves.
     /// </summary>
     /// <remarks>
-    /// Про тишину и провалы говорим только тогда, когда прочитано не одно
-    /// начало: у трека с длинной подводкой первые две секунды и должны быть
-    /// тихими, и объявлять его пустым было бы неправдой.
+    /// Silence and dropouts are only reported when more than the start was
+    /// read: a track with a long intro is supposed to be quiet for the first
+    /// two seconds, and calling it empty would be untrue.
     /// </remarks>
     private static void AddSoundIssues(
         List<CheckIssue> issues,
@@ -416,12 +413,12 @@ public sealed class FileChecker(
     }
 
     /// <summary>
-    /// Добавляет подозрение на перекодирование, если верхних частот нет там,
-    /// где они должны быть.
+    /// Flags suspected re-encoding when the top end is missing where it
+    /// should be present.
     /// </summary>
     /// <remarks>
-    /// Ровно подозрение: тихую и старую запись это правило может оговорить
-    /// зря, поэтому статус жёлтый, а формулировка — «похоже».
+    /// A suspicion only: the rule can misjudge quiet and old recordings, so
+    /// the status is a warning and the wording is hedged.
     /// </remarks>
     private static void AddSpectrumIssue(
         List<CheckIssue> issues,
@@ -461,8 +458,8 @@ public sealed class FileChecker(
     }
 
     /// <summary>
-    /// Сверяет файл с историей: считает отпечаток, находит тихую порчу и
-    /// решает, нужно ли перепроверять содержимое.
+    /// Compares the file with the history: fingerprints it, detects silent
+    /// corruption and decides whether the contents need re-checking.
     /// </summary>
     private HistoryOutcome UseHistory(
         string path,
@@ -503,15 +500,15 @@ public sealed class FileChecker(
             return new HistoryOutcome(hash, false, CheckStatus.Ok);
         }
 
-        // Пропускаем только то, что в прошлый раз было в порядке: у
-        // повреждённого файла причина хранится не в базе, а в замечаниях,
-        // и без них статус «повреждён» ничего не объяснит.
+        // Only previously healthy files are skipped: for a damaged one the
+        // cause lives in the findings rather than the database, and the status
+        // alone would explain nothing.
         bool unchanged = previous.Hash == hash && previous.Status == CheckStatus.Ok;
 
         return new HistoryOutcome(hash, unchanged, previous.Status);
     }
 
-    /// <summary>Запоминает файл в истории.</summary>
+    /// <summary>Records the file in the history.</summary>
     private void RememberInHistory(
         string path,
         FileInfo file,
@@ -534,13 +531,11 @@ public sealed class FileChecker(
             DateTimeOffset.Now));
     }
 
-    /// <summary>Что дала сверка с историей.</summary>
-    /// <param name="Hash">Отпечаток содержимого; <see langword="null" /> — не считался.</param>
-    /// <param name="Unchanged">Файл совпал с прошлой проверкой.</param>
-    /// <param name="PreviousStatus">Статус прошлой проверки.</param>
+    /// <summary>Outcome of the history comparison.</summary>
+    /// <param name="Hash">Content fingerprint; <see langword="null" /> when not computed.</param>
     private readonly record struct HistoryOutcome(string? Hash, bool Unchanged, CheckStatus PreviousStatus);
 
-    /// <summary>Переводит настройку глубины в область декодирования.</summary>
+    /// <summary>Maps the depth setting onto a decode scope.</summary>
     private static DecodeScope ToScope(CheckDepth depth) => depth switch
     {
         CheckDepth.Quick => DecodeScope.Quick,
@@ -548,10 +543,11 @@ public sealed class FileChecker(
         _ => DecodeScope.Sampled,
     };
 
-    /// <summary>Переводит вердикт разборщика в замечание по файлу.</summary>
+    /// <summary>Turns a validator verdict into a file finding.</summary>
     /// <remarks>
-    /// Вердикты «сумма сошлась», «структура цела» и «разборщика нет» замечаний
-    /// не дают: это не проблемы файла. Разница между ними видна в подробностях.
+    /// "Checksum matched", "structure intact" and "no validator" produce no
+    /// finding — none of them is a problem. The difference shows in the
+    /// details pane.
     /// </remarks>
     private static CheckIssue? ToIssue(ContainerValidation validation) => validation.Verdict switch
     {
@@ -568,24 +564,24 @@ public sealed class FileChecker(
         _ => null,
     };
 
-    /// <summary>Что делать дальше после разбора доступа к файлу.</summary>
+    /// <summary>What to do after resolving access to the file.</summary>
     private enum LockOutcome
     {
-        /// <summary>Можно проверять.</summary>
+        /// <summary>Safe to check.</summary>
         Proceed,
 
-        /// <summary>Файл пропускается.</summary>
+        /// <summary>The file is skipped.</summary>
         Skip,
 
-        /// <summary>Проверить не получится, замечание уже добавлено.</summary>
+        /// <summary>Cannot be checked; a finding has already been added.</summary>
         Failed,
     }
 
     private readonly record struct LockResolution(LockOutcome Outcome, TempCopy? Copy = null);
 
     /// <summary>
-    /// Проверяет доступ и, если файл занят, действует по выбранному правилу:
-    /// спросить / пропустить / подождать / временная копия / закрыть владельца.
+    /// Probes access and, when the file is locked, follows the chosen rule:
+    /// ask, skip, wait, temporary copy or close the owner.
     /// </summary>
     private async Task<LockResolution> ResolveAccessAsync(
         ScanItem item,
@@ -617,7 +613,7 @@ public sealed class FileChecker(
                 return new LockResolution(LockOutcome.Failed);
         }
 
-        // Дальше — файл занят другой программой.
+        // From here on the file is locked by another process.
         LockedFileAction action = settings.LockedFileAction;
 
         if (action == LockedFileAction.Ask)
@@ -659,9 +655,9 @@ public sealed class FileChecker(
 
             case LockedFileAction.TempCopy:
             case LockedFileAction.CloseOwner:
-                // «Закрыть владельца» программа сама не делает: убивать чужой процесс
-                // опасно, и решение об этом принимает пользователь в диалоге.
-                // Если сюда всё же дошли — проверяем по временной копии, это безопасно.
+                // Closing the owner is never done automatically: killing
+                // someone else's process is the user's decision, made in the
+                // dialog. Reaching here falls back to a temporary copy.
                 TempCopy copy = await tempCopyManager.CreateAsync(item.FullPath, cancellationToken).ConfigureAwait(false);
 
                 if (!copy.Created)
@@ -688,7 +684,7 @@ public sealed class FileChecker(
         }
     }
 
-    /// <summary>Ждёт освобождения файла заданное число попыток.</summary>
+    /// <summary>Waits for the lock to clear, for the configured number of retries.</summary>
     private async Task<LockResolution> WaitForReleaseAsync(
         ScanItem item,
         AppSettings settings,
@@ -733,12 +729,12 @@ public sealed class FileChecker(
 }
 
 /// <summary>
-/// Критический отказ механизма декодирования: проверку продолжать нельзя,
-/// но программа при этом не закрывается (03_IMPLEMENTATION_GUIDE.md, раздел 1).
+/// Critical decoder failure: the scan cannot continue, but the application
+/// stays open.
 /// </summary>
 public sealed class AudioEngineFailureException(string message, string? technicalDetail = null)
     : Exception(message)
 {
-    /// <summary>Техническая причина для журнала и подробностей.</summary>
+    /// <summary>Technical cause for the details pane.</summary>
     public string? TechnicalDetail { get; } = technicalDetail;
 }
