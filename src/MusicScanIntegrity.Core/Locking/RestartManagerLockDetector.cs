@@ -3,31 +3,30 @@ using System.Runtime.InteropServices;
 
 namespace MusicScanIntegrity.Core.Locking;
 
-/// <summary>Кто держит файл занятым.</summary>
+/// <summary>Identifies what holds a file locked.</summary>
 public interface ILockOwnerDetector
 {
     /// <summary>
-    /// Пытается определить программы, которые держат файл.
-    /// Если определить не удалось — возвращается результат с
+    /// Tries to determine which processes hold the file. On failure the
+    /// result carries
     /// <see cref="LockOwnerResult.IsReliable"/> = <see langword="false"/>,
-    /// и это честно показывается пользователю.
+    /// and that is shown to the user as such.
     /// </summary>
     LockOwnerResult Detect(string filePath);
 }
 
-/// <summary>Кто держит файл, и насколько этому можно верить.</summary>
-/// <param name="Owners">Найденные владельцы.</param>
-/// <param name="IsReliable">Определение удалось и результату можно верить.</param>
-/// <param name="TechnicalDetail">Техническая причина, если определить не вышло.</param>
+/// <summary>Who holds the file, and how far the answer can be trusted.</summary>
+/// <param name="IsReliable">Detection succeeded and the result can be trusted.</param>
+/// <param name="TechnicalDetail">Technical cause when detection failed.</param>
 public sealed record LockOwnerResult(
     IReadOnlyList<LockOwner> Owners,
     bool IsReliable,
     string? TechnicalDetail = null)
 {
-    /// <summary>Определить владельца не удалось.</summary>
+    /// <summary>The owner could not be determined.</summary>
     public static LockOwnerResult Unknown(string? detail = null) => new([], false, detail);
 
-    /// <summary>Текст для пользователя — без выдумок о том, чего мы не знаем.</summary>
+    /// <summary>Text for the user; never invents what is not known.</summary>
     public string DisplayText => !IsReliable
         ? "Определить программу-владельца не удалось."
         : Owners.Count == 0
@@ -35,27 +34,24 @@ public sealed record LockOwnerResult(
             : "Файл держит: " + string.Join(", ", Owners.Select(o => o.DisplayName));
 }
 
-/// <summary>Программа, которая держит файл.</summary>
-/// <param name="ProcessId">Идентификатор процесса.</param>
-/// <param name="ProcessName">Имя процесса.</param>
-/// <param name="Description">Описание приложения, если Windows его знает.</param>
+/// <summary>A process holding the file.</summary>
+/// <param name="Description">Application description, when Windows knows one.</param>
 public sealed record LockOwner(int ProcessId, string ProcessName, string? Description)
 {
-    /// <summary>Как показать программу пользователю.</summary>
+    /// <summary>How to present the process to the user.</summary>
     public string DisplayName => string.IsNullOrWhiteSpace(Description)
         ? $"{ProcessName} (PID {ProcessId})"
         : $"{Description} — {ProcessName} (PID {ProcessId})";
 }
 
 /// <summary>
-/// Определение владельца через Restart Manager — самый достоверный
-/// документированный способ на Windows.
+/// Owner detection through Restart Manager, the most reliable documented
+/// method on Windows.
 /// </summary>
 /// <remarks>
-/// 03_IMPLEMENTATION_GUIDE.md, раздел 2: нельзя показывать пользователю
-/// недостоверный список процессов — он может закрыть не ту программу.
-/// Поэтому при любой ошибке API мы возвращаем «определить не удалось»,
-/// а не догадки на основе эвристик.
+/// An unreliable process list must never be shown: the user could close the
+/// wrong application. Any API error therefore yields "could not determine"
+/// rather than a heuristic guess.
 /// </remarks>
 public sealed class RestartManagerLockDetector : ILockOwnerDetector
 {
@@ -89,7 +85,7 @@ public sealed class RestartManagerLockDetector : ILockOwnerDetector
             uint count = 0;
             uint reason = 0;
 
-            // Первый вызов узнаёт нужный размер массива, второй — заполняет его.
+            // The first call reports the array size, the second fills it.
             result = RmGetList(handle, out needed, ref count, null, ref reason);
 
             if (result == ErrorSuccess && needed == 0)
@@ -124,7 +120,7 @@ public sealed class RestartManagerLockDetector : ILockOwnerDetector
                 }
                 catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
                 {
-                    // Процесс уже завершился между вызовами — оставляем имя от Restart Manager.
+                    // Process exited between calls; keep the Restart Manager name.
                 }
 
                 owners.Add(new LockOwner(

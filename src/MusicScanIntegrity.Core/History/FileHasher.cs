@@ -4,23 +4,23 @@ using System.IO.Hashing;
 namespace MusicScanIntegrity.Core.History;
 
 /// <summary>
-/// Считает отпечаток содержимого файла.
+/// Fingerprints file contents.
 /// </summary>
 /// <remarks>
-/// XxHash3, а не SHA-256: от хеша здесь нужно единственное — заметить, что
-/// содержимое изменилось. Криптографическая стойкость для этого не нужна, а
-/// разница в скорости заметная: коллекцию в сотню гигабайт SHA-256 считал бы
-/// заметно дольше, и проверка упиралась бы уже не в диск, а в процессор.
+/// XxHash3 rather than SHA-256: the only requirement is noticing that contents
+/// changed, which needs no cryptographic strength. The speed difference is
+/// large enough that SHA-256 would make a hundred-gigabyte collection
+/// CPU-bound instead of disk-bound.
 /// </remarks>
 public static class FileHasher
 {
-    /// <summary>Размер порции чтения.</summary>
+    /// <summary>Read buffer size.</summary>
     private const int BufferSize = 1024 * 1024;
 
-    /// <summary>Считает отпечаток файла.</summary>
-    /// <param name="filePath">Путь к файлу.</param>
-    /// <param name="cancellationToken">Отмена: стоп или таймаут по файлу.</param>
-    /// <returns>Отпечаток в шестнадцатеричном виде или <see langword="null" />, если файл не прочитался.</returns>
+    /// <summary>Computes the fingerprint of a file.</summary>
+    /// <param name="filePath">Path to the file.</param>
+    /// <param name="cancellationToken">Cancelled by stop or by the per-file timeout.</param>
+    /// <returns>Hexadecimal fingerprint, or <see langword="null" /> when the file could not be read.</returns>
     public static string? Compute(string filePath, CancellationToken cancellationToken)
     {
         try

@@ -1,41 +1,37 @@
 namespace MusicScanIntegrity.Core.Locking;
 
-/// <summary>Можно ли прочитать файл прямо сейчас.</summary>
+/// <summary>Whether the file can be read right now.</summary>
 public enum FileAccessState
 {
-    /// <summary>Файл доступен для чтения.</summary>
+    /// <summary>Readable.</summary>
     Available,
 
-    /// <summary>Файла нет на диске.</summary>
+    /// <summary>Not present on disk.</summary>
     NotFound,
 
-    /// <summary>Файл занят другой программой.</summary>
+    /// <summary>Locked by another process.</summary>
     Locked,
 
-    /// <summary>Операционная система запретила доступ (права, политика).</summary>
+    /// <summary>The OS denied access: permissions or policy.</summary>
     AccessDenied,
 }
 
-/// <summary>Результат проверки доступа.</summary>
-/// <param name="State">Состояние.</param>
-/// <param name="TechnicalDetail">Техническая причина, если доступа нет.</param>
+/// <summary>Outcome of the access probe.</summary>
+/// <param name="TechnicalDetail">Technical cause when access was denied.</param>
 public readonly record struct FileAccessCheck(FileAccessState State, string? TechnicalDetail = null);
 
-/// <summary>Проверяет, доступен ли файл для чтения, не читая его целиком.</summary>
+/// <summary>Checks whether a file is readable without reading all of it.</summary>
 public static class FileAccessProbe
 {
     /// <summary>
-    /// Пробует открыть файл на чтение.
+    /// Tries to open the file for reading.
     /// </summary>
     /// <remarks>
-    /// Решение по неоднозначности: 02_ARCHITECTURE.md говорит про «эксклюзивный
-    /// доступ на чтение», но открытие с <see cref="FileShare.None"/> провалилось бы
-    /// на любом файле, который другая программа держит открытым даже только на чтение
-    /// (например, проигрыватель с открытым плейлистом) — при том что декодировать
-    /// такой файл прекрасно можно. Поэтому «занятым» файл считается только тогда,
-    /// когда его действительно не получается открыть на чтение с разделением
-    /// <see cref="FileShare.ReadWrite"/> — то есть когда владелец запретил чтение.
-    /// Это и есть ситуация, ради которой в спецификации описан диалог о занятом файле.
+    /// Opening with <see cref="FileShare.None"/> would fail on any file another
+    /// process merely holds open for reading — a player with a playlist open,
+    /// say — even though such a file decodes perfectly well. A file therefore
+    /// counts as locked only when it cannot be opened with
+    /// <see cref="FileShare.ReadWrite"/>, meaning the owner denied reads.
     /// </remarks>
     public static FileAccessCheck Check(string filePath)
     {
@@ -65,8 +61,8 @@ public static class FileAccessProbe
         }
         catch (IOException ex)
         {
-            // ERROR_SHARING_VIOLATION (32) и ERROR_LOCK_VIOLATION (33) — файл занят;
-            // остальные IO-ошибки тоже мешают чтению, но по другой причине.
+            // ERROR_SHARING_VIOLATION (32) and ERROR_LOCK_VIOLATION (33) mean
+            // locked; other IO errors also block reads, for other reasons.
             int code = ex.HResult & 0xFFFF;
             return code is 32 or 33
                 ? new FileAccessCheck(FileAccessState.Locked, $"Win32 error {code} · {ex.Message}")

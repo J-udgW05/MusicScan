@@ -3,13 +3,7 @@ using MusicScanIntegrity.Core.Models;
 
 namespace MusicScanIntegrity.Core.History;
 
-/// <summary>Что запомнено о файле с прошлой проверки.</summary>
-/// <param name="Path">Полный путь.</param>
-/// <param name="SizeBytes">Размер на момент прошлой проверки.</param>
-/// <param name="ModifiedUtc">Дата изменения на тот же момент.</param>
-/// <param name="Hash">Хеш содержимого.</param>
-/// <param name="Status">Чем закончилась прошлая проверка.</param>
-/// <param name="CheckedAt">Когда это было.</param>
+/// <summary>What was remembered about a file from the previous scan.</summary>
 public sealed record FileHistoryEntry(
     string Path,
     long SizeBytes,
@@ -19,83 +13,81 @@ public sealed record FileHistoryEntry(
     DateTimeOffset CheckedAt);
 
 /// <summary>
-/// История проверок: что и когда проверяли, каким было содержимое файла.
+/// Scan history: what was checked, when, and what the contents looked like.
 /// </summary>
 /// <remarks>
-/// Нужна ради одного вывода, который иначе получить нечем: содержимое файла
-/// изменилось, а размер и дата остались прежними. Так выглядит тихая порча —
-/// сбойный диск или память меняют байты, ничего об этом не сообщая.
+/// Exists for one conclusion nothing else can reach: contents changed while
+/// size and date stayed the same. That is what silent corruption looks like —
+/// a failing disk or memory rewriting bytes without saying so.
 /// </remarks>
 public interface IScanHistory : IDisposable
 {
-    /// <summary>История открыта и готова к работе.</summary>
+    /// <summary>The history is open and ready.</summary>
     bool IsOpen { get; }
 
-    /// <summary>Путь к файлу базы.</summary>
+    /// <summary>Path to the database file.</summary>
     string DatabasePath { get; }
 
-    /// <summary>Открывает или создаёт базу.</summary>
-    /// <param name="databasePath">Путь к файлу базы.</param>
-    /// <returns>Описание ошибки, если открыть не удалось; иначе <see langword="null" />.</returns>
+    /// <summary>Opens or creates the database.</summary>
+    /// <param name="databasePath">Path to the database file.</param>
+    /// <returns>An error description if opening failed, otherwise <see langword="null" />.</returns>
     string? Open(string databasePath);
 
-    /// <summary>Читает запись о файле.</summary>
-    /// <param name="path">Полный путь к файлу.</param>
-    /// <returns>Запись или <see langword="null" />, если файл встречается впервые.</returns>
+    /// <summary>Reads the entry for a file.</summary>
+    /// <param name="path">Full path to the file.</param>
+    /// <returns>The entry, or <see langword="null" /> when the file is new.</returns>
     FileHistoryEntry? Find(string path);
 
-    /// <summary>Сохраняет запись о файле.</summary>
-    /// <param name="entry">Что запомнить.</param>
+    /// <summary>Stores the entry for a file.</summary>
     void Save(FileHistoryEntry entry);
 
-    /// <summary>Стирает всю историю.</summary>
+    /// <summary>Wipes the whole history.</summary>
     void Clear();
 
-    /// <summary>Закрывает базу.</summary>
+    /// <summary>Closes the database.</summary>
     void Close();
 
-    /// <summary>Сколько записей хранится.</summary>
+    /// <summary>How many entries are stored.</summary>
     int Count();
 }
 
 /// <inheritdoc cref="IScanHistory" />
 /// <remarks>
-/// SQLite, а не свой формат: база переживает падение программы, читается
-/// сторонними средствами и не требует держать всю коллекцию в памяти.
-/// Запись идёт пачками в одной транзакции — на сотне тысяч файлов это разница
-/// между секундами и минутами.
+/// SQLite rather than a bespoke format: it survives a crash, can be read with
+/// other tools and does not require holding the collection in memory. Writes
+/// are batched into a single transaction — on a hundred thousand files that is
+/// the difference between seconds and minutes.
 /// </remarks>
 public sealed class ScanHistory : IScanHistory
 {
-    /// <summary>Папка для данных рядом с программой — как и у настроек.</summary>
+    /// <summary>Data folder next to the executable, as for settings.</summary>
     private const string DataFolderName = "data";
 
-    /// <summary>Имя файла базы.</summary>
+    /// <summary>Database file name.</summary>
     private const string FileName = "history.db";
 
     /// <summary>
-    /// Путь к базе по умолчанию: рядом с программой, а если туда писать
-    /// нельзя — в профиле пользователя.
+    /// Default database path: next to the executable, or in the user profile
+    /// when that folder is not writable.
     /// </summary>
-    /// <returns>Полный путь.</returns>
+    /// <returns>Full path.</returns>
     /// <remarks>
-    /// Запасной путь нужен установленной программе: из <c>Program Files</c>
-    /// обычному пользователю писать не дают, и без него слежение за порчей
-    /// молча не работало бы. Настройки так умеют с самого начала.
+    /// The fallback matters for an installed build: Program Files is not
+    /// writable for an ordinary user, and without it corruption tracking would
+    /// silently do nothing.
     /// </remarks>
     public static string ResolveDefaultPath() =>
         Path.Combine(Common.WritableFolder.Resolve(DataFolderName), FileName);
 
     /// <summary>
-    /// Границы дат, которые переживают перевод в файловое время Windows.
+    /// Date bounds that survive conversion to Windows file time.
     /// </summary>
     /// <remarks>
-    /// Дата изменения хранится как FILETIME — целое число, по которому легко
-    /// сравнивать. Но <see cref="DateTime.ToFileTimeUtc" /> бросает исключение
-    /// на датах до 1601 года, а такие в коллекциях встречаются: испорченная
-    /// запись в файловой системе, распаковка архива без дат, перенос с других
-    /// носителей. Раньше один такой файл получал «непредвиденную ошибку»
-    /// вместо честного результата проверки.
+    /// Modification dates are stored as FILETIME, an integer that compares
+    /// cheaply. <see cref="DateTime.ToFileTimeUtc" /> throws on dates before
+    /// 1601, and those do occur: damaged filesystem records, archives extracted
+    /// without dates, files moved from other media. Such a file used to report
+    /// an unexpected error instead of a real result.
     /// </remarks>
     private static readonly DateTime FileTimeEpoch = new(1601, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -139,8 +131,8 @@ public sealed class ScanHistory : IScanHistory
 
                 using SqliteCommand command = _connection.CreateCommand();
 
-                // WAL: проверка пишет часто, а читает редко — так записи не
-                // блокируют друг друга и база переживает аварийное закрытие.
+                // WAL: the scan writes often and reads rarely, so writes do
+                // not block each other and the database survives a hard exit.
                 command.CommandText = """
                     PRAGMA journal_mode = WAL;
                     PRAGMA synchronous = NORMAL;
@@ -159,9 +151,8 @@ public sealed class ScanHistory : IScanHistory
                 DatabasePath = databasePath;
                 return null;
             }
-            // Путь к базе берётся из настроек, то есть его мог править человек:
-            // ловим и то, чем отвечают Path и Directory на негодный путь, а не
-            // только ошибки самой SQLite.
+            // The path comes from hand-editable settings, so catch what Path
+            // and Directory throw on a malformed path, not just SqliteException.
             catch (Exception ex) when (ex is SqliteException
                                           or IOException
                                           or UnauthorizedAccessException
@@ -205,8 +196,8 @@ public sealed class ScanHistory : IScanHistory
             }
             catch (Exception ex) when (ex is SqliteException or InvalidCastException)
             {
-                // Повреждённая база не должна ломать проверку: считаем, что
-                // файл встречается впервые.
+                // A damaged database must not break the scan; treat the file
+                // as previously unseen.
                 return null;
             }
         }
@@ -244,7 +235,7 @@ public sealed class ScanHistory : IScanHistory
             }
             catch (SqliteException)
             {
-                // Не записалось — проверка от этого не должна падать.
+                // A failed write must not fail the scan.
             }
         }
     }
@@ -267,9 +258,8 @@ public sealed class ScanHistory : IScanHistory
             }
             catch (SqliteException)
             {
-                // Очистку вызывает кнопка в настройках. Исключение отсюда
-                // осталось бы непойманным и уронило бы программу — а не
-                // стёршаяся история этого не стоит.
+                // Invoked from a settings button, where an escaping exception
+                // would crash the app — not worth it for a failed wipe.
             }
         }
     }
@@ -303,10 +293,9 @@ public sealed class ScanHistory : IScanHistory
     /// <inheritdoc />
     public void Close()
     {
-        // Под замком — иначе закрытие может прийтись на середину запроса.
-        // Случай не выдуманный: проверка пишет в базу из рабочих потоков, а
-        // выключатель «Следить за порчей» в настройках закрывает её из потока
-        // окна. Раньше это роняло соединение прямо под работающим запросом.
+        // Under the lock, or a close can land in the middle of a query. This
+        // happens for real: the scan writes from worker threads while the
+        // corruption-tracking toggle closes the database from the UI thread.
         lock (_lock)
         {
             _connection?.Dispose();
@@ -315,15 +304,15 @@ public sealed class ScanHistory : IScanHistory
         }
     }
 
-    /// <summary>Переводит дату в файловое время, не спотыкаясь о негодные значения.</summary>
+    /// <summary>Converts a date to file time, tolerating out-of-range values.</summary>
     private static long ToFileTime(DateTime value) =>
         value.ToUniversalTime() <= FileTimeEpoch ? 0 : value.ToFileTimeUtc();
 
-    /// <summary>Обратный перевод — с той же оглядкой на негодные значения.</summary>
+    /// <summary>The reverse conversion, with the same tolerance.</summary>
     private static DateTime FromFileTime(long value) =>
         value <= 0 ? FileTimeEpoch : DateTime.FromFileTimeUtc(value);
 
-    /// <summary>Время проверки: за границами диапазона берётся начало отсчёта.</summary>
+    /// <summary>Check time; values outside the range fall back to the epoch.</summary>
     private static DateTimeOffset FromUnixSeconds(long value) =>
         value < DateTimeOffset.MinValue.ToUnixTimeSeconds() || value > DateTimeOffset.MaxValue.ToUnixTimeSeconds()
             ? DateTimeOffset.UnixEpoch

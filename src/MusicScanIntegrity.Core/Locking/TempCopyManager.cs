@@ -1,30 +1,29 @@
 ﻿
 namespace MusicScanIntegrity.Core.Locking;
 
-/// <summary>Временные копии занятых файлов.</summary>
+/// <summary>Temporary copies of locked files.</summary>
 public interface ITempCopyManager
 {
-    /// <summary>Папка, в которой создаются временные копии.</summary>
+    /// <summary>Folder the temporary copies are created in.</summary>
     string TempFolder { get; }
 
     /// <summary>
-    /// Делает временную копию файла. Копия обязательно удаляется
-    /// при освобождении возвращённого объекта — чем бы ни закончилась проверка
-    /// (03_IMPLEMENTATION_GUIDE.md, раздел 2).
+    /// Makes a temporary copy. The copy is always removed when the returned
+    /// object is disposed, however the check ends.
     /// </summary>
     Task<TempCopy> CreateAsync(string sourcePath, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Удаляет «осиротевшие» копии от предыдущего запуска, который завершился
-    /// аварийно и не успел убрать за собой.
+    /// Removes orphaned copies left by a previous run that crashed before
+    /// cleaning up.
     /// </summary>
-    /// <returns>Сколько файлов удалось удалить.</returns>
+    /// <returns>How many files were removed.</returns>
     int CleanupOrphans();
 }
 
 /// <summary>
-/// Временная копия файла. Удаляется в <see cref="DisposeAsync"/> — вызывать
-/// обязательно, поэтому объект всегда используется через <c>await using</c>.
+/// A temporary copy of a file, removed in <see cref="DisposeAsync"/>; always
+/// use it through <c>await using</c>.
 /// </summary>
 public sealed class TempCopy : IAsyncDisposable
 {
@@ -35,16 +34,16 @@ public sealed class TempCopy : IAsyncDisposable
         Error = error;
     }
 
-    /// <summary>Путь к копии (или к исходному файлу, если скопировать не удалось).</summary>
+    /// <summary>Path to the copy, or to the original when copying failed.</summary>
     public string Path { get; }
 
-    /// <summary>Копия действительно создана.</summary>
+    /// <summary>A copy was actually made.</summary>
     public bool Created { get; }
 
-    /// <summary>Почему копию создать не удалось.</summary>
+    /// <summary>Why the copy could not be made.</summary>
     public string? Error { get; }
 
-    /// <summary>Копия не создана — вернулась заглушка с описанием причины.</summary>
+    /// <summary>No copy; a stub carrying the reason.</summary>
     public static TempCopy Failed(string sourcePath, string error) => new(sourcePath, false, error);
 
     /// <inheritdoc />
@@ -64,7 +63,7 @@ public sealed class TempCopy : IAsyncDisposable
         }
         catch (Exception)
         {
-            // Не смогли удалить сейчас — уберём при следующем запуске в CleanupOrphans.
+            // Could not delete now; CleanupOrphans will get it next start.
         }
 
         return ValueTask.CompletedTask;
@@ -76,8 +75,8 @@ public sealed class TempCopyManager : ITempCopyManager
 {
     private const string CopyExtension = ".tmp";
 
-    /// <summary>Создаёт менеджер временных копий.</summary>
-    /// <param name="tempFolder">Папка для копий (по умолчанию %TEMP%\MusicScanIntegrity).</param>
+    /// <summary>Creates the temporary copy manager.</summary>
+    /// <param name="tempFolder">Folder for copies; defaults to %TEMP%\MusicScanIntegrity.</param>
     public TempCopyManager(string? tempFolder = null)
     {
         TempFolder = tempFolder ?? Path.Combine(Path.GetTempPath(), "MusicScanIntegrity");
@@ -148,29 +147,29 @@ public sealed class TempCopyManager : ITempCopyManager
                 }
                 catch (IOException)
                 {
-                    // Файл всё ещё занят — вероятно, работает вторая копия программы.
+                    // Still locked; probably a second instance is running.
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    // Нет прав на удаление — не наша копия, не трогаем.
+                    // No delete permission; not our copy, leave it alone.
                 }
             }
         }
         catch (Exception)
         {
-            // Обход папки мог сорваться на полпути: папку удалили, диск отняли,
-            // прав не хватило. Уборка мусора — не то дело, ради которого стоит
-            // мешать запуску программы, поэтому возвращаем что успели.
+            // The walk can fail midway: folder deleted, drive removed, no
+            // permission. Cleanup is not worth blocking startup, so return
+            // whatever was managed.
         }
 
         return removed;
     }
 
-    /// <summary>Удаляет временную копию, не поднимая шума, если не вышло.</summary>
+    /// <summary>Deletes a temporary copy, staying quiet on failure.</summary>
     /// <remarks>
-    /// Копия лежит в папке программы и будет подобрана уборкой при следующем
-    /// запуске: <see cref="CleanupOrphans" /> для того и есть. Сообщать о
-    /// неудаче некому и незачем — на результат проверки она не влияет.
+    /// The copy sits in the application's temp folder and
+    /// <see cref="CleanupOrphans" /> will collect it next start. A failure here
+    /// does not affect the scan result and has nobody to report to.
     /// </remarks>
     private void TryDelete(string path)
     {

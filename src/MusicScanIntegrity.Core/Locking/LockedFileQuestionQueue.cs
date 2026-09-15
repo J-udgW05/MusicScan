@@ -3,14 +3,13 @@ using MusicScanIntegrity.Core.Settings;
 namespace MusicScanIntegrity.Core.Locking;
 
 /// <summary>
-/// Выстраивает вопросы о занятых файлах в очередь и задаёт их по одному.
+/// Queues locked-file questions and asks them one at a time.
 /// </summary>
 /// <remarks>
-/// Проверка идёт параллельно, поэтому несколько файлов могут одновременно
-/// оказаться занятыми. Показывать несколько окон сразу — плохой опыт: непонятно,
-/// какое окно к какому файлу относится (03_IMPLEMENTATION_GUIDE.md, раздел 2).
-/// Здесь же обрабатывается флажок «поступать так же со всеми»: после него
-/// остальные файлы решаются без вопросов.
+/// The scan runs in parallel, so several files can be locked at once, and a
+/// stack of windows leaves the user unable to tell which belongs to which file.
+/// The "apply to all" flag is handled here too: after it, the rest are decided
+/// without asking.
 /// </remarks>
 public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) : IDisposable
 {
@@ -21,7 +20,7 @@ public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) :
     private int _waiting;
     private bool _stopRequested;
 
-    /// <summary>Пользователь попросил остановить проверку прямо из вопроса.</summary>
+    /// <summary>The user asked to stop the scan from the prompt.</summary>
     public bool StopRequested
     {
         get
@@ -33,11 +32,11 @@ public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) :
         }
     }
 
-    /// <summary>Сколько вопросов сейчас ждёт своей очереди.</summary>
+    /// <summary>How many questions are currently waiting.</summary>
     public int Waiting => Volatile.Read(ref _waiting);
 
     /// <summary>
-    /// Спрашивает пользователя (или сразу возвращает ранее выбранное «ко всем»).
+    /// Asks the user, or returns the earlier "apply to all" answer.
     /// </summary>
     public async Task<LockedFileDecision> AskAsync(
         string filePath,
@@ -71,8 +70,8 @@ public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) :
 
         try
         {
-            // Пока файл стоял в очереди, пользователь мог ответить «ко всем»
-            // или остановить проверку — проверяем ещё раз.
+            // While this file waited the user may have answered "apply to
+            // all" or stopped the scan; check again.
             lock (_stateLock)
             {
                 if (_stopRequested)
@@ -86,7 +85,7 @@ public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) :
                 }
             }
 
-            // Себя в счётчик «ещё в очереди» не включаем.
+            // This question is not counted among those still queued.
             int queuedAfterThis = Math.Max(0, Waiting - 1);
             LockedFileQuestion question = new(filePath, sizeBytes, owner, queuedAfterThis);
             LockedFileDecision decision = await inner.AskAsync(question, cancellationToken).ConfigureAwait(false);
@@ -112,7 +111,7 @@ public sealed class LockedFileQuestionQueue(ILockedFileDecisionProvider inner) :
         }
     }
 
-    /// <summary>Сбрасывает состояние перед новой проверкой.</summary>
+    /// <summary>Resets state before a new scan.</summary>
     public void Reset()
     {
         lock (_stateLock)

@@ -2,41 +2,38 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Locking;
 
-/// <summary>Вопрос пользователю о занятом файле.</summary>
-/// <param name="FilePath">Путь к занятому файлу.</param>
-/// <param name="SizeBytes">Размер файла — нужен, чтобы честно сказать, сколько будет скопировано.</param>
-/// <param name="Owner">Кто держит файл (или честное «определить не удалось»).</param>
-/// <param name="QueuedAfterThis">Сколько ещё вопросов ждёт в очереди.</param>
+/// <summary>A question to the user about a locked file.</summary>
+/// <param name="SizeBytes">File size, so the copy prompt can state how much will be copied.</param>
+/// <param name="Owner">Who holds the file, or an honest "could not determine".</param>
+/// <param name="QueuedAfterThis">How many more questions are waiting.</param>
 public sealed record LockedFileQuestion(
     string FilePath,
     long SizeBytes,
     LockOwnerResult Owner,
     int QueuedAfterThis);
 
-/// <summary>Ответ пользователя.</summary>
-/// <param name="Action">Что делать с этим файлом.</param>
-/// <param name="ApplyToAll">Поступать так же со всеми остальными занятыми файлами.</param>
-/// <param name="StopScan">Пользователь решил остановить всю проверку.</param>
+/// <summary>The user's answer.</summary>
+/// <param name="ApplyToAll">Apply the same action to every other locked file.</param>
+/// <param name="StopScan">The user asked to stop the whole scan.</param>
 public sealed record LockedFileDecision(LockedFileAction Action, bool ApplyToAll = false, bool StopScan = false)
 {
-    /// <summary>Ответ по умолчанию, когда спрашивать некого (например, в тестах).</summary>
+    /// <summary>Default answer when there is nobody to ask, for example in tests.</summary>
     public static LockedFileDecision Skip { get; } = new(LockedFileAction.Skip);
 }
 
 /// <summary>
-/// Кто спрашивает пользователя про занятый файл.
-/// Реализация в интерфейсе обязана показывать вопросы по одному
-/// (03_IMPLEMENTATION_GUIDE.md, раздел 2), а не пачкой окон.
+/// Asks the user about a locked file. Implementations must present questions
+/// one at a time rather than opening a stack of windows.
 /// </summary>
 public interface ILockedFileDecisionProvider
 {
-    /// <summary>Задаёт вопрос и ждёт ответа пользователя.</summary>
+    /// <summary>Asks and waits for the answer.</summary>
     Task<LockedFileDecision> AskAsync(LockedFileQuestion question, CancellationToken cancellationToken);
 }
 
 /// <summary>
-/// Заглушка на случай, когда спрашивать некому (тесты, пакетный режим):
-/// файл просто пропускается.
+/// Stub for when there is nobody to ask (tests, batch mode): the file is
+/// simply skipped.
 /// </summary>
 public sealed class AlwaysSkipDecisionProvider : ILockedFileDecisionProvider
 {
