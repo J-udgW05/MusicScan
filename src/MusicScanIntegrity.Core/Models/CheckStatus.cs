@@ -1,28 +1,26 @@
 namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Итоговый статус проверки одного файла.
-/// Ровно четыре значения, как зафиксировано в 01_SPECIFICATION.md, раздел 3.
+/// Final status of one checked file. There are exactly four.
 /// </summary>
 /// <remarks>
-/// Решение по неоднозначности: в 03_IMPLEMENTATION_GUIDE.md часть ситуаций названа
-/// «ошибка» (файл не найден, ошибка декодирования, ошибка чтения аудиоданных), но
-/// отдельного статуса «ошибка» спецификация не вводит — только четыре перечисленных.
-/// Поэтому все «ошибки» ложатся в <see cref="Corrupted"/> (красная категория),
-/// а конкретная причина всегда явно показывается пользователю в описании результата
-/// (<see cref="CheckIssue"/>), чтобы «файл не найден» не выглядел как «битое аудио».
+/// There is deliberately no separate "error" status. A missing file, a denied
+/// read and a decoder failure all land in <see cref="Corrupted"/>; the actual
+/// cause is carried by <see cref="CheckIssue"/> and always shown, so that
+/// "file not found" does not read as "broken audio". Adding a fifth value
+/// would split the four status colours the whole UI is built on.
 /// </remarks>
 public enum CheckStatus
 {
-    /// <summary>Файл проигрывается, замечаний нет.</summary>
+    /// <summary>Plays back, nothing to report.</summary>
     Ok = 0,
 
-    /// <summary>Файл проигрывается, но есть мягкое замечание (теги, таймаут, расширение, блокировка).</summary>
+    /// <summary>Plays back, but something is off: tags, timeout, extension, lock.</summary>
     Warning = 1,
 
-    /// <summary>Файл не удалось проверить: не декодируется, не найден, нет доступа.</summary>
+    /// <summary>Could not be checked: undecodable, missing or inaccessible.</summary>
     Corrupted = 2,
 
-    /// <summary>Файл не проверялся — так решил пользователь.</summary>
+    /// <summary>Not checked, by the user's decision.</summary>
     Skipped = 3,
 }

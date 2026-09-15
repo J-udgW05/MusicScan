@@ -1,34 +1,34 @@
 namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Итог быстрого обхода папки: что нашлось, сколько и где не хватило прав.
-/// Нужен, чтобы сразу предложить пользователю начать проверку
-/// (02_ARCHITECTURE.md, раздел 9) — без декодирования файлов.
+/// Outcome of the fast folder walk: what was found, how much of it, and where
+/// access was denied. Produced without decoding anything so the app can offer
+/// to start the scan straight away.
 /// </summary>
 public sealed class DiscoveryResult
 {
-    /// <summary>Аудиофайлы и образы дисков, которые будут декодироваться.</summary>
+    /// <summary>Audio files and disc images that will be decoded.</summary>
     public required IReadOnlyList<ScanItem> AudioItems { get; init; }
 
-    /// <summary>Найденные плейлисты.</summary>
+    /// <summary>Playlists found along the way.</summary>
     public required IReadOnlyList<ScanItem> Playlists { get; init; }
 
-    /// <summary>Сколько папок обошли.</summary>
+    /// <summary>How many folders were walked.</summary>
     public required int FolderCount { get; init; }
 
-    /// <summary>Папки, в которые не пустила операционная система, — показываются честно.</summary>
+    /// <summary>Folders the OS refused; reported rather than silently skipped.</summary>
     public required IReadOnlyList<InaccessibleFolder> InaccessibleFolders { get; init; }
 
-    /// <summary>Корневая папка обхода.</summary>
+    /// <summary>Root of the walk.</summary>
     public required string RootPath { get; init; }
 
-    /// <summary>Сколько времени занял обход.</summary>
+    /// <summary>How long the walk took.</summary>
     public TimeSpan Duration { get; init; }
 
-    /// <summary>Всего объектов к проверке.</summary>
+    /// <summary>Total items queued for checking.</summary>
     public int TotalCount => AudioItems.Count + Playlists.Count;
 
-    /// <summary>Пустой результат — удобно как значение по умолчанию.</summary>
+    /// <summary>Empty result, handy as a default value.</summary>
     public static DiscoveryResult Empty(string rootPath) => new()
     {
         AudioItems = [],
@@ -39,8 +39,7 @@ public sealed class DiscoveryResult
     };
 }
 
-/// <summary>Папка, которую не удалось прочитать, и техническая причина.</summary>
-/// <param name="Path">Путь к папке.</param>
-/// <param name="Reason">Причина в человеческом виде.</param>
-/// <param name="TechnicalDetail">Техническая причина (тип исключения, код Windows).</param>
+/// <summary>A folder that could not be read, with the reason.</summary>
+/// <param name="Reason">Human-readable cause.</param>
+/// <param name="TechnicalDetail">Exception type or Windows error code.</param>
 public sealed record InaccessibleFolder(string Path, string Reason, string? TechnicalDetail);

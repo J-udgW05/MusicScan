@@ -1,43 +1,39 @@
 namespace MusicScanIntegrity.Core.Models;
 
-/// <summary>О чём говорит замечание по коллекции.</summary>
+/// <summary>What a collection-level finding is about.</summary>
 public enum CollectionFindingKind
 {
-    /// <summary>В нумерации дорожек папки есть пропуски.</summary>
+    /// <summary>Track numbering in the folder has gaps.</summary>
     MissingTracks,
 
-    /// <summary>В одной папке файлы разных форматов.</summary>
+    /// <summary>One folder mixes several audio formats.</summary>
     MixedFormats,
 
-    /// <summary>Ни у одного файла папки нет обложки.</summary>
+    /// <summary>No file in the folder carries cover art.</summary>
     NoCover,
 
-    /// <summary>В одной папке разные значения тега «альбом».</summary>
+    /// <summary>One folder mixes several album tag values.</summary>
     MixedAlbums,
 
-    /// <summary>Один и тот же трек лежит в нескольких местах.</summary>
+    /// <summary>The same track exists in more than one place.</summary>
     Duplicate,
 }
 
 /// <summary>
-/// Замечание, которое относится не к файлу, а к папке или к коллекции целиком.
+/// A finding about a folder or the collection as a whole rather than a file.
 /// </summary>
 /// <remarks>
-/// Отдельный тип, а не <see cref="CheckIssue" />, по существу дела: пропуск в
-/// нумерации — свойство альбома, а не какого-то одного файла в нём, и вешать
-/// такое замечание на случайно выбранный файл было бы неправдой.
+/// Kept separate from <see cref="CheckIssue" /> on the merits: a gap in track
+/// numbering is a property of the album, not of any single file in it, and
+/// pinning it to an arbitrary file would be untrue.
 /// </remarks>
-/// <param name="Kind">О чём речь.</param>
-/// <param name="Path">Папка или файл, к которому относится замечание.</param>
-/// <param name="Message">Формулировка для человека.</param>
-/// <param name="Detail">Подробности: чего именно не хватает, где лежат копии.</param>
 public sealed record CollectionFinding(
     CollectionFindingKind Kind,
     string Path,
     string Message,
     string? Detail = null)
 {
-    /// <summary>Короткая подпись вида замечания.</summary>
+    /// <summary>Short caption for the kind of finding.</summary>
     public string KindLabel => Kind switch
     {
         CollectionFindingKind.MissingTracks => "Пропуски в нумерации",

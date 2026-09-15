@@ -1,15 +1,9 @@
 namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Счётчики хода проверки — то, что показывает боковая колонка вкладки «Проверка»
-/// и статусная строка.
+/// Running scan tallies shown in the scan tab's side column and the status bar.
 /// </summary>
-/// <param name="Total">Всего файлов к проверке.</param>
-/// <param name="Checked">Проверено (получен любой итоговый статус).</param>
-/// <param name="Ok">В порядке.</param>
-/// <param name="Corrupted">Повреждено.</param>
-/// <param name="Warnings">С предупреждениями.</param>
-/// <param name="Skipped">Пропущено.</param>
+/// <param name="Checked">Files that reached any final status.</param>
 public readonly record struct ScanCounters(
     int Total,
     int Checked,
@@ -18,10 +12,10 @@ public readonly record struct ScanCounters(
     int Warnings,
     int Skipped)
 {
-    /// <summary>Доля выполненного от 0 до 1.</summary>
+    /// <summary>Completed share, 0 to 1.</summary>
     public double Progress => Total <= 0 ? 0 : Math.Clamp((double)Checked / Total, 0, 1);
 
-    /// <summary>Прибавляет к счётчикам ещё один результат.</summary>
+    /// <summary>Folds one more result into the tallies.</summary>
     public ScanCounters Add(CheckStatus status) => status switch
     {
         CheckStatus.Ok => this with { Checked = Checked + 1, Ok = Ok + 1 },

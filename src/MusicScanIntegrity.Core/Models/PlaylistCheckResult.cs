@@ -1,33 +1,30 @@
 ﻿namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Результат проверки одного плейлиста.
-/// У плейлистов проверяется только существование путей внутри — декодирование
-/// уже покрыто обычным сканированием (02_ARCHITECTURE.md, раздел 6).
+/// Result of checking one playlist. Only the existence of the referenced paths
+/// is verified — decoding is already covered by the ordinary scan.
 /// </summary>
 public sealed class PlaylistCheckResult
 {
-    /// <summary>Путь к файлу плейлиста.</summary>
+    /// <summary>Path to the playlist file.</summary>
     public required string FullPath { get; init; }
 
-    /// <summary>Имя файла плейлиста.</summary>
+    /// <summary>File name of the playlist.</summary>
     public string FileName => Path.GetFileName(FullPath);
 
-    /// <summary>Все записи плейлиста.</summary>
+    /// <summary>Every entry in the playlist.</summary>
     public required IReadOnlyList<PlaylistEntry> Entries { get; init; }
 
-    /// <summary>Не удалось разобрать сам файл плейлиста.</summary>
+    /// <summary>The playlist file itself could not be parsed.</summary>
     public CheckIssue? ParseIssue { get; init; }
 
-    /// <summary>
-    /// Замечание по содержимому: например, метки cue выходят за длительность файла.
-    /// </summary>
+    /// <summary>Issue with the contents, e.g. cue marks past the end of the file.</summary>
     public CheckIssue? ContentIssue { get; init; }
 
-    /// <summary>Сколько путей не нашлось на диске.</summary>
+    /// <summary>How many referenced paths are missing from disk.</summary>
     public int MissingCount => Entries.Count(e => !e.Exists);
 
-    /// <summary>Итоговый статус плейлиста.</summary>
+    /// <summary>Final status of the playlist.</summary>
     public CheckStatus Status =>
         ParseIssue is not null ? ParseIssue.Severity
         : ContentIssue is not null ? ContentIssue.Severity
@@ -35,13 +32,11 @@ public sealed class PlaylistCheckResult
         : CheckStatus.Ok;
 }
 
-/// <summary>Одна запись внутри плейлиста.</summary>
-/// <param name="RawPath">Путь ровно так, как он записан в плейлисте.</param>
-/// <param name="ResolvedPath">Развёрнутый абсолютный путь (относительные — от папки плейлиста).</param>
-/// <param name="Exists">Файл найден на диске.</param>
+/// <summary>One entry inside a playlist.</summary>
+/// <param name="RawPath">The path exactly as written in the playlist.</param>
+/// <param name="ResolvedPath">Absolute path; relative ones resolve against the playlist folder.</param>
 /// <param name="KnownStatus">
-/// Статус из основного сканирования, если этот файл уже проверялся.
-/// Нужен, чтобы один и тот же файл не получил два разных результата
-/// (03_IMPLEMENTATION_GUIDE.md, раздел 2).
+/// Status from the main scan when this file was already checked, so the same
+/// file cannot end up with two different results.
 /// </param>
 public sealed record PlaylistEntry(string RawPath, string? ResolvedPath, bool Exists, CheckStatus? KnownStatus = null);

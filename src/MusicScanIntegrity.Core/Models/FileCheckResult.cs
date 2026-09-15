@@ -2,68 +2,62 @@
 
 namespace MusicScanIntegrity.Core.Models;
 
-/// <summary>Результат проверки одного файла.</summary>
+/// <summary>Result of checking one file.</summary>
 public sealed class FileCheckResult
 {
-    /// <summary>Полный путь к файлу.</summary>
+    /// <summary>Full path to the file.</summary>
     public required string FullPath { get; init; }
 
-    /// <summary>Имя файла без папки.</summary>
+    /// <summary>File name without the folder.</summary>
     public required string FileName { get; init; }
 
-    /// <summary>Папка, в которой лежит файл.</summary>
+    /// <summary>Folder the file sits in.</summary>
     public required string DirectoryPath { get; init; }
 
-    /// <summary>Размер в байтах; -1, если узнать не удалось.</summary>
+    /// <summary>Size in bytes; -1 when it could not be read.</summary>
     public required long SizeBytes { get; init; }
 
-    /// <summary>Итоговый статус — самое серьёзное из замечаний.</summary>
+    /// <summary>Final status: the most serious of the findings.</summary>
     public required CheckStatus Status { get; init; }
 
-    /// <summary>Все замечания по файлу; пустой список означает «в порядке».</summary>
+    /// <summary>All findings; an empty list means the file is fine.</summary>
     public required IReadOnlyList<CheckIssue> Issues { get; init; }
 
-    /// <summary>Сколько заняла проверка именно этого файла.</summary>
+    /// <summary>How long checking this file took.</summary>
     public TimeSpan Duration { get; init; }
 
     /// <summary>
-    /// Формат по расширению («FLAC», «MP3»). Если содержимое не совпало с расширением,
-    /// сюда попадает вид «FLAC?» — как в макете результатов.
+    /// Format from the extension ("FLAC", "MP3"). When the contents disagree
+    /// with the extension it reads "FLAC?".
     /// </summary>
     public required string Format { get; init; }
 
-    /// <summary>Тип объекта (аудио, плейлист, образ диска).</summary>
+    /// <summary>Item kind: audio, playlist or disc image.</summary>
     public ScanItemKind Kind { get; init; } = ScanItemKind.Audio;
 
-    /// <summary>Прочитанные теги — заполняются, только если включена проверка метаданных.</summary>
+    /// <summary>Tags read from the file; filled only when tag checking is on.</summary>
     public TrackMetadata? Metadata { get; init; }
 
-    /// <summary>
-    /// Длительность по данным заголовка; 0 — неизвестна.
-    /// </summary>
+    /// <summary>Duration from the header; 0 when unknown.</summary>
     /// <remarks>
-    /// Нужна не для показа, а для сверки: cue-лист размечает дорожки временем
-    /// от начала файла, и метка за пределом длительности означает, что cue и
-    /// файл — из разных изданий.
+    /// Not for display but for cross-checking: a cue sheet marks tracks by
+    /// offset from the start, so a mark past the duration means the cue and
+    /// the file come from different releases.
     /// </remarks>
     public double DurationSeconds { get; init; }
 
-    /// <summary>
-    /// Файл не изменился с прошлой проверки, и глубокие проверки пропущены.
-    /// </summary>
+    /// <summary>Unchanged since the last scan, so deep checks were skipped.</summary>
     public bool Unchanged { get; init; }
 
-    /// <summary>
-    /// Чем закончилась проверка файла его собственными средствами.
-    /// </summary>
+    /// <summary>Outcome of validating the file against its own format.</summary>
     /// <remarks>
-    /// Хранится отдельно от замечаний: для исправного файла замечаний нет, но
-    /// разница между «суммы сошлись» и «сумм в формате нет» важна и должна быть
-    /// видна в подробностях.
+    /// Kept apart from the findings: a healthy file has none, yet the
+    /// difference between "checksums matched" and "this format has no
+    /// checksums" matters and belongs in the details pane.
     /// </remarks>
     public ContainerValidation? Integrity { get; init; }
 
-    /// <summary>Подпись статуса для таблицы: уточняющая, если замечание одно.</summary>
+    /// <summary>Status caption for the table; specific when there is one finding.</summary>
     public string StatusLabel
     {
         get
@@ -73,7 +67,7 @@ public sealed class FileCheckResult
                 return Status.DisplayName();
             }
 
-            // Показываем самое серьёзное замечание; при равенстве — первое по порядку.
+            // Most serious finding wins; ties go to the first one.
             CheckIssue leading = Issues[0];
             foreach (CheckIssue issue in Issues)
             {
@@ -87,12 +81,12 @@ public sealed class FileCheckResult
         }
     }
 
-    /// <summary>Человеческое описание для колонки «Описание» и панели подробностей.</summary>
+    /// <summary>Human-readable text for the description column and the details pane.</summary>
     public string Description => Issues.Count == 0
         ? IntegrityNote
         : string.Join(" ", Issues.Select(i => i.Message));
 
-    /// <summary>Что именно удалось подтвердить у исправного файла.</summary>
+    /// <summary>What exactly was confirmed about a healthy file.</summary>
     private string IntegrityNote => Unchanged
         ? "Файл не изменился с прошлой проверки — проверен по отпечатку содержимого."
         : Integrity?.Verdict switch
@@ -104,7 +98,7 @@ public sealed class FileCheckResult
         _ => "Файл прочитан и декодирован без ошибок.",
     };
 
-    /// <summary>Технические причины всех замечаний — вторая строка в подробностях.</summary>
+    /// <summary>Technical causes of every finding; the second line in the details.</summary>
     public string? TechnicalDetail
     {
         get
@@ -114,7 +108,7 @@ public sealed class FileCheckResult
         }
     }
 
-    /// <summary>Собирает результат, выводя итоговый статус из списка замечаний.</summary>
+    /// <summary>Builds the result, deriving the status from the findings.</summary>
     public static FileCheckResult From(
         ScanItem item,
         IReadOnlyList<CheckIssue> issues,
@@ -149,13 +143,8 @@ public sealed class FileCheckResult
     }
 }
 
-/// <summary>Основные теги трека — то, что проверяется при включённой проверке метаданных.</summary>
-/// <param name="Title">Название.</param>
-/// <param name="Artist">Исполнитель.</param>
-/// <param name="Album">Альбом.</param>
-/// <param name="DurationSeconds">Длительность по данным тегов, если известна.</param>
-/// <param name="TrackNumber">Номер дорожки; 0 — не указан.</param>
-/// <param name="HasCover">В файле есть обложка.</param>
+/// <summary>The track tags that tag checking looks at.</summary>
+/// <param name="TrackNumber">Track number; 0 when absent.</param>
 public sealed record TrackMetadata(
     string? Title,
     string? Artist,
@@ -164,13 +153,13 @@ public sealed record TrackMetadata(
     int TrackNumber = 0,
     bool HasCover = false)
 {
-    /// <summary>Все три основных тега заполнены.</summary>
+    /// <summary>All three main tags are present.</summary>
     public bool IsComplete =>
         !string.IsNullOrWhiteSpace(Title) &&
         !string.IsNullOrWhiteSpace(Artist) &&
         !string.IsNullOrWhiteSpace(Album);
 
-    /// <summary>Перечисляет отсутствующие теги для человеческого сообщения.</summary>
+    /// <summary>Lists the missing tags for the user-facing message.</summary>
     public IReadOnlyList<string> MissingFields
     {
         get

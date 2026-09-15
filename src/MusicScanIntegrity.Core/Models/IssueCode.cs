@@ -1,97 +1,94 @@
 ﻿namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Конкретная причина, по которой файл получил свой статус.
-/// Перечень покрывает таблицу особых ситуаций из 03_IMPLEMENTATION_GUIDE.md, раздел 1.
+/// The concrete reason a file ended up with its status.
 /// </summary>
 public enum IssueCode
 {
-    /// <summary>Замечаний нет.</summary>
+    /// <summary>Nothing to report.</summary>
     None = 0,
 
-    /// <summary>Файл пропал с диска между построением списка и проверкой.</summary>
+    /// <summary>File disappeared between the walk and the check.</summary>
     FileNotFound,
 
-    /// <summary>Файл существует, но операционная система не дала его прочитать.</summary>
+    /// <summary>File exists, but the OS refused to read it.</summary>
     AccessDenied,
 
-    /// <summary>Файл занят другой программой, пользователь решил его пропустить.</summary>
+    /// <summary>Locked by another process; the user chose to skip it.</summary>
     LockedSkippedByUser,
 
-    /// <summary>Файл занят другой программой, время ожидания разблокировки истекло.</summary>
+    /// <summary>Locked by another process; the wait timed out.</summary>
     LockedWaitTimeout,
 
-    /// <summary>Файл был занят, проверка выполнена по временной копии.</summary>
+    /// <summary>Was locked; checked through a temporary copy.</summary>
     LockedCheckedViaCopy,
 
-    /// <summary>Не удалось сделать временную копию занятого файла.</summary>
+    /// <summary>Could not make a temporary copy of the locked file.</summary>
     LockedCopyFailed,
 
-    /// <summary>Файл защищён паролем/DRM (встречается у части WMA и AAC).</summary>
+    /// <summary>Password- or DRM-protected; happens with some WMA and AAC.</summary>
     PasswordProtected,
 
-    /// <summary>Не удалось вообще начать декодирование.</summary>
+    /// <summary>Decoding could not be started at all.</summary>
     DecodeStartFailed,
 
-    /// <summary>Декодирование началось, но чтение аудиоданных сорвалось.</summary>
+    /// <summary>Decoding started, but reading the audio data failed.</summary>
     AudioReadFailed,
 
-    /// <summary>Файл пустой или заведомо короче, чем может быть валидное аудио.</summary>
+    /// <summary>Empty, or shorter than valid audio could possibly be.</summary>
     EmptyFile,
 
-    /// <summary>Проверка одного файла превысила разрешённый таймаут.</summary>
+    /// <summary>Checking this one file exceeded the allowed timeout.</summary>
     CheckTimeout,
 
-    /// <summary>Расширение не совпадает с реальным содержимым, но это аудио.</summary>
+    /// <summary>Extension does not match the contents, but it is still audio.</summary>
     ExtensionMismatch,
 
-    /// <summary>Включена проверка тегов, а теги отсутствуют или не читаются.</summary>
+    /// <summary>Tag checking is on and tags are missing or unreadable.</summary>
     MetadataProblem,
 
-    /// <summary>Размер файла больше настроенного порога «большого файла».</summary>
+    /// <summary>Larger than the configured large-file threshold.</summary>
     LargeFile,
 
-    /// <summary>Файл, указанный в плейлисте, отсутствует на диске.</summary>
+    /// <summary>A file referenced by a playlist is missing from disk.</summary>
     PlaylistTargetMissing,
 
-    /// <summary>Метки дорожек в cue-листе выходят за длительность файла.</summary>
+    /// <summary>Cue-sheet track marks fall past the end of the file.</summary>
     CueMarksBeyondFile,
 
-    /// <summary>Не удалось разобрать сам файл плейлиста.</summary>
+    /// <summary>The playlist file itself could not be parsed.</summary>
     PlaylistUnreadable,
 
-    /// <summary>Контрольная сумма внутри формата не сошлась — файл повреждён.</summary>
+    /// <summary>A checksum inside the format did not match; the file is damaged.</summary>
     ChecksumMismatch,
 
-    /// <summary>Структура файла разрушена: кадры, страницы или блоки не сходятся.</summary>
+    /// <summary>Structure is broken: frames, pages or blocks do not line up.</summary>
     ContainerDamaged,
 
-    /// <summary>Файл обрывается: данных меньше, чем обещано его же заголовком.</summary>
+    /// <summary>Truncated: less data than its own header promises.</summary>
     Truncated,
 
-    /// <summary>Файл декодируется, но звука в нём нет — сплошная тишина.</summary>
+    /// <summary>Decodes, but carries no sound at all.</summary>
     DigitalSilence,
 
-    /// <summary>Внутри звучащего трека провал в тишину — похоже на потерянный кусок.</summary>
+    /// <summary>A silent gap inside an otherwise audible track; looks like lost data.</summary>
     AudioDropout,
 
-    /// <summary>Заметная часть отсчётов упирается в предел шкалы.</summary>
+    /// <summary>A noticeable share of samples hits the top of the scale.</summary>
     Clipping,
 
-    /// <summary>У записи есть постоянная составляющая — признак плохой оцифровки.</summary>
+    /// <summary>The recording carries a DC component; a sign of poor digitisation.</summary>
     DcOffset,
 
-    /// <summary>
-    /// Содержимое изменилось при неизменных размере и дате — тихая порча.
-    /// </summary>
+    /// <summary>Contents changed while size and date stayed the same.</summary>
     SilentCorruption,
 
-    /// <summary>Текст в тегах прочитан не в той кодировке — кракозябры.</summary>
+    /// <summary>Tag text was written in the wrong encoding; reads as mojibake.</summary>
     BrokenTagText,
 
-    /// <summary>Похоже, файл собран перекодированием из сжатого с потерями.</summary>
+    /// <summary>Looks re-encoded from a lossy source.</summary>
     TranscodeSuspected,
 
-    /// <summary>Непредвиденная ошибка при проверке именно этого файла.</summary>
+    /// <summary>Unexpected error while checking this particular file.</summary>
     UnexpectedError,
 }

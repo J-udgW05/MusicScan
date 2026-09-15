@@ -1,18 +1,15 @@
 ﻿namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
-/// Одно замечание по файлу: код, человеческая формулировка и техническая причина.
+/// One finding about a file: a code, a human wording and a technical cause.
 /// </summary>
 /// <remarks>
-/// Разделение на «человеческий» и «технический» текст — требование UI_SPEC.md, раздел 9:
-/// в основном тексте не должно быть «Error 0x…», техническая причина идёт второй строкой.
+/// The split is deliberate — the main text must never read "Error 0x…"; the
+/// technical cause goes on a second line.
 /// </remarks>
-/// <param name="Code">Код замечания.</param>
-/// <param name="Message">Формулировка для человека, например «Файл не найден».</param>
-/// <param name="TechnicalDetail">Техническая причина: код ошибки декодера, исключение и т.п.</param>
 public sealed record CheckIssue(IssueCode Code, string Message, string? TechnicalDetail = null)
 {
-    /// <summary>Статус, который это замечание задаёт файлу.</summary>
+    /// <summary>Status this finding gives the file.</summary>
     public CheckStatus Severity => Code switch
     {
         IssueCode.None => CheckStatus.Ok,
@@ -30,11 +27,11 @@ public sealed record CheckIssue(IssueCode Code, string Message, string? Technica
 
         IssueCode.LockedSkippedByUser => CheckStatus.Skipped,
 
-        // Всё остальное — мягкие замечания: файл читается, но что-то не так.
+        // Everything else is soft: the file reads, but something is off.
         _ => CheckStatus.Warning,
     };
 
-    /// <summary>Короткая подпись для колонки «Статус» в таблице результатов.</summary>
+    /// <summary>Short caption for the status column of the results table.</summary>
     public string ShortLabel => Code switch
     {
         IssueCode.MetadataProblem => "Нет тегов",

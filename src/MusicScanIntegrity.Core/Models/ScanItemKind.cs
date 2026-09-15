@@ -1,14 +1,14 @@
 namespace MusicScanIntegrity.Core.Models;
 
-/// <summary>Что именно нашёл обход папки.</summary>
+/// <summary>What the folder walk turned up.</summary>
 public enum ScanItemKind
 {
-    /// <summary>Обычный аудиофайл — его нужно декодировать.</summary>
+    /// <summary>Plain audio file, to be decoded.</summary>
     Audio,
 
-    /// <summary>Плейлист — у него проверяются только пути внутри.</summary>
+    /// <summary>Playlist; only the paths inside it are checked.</summary>
     Playlist,
 
-    /// <summary>Образ диска (ISO/SACD) — экспериментальная поддержка.</summary>
+    /// <summary>Disc image (ISO/SACD); experimental support.</summary>
     DiscImage,
 }

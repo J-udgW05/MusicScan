@@ -1,36 +1,34 @@
 ﻿namespace MusicScanIntegrity.Core.Models;
 
-/// <summary>Сводка по завершённой (или остановленной) проверке — основа вкладки «Отчёт».</summary>
+/// <summary>Summary of a finished or stopped scan; the basis of the report tab.</summary>
 public sealed class ScanSummary
 {
-    /// <summary>Корневая папка проверки.</summary>
+    /// <summary>Root folder of the scan.</summary>
     public required string RootPath { get; init; }
 
-    /// <summary>Итоговые счётчики.</summary>
+    /// <summary>Final tallies.</summary>
     public required ScanCounters Counters { get; init; }
 
-    /// <summary>Когда проверка началась.</summary>
+    /// <summary>When the scan started.</summary>
     public required DateTimeOffset StartedAt { get; init; }
 
-    /// <summary>Сколько времени заняла проверка.</summary>
+    /// <summary>How long the scan took.</summary>
     public required TimeSpan Duration { get; init; }
 
-    /// <summary>Сколько потоков реально использовалось.</summary>
+    /// <summary>How many threads were actually used.</summary>
     public required int Parallelism { get; init; }
 
-    /// <summary>
-    /// Насколько глубоко читались файлы.
-    /// </summary>
+    /// <summary>How deeply files were read.</summary>
     /// <remarks>
-    /// Попадает в отчёт: без этого отчёты быстрой и полной проверки выглядят
-    /// одинаково, хотя стоят за ними очень разные утверждения.
+    /// Goes into the report: without it a quick scan and a full one produce
+    /// identical-looking reports that stand for very different claims.
     /// </remarks>
     public Settings.CheckDepth Depth { get; init; } = Settings.CheckDepth.Sampled;
 
-    /// <summary>Сверялись ли контрольные суммы формата.</summary>
+    /// <summary>Whether container checksums were verified.</summary>
     public bool ContainerIntegrityChecked { get; init; } = true;
 
-    /// <summary>Как проверяли — одной строкой для отчёта.</summary>
+    /// <summary>One-line description of how the scan was performed.</summary>
     public string DepthLabel
     {
         get
@@ -48,27 +46,25 @@ public sealed class ScanSummary
         }
     }
 
-    /// <summary>Проверка была прервана пользователем.</summary>
+    /// <summary>The user interrupted the scan.</summary>
     public bool WasStopped { get; init; }
 
-    /// <summary>Проверка остановлена из-за критического сбоя; текст для пользователя.</summary>
+    /// <summary>Scan aborted by a critical failure; text for the user.</summary>
     public string? CriticalFailure { get; init; }
 
-    /// <summary>Разбивка по папкам — «Проверенные папки» на вкладке «Отчёт».</summary>
+    /// <summary>Per-folder breakdown shown on the report tab.</summary>
     public IReadOnlyList<FolderStat> Folders { get; init; } = [];
 
-    /// <summary>Сколько плейлистов проверено.</summary>
+    /// <summary>How many playlists were checked.</summary>
     public int PlaylistCount { get; init; }
 
-    /// <summary>Сколько путей внутри плейлистов не нашлось.</summary>
+    /// <summary>How many paths inside playlists were missing.</summary>
     public int PlaylistMissingLinks { get; init; }
 
-    /// <summary>Папки, куда не пустила система при обходе.</summary>
+    /// <summary>Folders the OS refused during the walk.</summary>
     public IReadOnlyList<InaccessibleFolder> InaccessibleFolders { get; init; } = [];
 }
 
-/// <summary>Статистика по одной папке.</summary>
-/// <param name="Path">Путь к папке.</param>
-/// <param name="FileCount">Сколько файлов проверено в ней.</param>
-/// <param name="BadCount">Сколько из них повреждено.</param>
+/// <summary>Per-folder statistics.</summary>
+/// <param name="BadCount">How many of the checked files are corrupted.</param>
 public sealed record FolderStat(string Path, int FileCount, int BadCount);

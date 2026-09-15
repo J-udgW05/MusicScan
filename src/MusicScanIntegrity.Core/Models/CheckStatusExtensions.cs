@@ -1,9 +1,9 @@
 ﻿namespace MusicScanIntegrity.Core.Models;
 
-/// <summary>Русские подписи статусов — единые для интерфейса, отчётов и логов.</summary>
+/// <summary>Status captions and glyphs, shared by the UI and the reports.</summary>
 public static class CheckStatusExtensions
 {
-    /// <summary>Название статуса так, как его видит пользователь.</summary>
+    /// <summary>Status name as the user sees it.</summary>
     public static string DisplayName(this CheckStatus status) => status switch
     {
         CheckStatus.Ok => "В порядке",
@@ -14,8 +14,8 @@ public static class CheckStatusExtensions
     };
 
     /// <summary>
-    /// Текстовый значок статуса. UI_SPEC.md, раздел 1: статус никогда не передаётся
-    /// только цветом — рядом всегда значок и слово.
+    /// Textual status mark. Status is never conveyed by colour alone — a glyph
+    /// and a word always sit next to it.
     /// </summary>
     public static string Glyph(this CheckStatus status) => status switch
     {
@@ -26,7 +26,7 @@ public static class CheckStatusExtensions
         _ => "?",
     };
 
-    /// <summary>Ключ иконки из набора (Icons.dc.html) для этого статуса.</summary>
+    /// <summary>Icon key for this status.</summary>
     public static string IconKey(this CheckStatus status) => status switch
     {
         CheckStatus.Ok => "status-ok",
@@ -37,10 +37,9 @@ public static class CheckStatusExtensions
     };
 
     /// <summary>
-    /// Ключ «голого» знака статуса — без кружка вокруг галочки и крестика.
-    /// Макет программы использует именно его там, где значок мелкий (13–14 px)
-    /// и стоит внутри цветного квадрата или плашки: кружок на таком размере
-    /// только замыливает знак.
+    /// Bare status mark, without the ring around the tick and cross. Used where
+    /// the glyph is small (13–14 px) and sits inside a coloured square, where
+    /// the ring only blurs it.
     /// </summary>
     public static string MarkKey(this CheckStatus status) => status switch
     {
@@ -52,8 +51,8 @@ public static class CheckStatusExtensions
     };
 
     /// <summary>
-    /// Более серьёзный из двух статусов. «Пропущен» — терминальное состояние:
-    /// файл не проверялся, поэтому он не смешивается с результатами проверки.
+    /// The more serious of two statuses. Skipped is terminal: the file was not
+    /// checked at all, so it never merges with scan outcomes.
     /// </summary>
     public static CheckStatus Combine(this CheckStatus first, CheckStatus second)
     {
