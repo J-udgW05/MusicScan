@@ -2,24 +2,22 @@
 
 namespace MusicScanIntegrity.Core.Audio;
 
-/// <summary>Чтение основных тегов файла.</summary>
+/// <summary>Reads the main tags of a file.</summary>
 public interface IMetadataReader
 {
     /// <summary>
-    /// Читает название, исполнителя и альбом.
-    /// Возвращает <see langword="null"/>, если теги прочитать не удалось вообще, —
-    /// это тоже «проблемы с метаданными», а не повреждение аудио.
+    /// Reads title, artist and album. Returns <see langword="null"/> when tags
+    /// could not be read at all — still a metadata problem, not damaged audio.
     /// </summary>
-    /// <param name="filePath">Путь к файлу.</param>
-    /// <param name="error">Техническая причина, если чтение не удалось.</param>
+    /// <param name="filePath">Path to the file.</param>
+    /// <param name="error">Technical cause when reading failed.</param>
     TrackMetadata? Read(string filePath, out string? error);
 }
 
-/// <summary>Чтение тегов через TagLib#.</summary>
+/// <summary>Tag reading through TagLib#.</summary>
 /// <remarks>
-/// Отсутствие тегов сознательно не смешивается с повреждением аудио: огромное
-/// количество нормальной музыки хранится вообще без тегов
-/// (03_IMPLEMENTATION_GUIDE.md, раздел 2).
+/// Missing tags are deliberately kept apart from damaged audio: a great deal
+/// of perfectly good music carries no tags at all.
 /// </remarks>
 public sealed class TagLibMetadataReader : IMetadataReader
 {
@@ -43,7 +41,7 @@ public sealed class TagLibMetadataReader : IMetadataReader
         }
         catch (TagLib.UnsupportedFormatException ex)
         {
-            // Теги для этого контейнера TagLib читать не умеет — это не поломка файла.
+            // TagLib cannot read tags for this container; the file is fine.
             error = $"TagLib не поддерживает контейнер: {ex.Message}";
             return null;
         }

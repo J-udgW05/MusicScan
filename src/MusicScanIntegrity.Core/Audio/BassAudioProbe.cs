@@ -5,52 +5,52 @@ using MusicScanIntegrity.Core.Analysis;
 namespace MusicScanIntegrity.Core.Audio;
 
 /// <summary>
-/// Проверка файлов через библиотеку BASS (зафиксированный выбор,
-/// 01_SPECIFICATION.md, раздел 10).
+/// Checks files through the BASS library.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Файл не проигрывается, а декодируется «вхолостую»: поток создаётся с флагом
-/// <see cref="BassFlags.Decode"/>, устройство вывода — «no sound» (номер 0),
-/// поэтому звука не слышно и звуковая карта не занимается.
+/// Nothing is played back: streams are created with
+/// <see cref="BassFlags.Decode"/> against the "no sound" device, so no audio is
+/// heard and the sound card stays free.
 /// </para>
 /// <para>
-/// Native-библиотеки (bass.dll и плагины форматов) лежат в подпапке <c>bass\</c>
-/// рядом с исполняемым файлом и загружаются оттуда явно — в репозиторий они не
-/// коммитятся, их скачивает <c>tools\fetch-bass.ps1</c> (см. README).
+/// The native libraries (bass.dll and the format plug-ins) live in the
+/// <c>bass\</c> folder next to the executable and are loaded from there
+/// explicitly. They are not committed — <c>tools\fetch-bass.ps1</c> downloads
+/// them under the un4seen licence.
 /// </para>
 /// </remarks>
 public sealed class BassAudioProbe : IAudioProbe, IDisposable
 {
-    /// <summary>Сколько секунд аудио читаем: спецификация требует «первые одна-две секунды».</summary>
+    /// <summary>Seconds of audio read by the quick scan.</summary>
     private const double SecondsToDecode = 2.0;
 
-    /// <summary>Размер буфера чтения — читаем порциями, чтобы реагировать на отмену.</summary>
+    /// <summary>Read buffer size; reading in chunks keeps cancellation responsive.</summary>
     private const int ReadChunkBytes = 64 * 1024;
 
-    /// <summary>Длина одного окна при выборочной проверке.</summary>
+    /// <summary>Length of one window in a sampled scan.</summary>
     private const double SampleWindowSeconds = 1.5;
 
-    /// <summary>Сколько окон читать при выборочной проверке.</summary>
+    /// <summary>How many windows a sampled scan reads.</summary>
     private const int SampleWindows = 5;
 
     /// <summary>
-    /// Насколько прочитанное может быть короче заявленного, чтобы это ещё не
-    /// считалось обрывом. Заголовки округляют длительность, и придираться к
-    /// десятым долям секунды значило бы объявлять повреждёнными исправные файлы.
+    /// How far short of the declared length the audio may fall before it
+    /// counts as truncated. Headers round the duration, and quibbling over
+    /// tenths of a second would condemn healthy files.
     /// </summary>
     private const double TruncationToleranceSeconds = 1.0;
 
-    /// <summary>Устройство «no sound»: декодируем без вывода звука.</summary>
+    /// <summary>The "no sound" device: decode without any output.</summary>
     private const int NoSoundDevice = 0;
 
-    /// <summary>Трекерные форматы открываются через MusicLoad, а не CreateStream.</summary>
+    /// <summary>Tracker formats open through MusicLoad rather than CreateStream.</summary>
     private static readonly HashSet<string> TrackerExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".mod", ".xm", ".it", ".s3m", ".mtm", ".umx",
     };
 
-    /// <summary>Сколько ждать завершения начатых чтений при закрытии.</summary>
+    /// <summary>How long shutdown waits for reads already in flight.</summary>
     private static readonly TimeSpan ShutdownWait = TimeSpan.FromSeconds(3);
 
     private readonly List<int> _plugins = [];
@@ -59,22 +59,21 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
     private bool _initialized;
     private bool _disposed;
 
-    /// <summary>Сколько чтений идёт прямо сейчас.</summary>
+    /// <summary>How many reads are in flight right now.</summary>
     /// <remarks>
-    /// Нужен закрытию: <c>Bass.Free</c> обрывает библиотеку целиком, и если в
-    /// этот момент рабочий поток сидит внутри декодера, программа падает не
-    /// исключением, а вместе с процессом. Счётчик даёт закрытию дождаться
-    /// начатых чтений.
+    /// Needed at shutdown: <c>Bass.Free</c> tears the library down whole, and
+    /// if a worker thread is inside the decoder at that moment the process
+    /// dies outright rather than throwing. The counter lets shutdown wait.
     /// </remarks>
     private int _activeProbes;
 
     /// <inheritdoc />
     public bool IsAvailable => Volatile.Read(ref _initialized);
 
-    /// <summary>Папка, из которой загружались native-библиотеки.</summary>
+    /// <summary>Folder the native libraries were loaded from.</summary>
     public string NativeFolder { get; } = Path.Combine(AppContext.BaseDirectory, "bass");
 
-    /// <summary>Имена успешно загруженных плагинов — показываются в окне «О программе».</summary>
+    /// <summary>Names of the plug-ins that loaded, shown in the about window.</summary>
     public IReadOnlyList<string> LoadedPlugins { get; private set; } = [];
 
     /// <inheritdoc />
@@ -93,10 +92,10 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
                        "Запустите tools\\fetch-bass.ps1 или скопируйте библиотеки вручную (см. README).";
             }
 
-            // Явно добавляем bass\ в пути поиска DLL: иначе LoadLibrary ищет
-            // bass.dll только рядом с exe и в системных папках. Неудача сама
-            // по себе ещё не приговор — библиотеку может найти и обычный поиск,
-            // — но если инициализация потом не задастся, причину надо назвать.
+            // Add bass\ to the DLL search path explicitly: LoadLibrary only
+            // looks next to the exe and in the system folders. Failing here is
+            // not fatal — the ordinary search may still find it — but if
+            // initialisation then fails, this is the cause to report.
             string? searchPathNote = SetDllDirectory(NativeFolder)
                 ? null
                 : $" Не удалось добавить {NativeFolder} в пути поиска библиотек " +
@@ -104,8 +103,9 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
 
             try
             {
-                // Проверка не проигрывает звук, поэтому фоновые потоки обновления
-                // буферов не нужны — это заметно экономит процессор на больших коллекциях.
+                // Nothing is played back, so the background buffer-update
+                // threads are pointless; skipping them saves measurable CPU on
+                // large collections.
                 Bass.Configure(Configuration.UpdateThreads, 0);
                 Bass.Configure(Configuration.UpdatePeriod, 0);
                 Bass.Configure(Configuration.MusicVirtual, 0);
@@ -155,8 +155,8 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         int handle = 0;
         bool isTracker = TrackerExtensions.Contains(Path.GetExtension(filePath));
 
-        // Отмечаемся до первого обращения к библиотеке: закрытие ждёт, пока
-        // счётчик обнулится, и только потом освобождает BASS.
+        // Registered before touching the library: shutdown waits for this
+        // counter to reach zero before freeing BASS.
         Interlocked.Increment(ref _activeProbes);
 
         try
@@ -172,19 +172,19 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
 
             string? format = DetectFormat(handle);
 
-            // Длина, заявленная заголовком файла. У потоков без длины BASS
-            // возвращает −1 — тогда сравнивать будет не с чем.
+            // Length declared by the header. BASS returns −1 for streams
+            // without one, leaving nothing to compare against.
             long totalBytes = Bass.ChannelGetLength(handle);
             double declared = totalBytes > 0 ? Bass.ChannelBytes2Seconds(handle, totalBytes) : 0;
 
-            // Отсчёты и так проходят через буфер чтения, поэтому громкость,
-            // перегрузка и провалы в тишину достаются без второго прохода.
+            // The samples pass through the read buffer anyway, so level,
+            // clipping and dropouts come for free.
             ChannelInfo info = Bass.ChannelGetInfo(handle);
             AudioStatsAccumulator stats = new(Math.Max(1, info.Frequency * Math.Max(1, info.Channels)));
 
-            // Спектр набирается из тех же буферов: он отвечает на вопрос, до
-            // какой частоты в файле есть звук, и выдаёт «лослесс», собранный
-            // из сжатого с потерями.
+            // The spectrum is built from the same buffers; it shows how high
+            // the audio reaches and exposes "lossless" built from a lossy
+            // source.
             SpectrumAnalyzer spectrum = new(info.Frequency, Math.Max(1, info.Channels));
             SampleSink sink = new(stats, spectrum);
 
@@ -208,8 +208,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         }
         catch (Exception ex)
         {
-            // Один плохой файл не должен ронять проверку целиком
-            // (02_ARCHITECTURE.md, раздел 4).
+            // One bad file must not bring the whole scan down.
             return new AudioProbeResult(
                 AudioProbeOutcome.ReadFailed,
                 "Непредвиденная ошибка при чтении файла.",
@@ -233,7 +232,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         }
     }
 
-    /// <summary>Быстрая проверка: только первые секунды.</summary>
+    /// <summary>Quick scan: the first seconds only.</summary>
     private static AudioProbeResult ReadBeginning(
         int handle,
         string? format,
@@ -244,7 +243,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         long target = Bass.ChannelSeconds2Bytes(handle, SecondsToDecode);
         if (target <= 0)
         {
-            // Декодер не смог перевести секунды в байты — читаем фиксированный кусок.
+            // The decoder could not convert seconds to bytes; read a fixed chunk.
             target = ReadChunkBytes * 4;
         }
 
@@ -260,7 +259,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             : AudioProbeResult.Success(Bass.ChannelBytes2Seconds(handle, read.Bytes), format, declared);
     }
 
-    /// <summary>Полная проверка: файл читается до конца.</summary>
+    /// <summary>Full scan: the file is read to the end.</summary>
     private static AudioProbeResult ReadWholeFile(
         int handle,
         string? format,
@@ -289,12 +288,12 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
     }
 
     /// <summary>
-    /// Выборочная проверка: начало, конец и несколько мест в середине.
+    /// Sampled scan: start, end and several places in between.
     /// </summary>
     /// <remarks>
-    /// Размен между быстрой и полной: повреждение в середине трека слышно, а
-    /// читается при этом несколько секунд, а не весь файл. Последнее окно берётся
-    /// у самого конца — недокачанные файлы обрываются именно там.
+    /// The trade between quick and full: damage in the middle of a track is
+    /// caught while only seconds are read. The last window sits at the very
+    /// end, which is where partial downloads break off.
     /// </remarks>
     private static AudioProbeResult ReadSamples(
         int handle,
@@ -310,7 +309,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             windowBytes = ReadChunkBytes * 2;
         }
 
-        // Файл короче нескольких окон — читать его целиком и быстрее, и точнее.
+        // Shorter than a few windows: reading it whole is both faster and more accurate.
         if (totalBytes <= 0 || totalBytes <= windowBytes * SampleWindows)
         {
             return ReadWholeFile(handle, format, declared, sink, cancellationToken);
@@ -323,7 +322,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Последнее окно прижимается к концу файла, остальные раскладываются равномерно.
+            // The last window is pinned to the end; the rest are spread evenly.
             long position = i == SampleWindows - 1
                 ? Math.Max(0, totalBytes - windowBytes)
                 : totalBytes / SampleWindows * i;
@@ -334,7 +333,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
 
                 if (i == SampleWindows - 1)
                 {
-                    // До конца файла доехать не удалось: он короче, чем обещает заголовок.
+                    // Could not reach the end: shorter than the header promises.
                     return AudioProbeResult
                         .Success(Bass.ChannelBytes2Seconds(handle, decodedBytes), format, declared) with
                     {
@@ -371,13 +370,13 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         };
     }
 
-    /// <summary>Битрейт по данным декодера, килобит в секунду.</summary>
+    /// <summary>Bitrate per the decoder, in kilobits per second.</summary>
     private static int ReadBitrate(int handle) =>
         Bass.ChannelGetAttribute(handle, ChannelAttribute.Bitrate, out float bitrate)
             ? (int)Math.Round(bitrate)
             : 0;
 
-    /// <summary>Читает поток порциями, пока не наберёт нужное или не кончится звук.</summary>
+    /// <summary>Reads the stream in chunks until enough is gathered or the audio ends.</summary>
     private static ReadOutcome ReadRun(
         int handle,
         long targetBytes,
@@ -398,7 +397,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             {
                 Errors error = Bass.LastError;
 
-                // Конец файла — это не ошибка: короткие треки заканчиваются раньше.
+                // End of file is not an error: short tracks finish early.
                 return error == Errors.Ended
                     ? new ReadOutcome(total, null)
                     : new ReadOutcome(total, error);
@@ -409,8 +408,8 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
                 break;
             }
 
-            // Поток открыт с флагом Float, поэтому байты буфера — это отсчёты
-            // в диапазоне −1…1, и пересчитывать их не нужно.
+            // The stream is opened with the Float flag, so the buffer bytes
+            // are already samples in the −1…1 range.
             sink.Add(System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(buffer.AsSpan(0, read)));
 
             total += read;
@@ -419,7 +418,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         return new ReadOutcome(total, null);
     }
 
-    /// <summary>Длительность заметно меньше заявленной заголовком.</summary>
+    /// <summary>Duration falls noticeably short of the declared one.</summary>
     private static bool IsShort(double decoded, double declared) =>
         declared > 1 && decoded < declared - TruncationToleranceSeconds;
 
@@ -446,15 +445,15 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             format,
             declared);
 
-    /// <summary>Сколько удалось прочитать и с какой ошибкой это закончилось.</summary>
+    /// <summary>How much was read and which error ended it.</summary>
     private readonly record struct ReadOutcome(long Bytes, Errors? Failure);
 
     /// <summary>
-    /// Раздаёт прочитанные отсчёты всем, кто их считает.
+    /// Hands the samples that were read to everything that measures them.
     /// </summary>
     /// <remarks>
-    /// Нужен, чтобы не тащить через все способы чтения два отдельных
-    /// накопителя: буфер один, проход по нему тоже должен быть один.
+    /// Keeps the read paths from carrying two separate accumulators: one
+    /// buffer deserves one pass.
     /// </remarks>
     private sealed class SampleSink(AudioStatsAccumulator stats, SpectrumAnalyzer spectrum)
     {
@@ -482,9 +481,9 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
                 return;
             }
 
-            // Ждём начатые чтения. Новые не начнутся: Probe смотрит на _disposed.
-            // Если поток застрял насовсем, освобождаем всё равно — программа
-            // уже закрывается, и висеть в ожидании хуже.
+            // Wait for reads in flight; no new ones start because Probe checks
+            // _disposed. If a thread is stuck for good, free anyway — the app is
+            // closing, and hanging is worse.
             SpinWait spin = default;
             long deadline = Environment.TickCount64 + (long)ShutdownWait.TotalMilliseconds;
             while (Volatile.Read(ref _activeProbes) > 0 && Environment.TickCount64 < deadline)
@@ -503,7 +502,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         }
     }
 
-    /// <summary>Загружает все найденные плагины форматов из папки <c>bass\</c>.</summary>
+    /// <summary>Loads every format plug-in found in the <c>bass\</c> folder.</summary>
     private void LoadPlugins()
     {
         List<string> loaded = [];
@@ -512,7 +511,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         {
             string name = Path.GetFileNameWithoutExtension(dll);
 
-            // Сама bass.dll — не плагин.
+            // bass.dll itself is not a plug-in.
             if (name.Equals("bass", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
@@ -526,15 +525,15 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             }
             else
             {
-                // Не все bass*.dll — плагины формата (например, basswasapi):
-                // это не ошибка, просто такой файл нам не нужен.
+                // Not every bass*.dll is a format plug-in (basswasapi, say);
+                // a failure here is normal, not an error.
             }
         }
 
         LoadedPlugins = loaded;
     }
 
-    /// <summary>Формат, который определил сам декодер, — для сверки с расширением.</summary>
+    /// <summary>Format the decoder itself identified, for the extension check.</summary>
     private static string? DetectFormat(int handle)
     {
         if (!Bass.ChannelGetInfo(handle, out ChannelInfo info))
@@ -572,7 +571,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         };
     }
 
-    /// <summary>Разбирает ошибку открытия потока в понятный итог.</summary>
+    /// <summary>Turns a stream-open error into a meaningful outcome.</summary>
     private static AudioProbeResult FromOpenError(Errors error) => error switch
     {
         Errors.WmaLicense or Errors.WmaAccesDenied or Errors.WmaIndividual => new AudioProbeResult(
@@ -601,7 +600,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             $"BASS → {error}"),
     };
 
-    /// <summary>Человеческое описание кода ошибки BASS — без «Error 0x…» в основном тексте.</summary>
+    /// <summary>Human wording for a BASS error code; no "Error 0x…" in the main text.</summary>
     internal static string Describe(Errors error) => error switch
     {
         Errors.OK => "ошибок нет",

@@ -1,16 +1,15 @@
 ﻿namespace MusicScanIntegrity.Core.Audio;
 
 /// <summary>
-/// Что видно в самих отсчётах: громкость, перегрузка, постоянная составляющая,
-/// провалы в тишину.
+/// What the samples themselves show: level, clipping, DC offset and dropouts.
 /// </summary>
-/// <param name="Samples">Сколько отсчётов просмотрено.</param>
-/// <param name="Peak">Наибольшее значение по модулю; 1 — предел шкалы.</param>
-/// <param name="Rms">Средняя громкость.</param>
-/// <param name="ClippedSamples">Сколько отсчётов упёрлось в предел шкалы.</param>
-/// <param name="DcOffset">Среднее значение: у нормальной записи оно около нуля.</param>
-/// <param name="LongestSilentRun">Самая длинная тишина внутри звучащего куска, в отсчётах.</param>
-/// <param name="SampleRate">Сколько отсчётов приходится на секунду с учётом всех каналов.</param>
+/// <param name="Samples">How many samples were examined.</param>
+/// <param name="Peak">Largest absolute value; 1 is full scale.</param>
+/// <param name="Rms">Mean level.</param>
+/// <param name="ClippedSamples">How many samples reached full scale.</param>
+/// <param name="DcOffset">Mean value; close to zero in a healthy recording.</param>
+/// <param name="LongestSilentRun">Longest silence inside audible material, in samples.</param>
+/// <param name="SampleRate">Samples per second across all channels.</param>
 public sealed record AudioStats(
     long Samples,
     double Peak,
@@ -20,48 +19,49 @@ public sealed record AudioStats(
     long LongestSilentRun,
     int SampleRate)
 {
-    /// <summary>Ничего не измеряли.</summary>
+    /// <summary>Nothing was measured.</summary>
     public static readonly AudioStats Empty = new(0, 0, 0, 0, 0, 0, 0);
 
-    /// <summary>Доля отсчётов на пределе шкалы.</summary>
+    /// <summary>Share of samples at full scale.</summary>
     public double ClippedShare => Samples == 0 ? 0 : (double)ClippedSamples / Samples;
 
     /// <summary>
-    /// Самая длинная тишина внутри звучащего куска, в секундах.
+    /// Longest silence inside audible material, in seconds.
     /// </summary>
     /// <remarks>
-    /// Тишина в начале и в конце не считается: почти у каждого трека есть
-    /// подводка и затухание, и объявлять их провалом значило бы ругаться на
-    /// половину коллекции. Провал — это когда звук был, пропал и снова появился.
+    /// Silence at the start and the end does not count: nearly every track has
+    /// an intro and a fade, and calling those dropouts would flag half a
+    /// collection. A dropout is sound that stops and then returns.
     /// </remarks>
     public double LongestSilentSeconds => SampleRate <= 0 ? 0 : (double)LongestSilentRun / SampleRate;
 
-    /// <summary>Прочитанное — сплошная тишина.</summary>
+    /// <summary>What was read is entirely silent.</summary>
     /// <remarks>
-    /// Порог −60 дБ, а не ноль: у настоящих записей в тихих местах остаётся
-    /// шум оцифровки, и требовать точных нулей значило бы не находить ничего.
+    /// The threshold is −60 dB rather than zero: real recordings keep
+    /// conversion noise in quiet passages, and demanding exact zeroes would
+    /// find nothing.
     /// </remarks>
     public bool IsSilent => Samples > 0 && Peak < 0.001;
 }
 
 /// <summary>
-/// Накопитель характеристик звука: считает всё за один проход по отсчётам.
+/// Accumulates audio statistics in a single pass over the samples.
 /// </summary>
 /// <remarks>
-/// Отсчёты и так проходят через программу при декодировании, поэтому эти числа
-/// достаются бесплатно — без второго чтения диска. Вынесен в отдельный тип,
-/// чтобы проверяться тестами без BASS и без звуковых файлов.
+/// The samples pass through during decoding anyway, so these numbers are free
+/// — no second disk read. Kept as its own type so it can be tested without
+/// BASS and without audio files.
 /// </remarks>
 public sealed class AudioStatsAccumulator(int sampleRate)
 {
-    /// <summary>Уровень, ниже которого отсчёт считается тишиной.</summary>
+    /// <summary>Level below which a sample counts as silence.</summary>
     /// <remarks>
-    /// Не ноль: в записи, прошедшей через аналоговый тракт, абсолютных нулей
-    /// почти не бывает, а провал звука слышен уже на −80 дБ.
+    /// Not zero: a recording that passed through an analogue path almost never
+    /// contains absolute zeroes, and a dropout is audible from −80 dB.
     /// </remarks>
     private const double SilenceLevel = 0.0001;
 
-    /// <summary>Уровень, начиная с которого отсчёт считается упёршимся в предел.</summary>
+    /// <summary>Level from which a sample counts as clipped.</summary>
     private const double ClipLevel = 0.9995;
 
     private long _samples;
@@ -73,8 +73,8 @@ public sealed class AudioStatsAccumulator(int sampleRate)
     private long _longestSilentRun;
     private bool _sawSound;
 
-    /// <summary>Добавляет очередную порцию отсчётов.</summary>
-    /// <param name="samples">Отсчёты в диапазоне −1…1.</param>
+    /// <summary>Feeds in the next batch of samples.</summary>
+    /// <param name="samples">Samples in the −1…1 range.</param>
     public void Add(ReadOnlySpan<float> samples)
     {
         foreach (float value in samples)
@@ -102,8 +102,8 @@ public sealed class AudioStatsAccumulator(int sampleRate)
             }
             else
             {
-                // Тишина учитывается только когда она закончилась и до неё был
-                // звук: подводка в начале и затухание в конце провалом не считаются.
+                // Silence counts only once it ends and sound preceded it: the
+                // intro and the fade are not dropouts.
                 if (_sawSound && _silentRun > _longestSilentRun)
                 {
                     _longestSilentRun = _silentRun;
@@ -115,8 +115,8 @@ public sealed class AudioStatsAccumulator(int sampleRate)
         }
     }
 
-    /// <summary>Собирает итог.</summary>
-    /// <returns>Характеристики прочитанного звука.</returns>
+    /// <summary>Produces the result.</summary>
+    /// <returns>Statistics for the audio that was read.</returns>
     public AudioStats Build() => _samples == 0
         ? AudioStats.Empty
         : new AudioStats(

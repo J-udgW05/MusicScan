@@ -1,18 +1,17 @@
 namespace MusicScanIntegrity.Core.Audio;
 
 /// <summary>
-/// Определяет реальный формат файла по сигнатуре в его начале.
-/// Нужно для замечания «расширение не соответствует содержимому»
-/// (03_IMPLEMENTATION_GUIDE.md, раздел 1).
+/// Identifies the real format from the signature at the start of a file,
+/// which is what the extension-mismatch finding is based on.
 /// </summary>
 public static class ContentTypeSniffer
 {
-    /// <summary>Сколько байт достаточно прочитать, чтобы узнать формат.</summary>
+    /// <summary>How many bytes are enough to identify the format.</summary>
     public const int HeaderSize = 64;
 
     /// <summary>
-    /// Формат по сигнатуре: «FLAC», «MP3»… <see langword="null"/>, если
-    /// сигнатура неизвестна — это не повод жаловаться пользователю.
+    /// Format from the signature. <see langword="null"/> for an unknown
+    /// signature, which is not something to report to the user.
     /// </summary>
     public static string? Detect(ReadOnlySpan<byte> header)
     {
@@ -61,7 +60,7 @@ public static class ContentTypeSniffer
             return "WMA";
         }
 
-        // ID3-тег или прямой синхромаркер кадра MPEG.
+        // An ID3 tag or a bare MPEG frame sync marker.
         if (Starts(header, "ID3"u8))
         {
             return "MP3";
@@ -69,11 +68,11 @@ public static class ContentTypeSniffer
 
         if (header[0] == 0xFF && (header[1] & 0xE0) == 0xE0)
         {
-            // 0xFFF1/0xFFF9 — ADTS-заголовок AAC, остальное — MPEG Audio.
+            // 0xFFF1/0xFFF9 is an AAC ADTS header; anything else is MPEG Audio.
             return (header[1] & 0x16) == 0x10 ? "AAC" : "MP3";
         }
 
-        // Трекерные форматы: сигнатура лежит не в начале файла.
+        // Tracker formats keep their signature away from the start.
         if (header.Length >= 48 && header[44..48].SequenceEqual("SCRM"u8)) return "S3M";
         if (header.Length >= 4 && header[..4].SequenceEqual("IMPM"u8)) return "IT";
         if (header.Length >= 17 && header[..17].SequenceEqual("Extended Module: "u8)) return "XM";
@@ -81,7 +80,7 @@ public static class ContentTypeSniffer
         return null;
     }
 
-    /// <summary>Читает начало файла и определяет формат; <see langword="null"/> при ошибке чтения.</summary>
+    /// <summary>Reads the start of a file and identifies the format; <see langword="null"/> on a read error.</summary>
     public static string? DetectFromFile(string path)
     {
         try
@@ -105,8 +104,8 @@ public static class ContentTypeSniffer
     }
 
     /// <summary>
-    /// Считает, что расширение и содержимое согласованы.
-    /// Разные названия одного контейнера (M4A/MP4/ALAC, OGG/OPUS) конфликтом не считаются.
+    /// Whether extension and contents agree. Different names for the same
+    /// container (M4A/MP4/ALAC, OGG/OPUS) are not a conflict.
     /// </summary>
     public static bool Matches(string extension, string detectedFormat)
     {
@@ -127,7 +126,7 @@ public static class ContentTypeSniffer
             ("OPUS", "OPUS" or "OGG") => true,
             ("DFF", "DFF") or ("DSF", "DSF") => true,
             ("WAV", "WAV") => true,
-            // MP3-файл, начинающийся с ID3-тега, определяется как MP3 — и наоборот.
+            // An MP3 starting with an ID3 tag identifies as MP3, and vice versa.
             ("MP3", "MP1" or "MP2" or "MP3") => true,
             _ => false,
         };
@@ -138,7 +137,7 @@ public static class ContentTypeSniffer
 
     private static string DetectOgg(ReadOnlySpan<byte> header)
     {
-        // Кодек указан в первом пакете страницы Ogg, сразу после 28-байтового заголовка.
+        // The codec sits in the first packet of the Ogg page, right after the 28-byte header.
         if (header.Length >= 35)
         {
             ReadOnlySpan<byte> payload = header[28..];
