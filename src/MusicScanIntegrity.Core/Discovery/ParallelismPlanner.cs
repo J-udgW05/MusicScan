@@ -3,19 +3,19 @@ using MusicScanIntegrity.Core.Settings;
 namespace MusicScanIntegrity.Core.Discovery;
 
 /// <summary>
-/// Решает, сколько файлов проверять одновременно.
+/// Decides how many files are checked at once.
 /// </summary>
 /// <remarks>
-/// Вынесено из движка отдельной чистой функцией: решение зависит от настроек и
-/// типа носителя, и проверять его надо на всех сочетаниях, а не только на том
-/// диске, который случайно оказался в машине.
+/// Kept out of the engine as a pure function: the decision depends on the
+/// settings and the drive type, and has to be testable for every combination
+/// rather than whichever disk happens to be in the machine.
 /// </remarks>
 public static class ParallelismPlanner
 {
-    /// <summary>Выбирает число потоков.</summary>
-    /// <param name="settings">Текущие настройки.</param>
-    /// <param name="storage">Тип носителя, на котором лежит коллекция.</param>
-    /// <returns>Сколько файлов проверять одновременно.</returns>
+    /// <summary>Picks the thread count.</summary>
+    /// <param name="settings">Current settings.</param>
+    /// <param name="storage">Drive type the collection sits on.</param>
+    /// <returns>How many files to check at once.</returns>
     public static int Resolve(AppSettings settings, StorageType storage)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -27,8 +27,8 @@ public static class ParallelismPlanner
             return requested;
         }
 
-        // Ограничиваем только там, где перемотка действительно стоит времени.
-        // «Не знаю» — это не повод менять поведение: гадать вредно.
+        // Capped only where seeking actually costs time. "Unknown" is not a
+        // reason to change behaviour; guessing would be worse.
         return storage == StorageType.HardDisk ? AppSettings.HardDiskParallelism : requested;
     }
 }

@@ -1,8 +1,8 @@
 namespace MusicScanIntegrity.Core.Playlists;
 
 /// <summary>
-/// PLS — INI-подобный формат с секцией [playlist] и ключами вида «File1=путь».
-/// Интересуют только ключи FileN; Title и Length описывают трек, а не путь.
+/// PLS is an INI-like format with a [playlist] section and "File1=path" keys.
+/// Only the FileN keys matter; Title and Length describe the track.
 /// </summary>
 public sealed class PlsPlaylistParser : IPlaylistParser
 {
@@ -15,7 +15,7 @@ public sealed class PlsPlaylistParser : IPlaylistParser
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        // Сохраняем порядок из файла: File1, File2, … могут идти вперемешку с Title.
+        // Preserve file order: File1, File2, … may be interleaved with Title.
         List<(int Index, string Path)> entries = [];
         int fallbackIndex = int.MaxValue / 2;
 
@@ -45,7 +45,7 @@ public sealed class PlsPlaylistParser : IPlaylistParser
                 continue;
             }
 
-            // «File12» → 12; если номера нет, ставим запись в конец в порядке появления.
+            // "File12" → 12; entries without a number go last, in order.
             int index = int.TryParse(key.AsSpan(4), out int parsed) ? parsed : fallbackIndex++;
             entries.Add((index, value));
         }

@@ -3,21 +3,20 @@ using MusicScanIntegrity.Core.Models;
 
 namespace MusicScanIntegrity.Core.Playlists;
 
-/// <summary>Проверка плейлистов: существуют ли пути, на которые они ссылаются.</summary>
+/// <summary>Checks playlists: do the paths they reference exist.</summary>
 public interface IPlaylistService
 {
     /// <summary>
-    /// Проверяет один плейлист. Файлы не декодируются — только проверяется
-    /// существование путей (02_ARCHITECTURE.md, раздел 6).
+    /// Checks one playlist. Nothing is decoded; only path existence is
+    /// verified.
     /// </summary>
-    /// <param name="playlistPath">Путь к файлу плейлиста.</param>
+    /// <param name="playlistPath">Path to the playlist file.</param>
     /// <param name="knownStatuses">
-    /// Статусы файлов из основного сканирования — чтобы один и тот же файл
-    /// не получил два разных результата.
+    /// Statuses from the main scan, so the same file cannot end up with two
+    /// different results.
     /// </param>
     /// <param name="knownDurations">
-    /// Длительности файлов из основного сканирования: по ним проверяются метки
-    /// дорожек в cue-листах.
+    /// Durations from the main scan, used to validate cue sheet track marks.
     /// </param>
     Task<PlaylistCheckResult> CheckAsync(
         string playlistPath,
@@ -31,14 +30,14 @@ public sealed class PlaylistService : IPlaylistService
 {
     private readonly Dictionary<string, IPlaylistParser> _parsers;
 
-    /// <summary>Создаёт службу со стандартным набором разборщиков.</summary>
+    /// <summary>Creates the service with the standard set of parsers.</summary>
     public PlaylistService(IEnumerable<IPlaylistParser>? parsers = null)
     {
         _parsers = new Dictionary<string, IPlaylistParser>(StringComparer.OrdinalIgnoreCase);
 
-        // Пустой набор считается «не задан»: контейнер внедрения зависимостей
-        // подставляет пустую коллекцию вместо значения по умолчанию, и без этой
-        // проверки служба осталась бы вообще без разборщиков.
+        // An empty set counts as "not supplied": the DI container passes an
+        // empty collection rather than the default, which would leave the
+        // service with no parsers at all.
         IReadOnlyList<IPlaylistParser> all = parsers?.ToArray() is { Length: > 0 } provided
             ? provided
             : [new M3uPlaylistParser(), new PlsPlaylistParser(), new CuePlaylistParser()];
@@ -126,12 +125,12 @@ public sealed class PlaylistService : IPlaylistService
     }
 
     /// <summary>
-    /// Сверяет метки дорожек cue-листа с длительностью файла.
+    /// Checks cue sheet track marks against the file duration.
     /// </summary>
     /// <remarks>
-    /// Метка за пределом файла означает, что cue и аудио — из разных изданий:
-    /// диск размечен на один файл, а рядом лежит другой. Проигрыватель в таком
-    /// случае молча покажет дорожки, которых нет.
+    /// A mark past the end means the cue and the audio come from different
+    /// releases: the sheet describes one file while another sits next to it.
+    /// A player would silently list tracks that do not exist.
     /// </remarks>
     private static CheckIssue? CheckCueMarks(
         string playlistPath,
@@ -163,8 +162,8 @@ public sealed class PlaylistService : IPlaylistService
 
         CueMark last = marks[^1];
 
-        // Допуск в секунду: последняя дорожка иногда начинается вплотную к концу,
-        // а длительность из заголовка округлена.
+        // One second of slack: the last track sometimes starts right at the
+        // end and the header duration is rounded.
         if (last.Seconds <= duration + 1)
         {
             return null;
@@ -177,8 +176,8 @@ public sealed class PlaylistService : IPlaylistService
     }
 
     /// <summary>
-    /// Разворачивает путь из плейлиста. Относительные пути считаются
-    /// от папки самого плейлиста, а не от рабочей папки программы.
+    /// Resolves a playlist path. Relative paths are taken from the playlist's
+    /// own folder, not the process working directory.
     /// </summary>
     internal static string? ResolvePath(string rawPath, string baseFolder)
     {
@@ -188,7 +187,7 @@ public sealed class PlaylistService : IPlaylistService
             return null;
         }
 
-        // Ссылки на поток по сети — не файл на диске, проверять нечего.
+        // Network stream URLs are not files on disk; nothing to check.
         if (trimmed.Contains("://", StringComparison.Ordinal))
         {
             return null;
@@ -196,7 +195,7 @@ public sealed class PlaylistService : IPlaylistService
 
         try
         {
-            // В плейлистах, приехавших с других систем, встречается «/» вместо «\».
+            // Playlists from other systems use "/" instead of "\".
             string normalized = trimmed.Replace('/', Path.DirectorySeparatorChar);
 
             return Path.IsPathRooted(normalized)
@@ -205,14 +204,14 @@ public sealed class PlaylistService : IPlaylistService
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {
-            // Строка вообще не похожа на путь — считаем её отсутствующей записью.
+            // Not path-like at all; treated as a missing entry.
             return null;
         }
     }
 
     /// <summary>
-    /// Читает плейлист с учётом кодировки: .m3u8 и файлы с BOM — UTF-8,
-    /// старые .m3u и .pls без BOM обычно в системной ANSI-кодировке.
+    /// Reads a playlist with encoding detection: .m3u8 and files with a BOM
+    /// are UTF-8; older .m3u and .pls without one are usually system ANSI.
     /// </summary>
     private static async Task<string> ReadTextAsync(string path, CancellationToken cancellationToken)
     {
@@ -239,7 +238,7 @@ public sealed class PlaylistService : IPlaylistService
             return Encoding.UTF8.GetString(bytes);
         }
 
-        // Пробуем UTF-8 строго: если байты валидный UTF-8, это почти наверняка он.
+        // Try strict UTF-8 first: if the bytes decode, it almost certainly is.
         try
         {
             return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes);

@@ -4,13 +4,12 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Discovery;
 
-/// <summary>Быстрый обход папки без декодирования файлов.</summary>
+/// <summary>Fast folder walk that decodes nothing.</summary>
 public interface IFileDiscoveryService
 {
     /// <summary>
-    /// Обходит папку и собирает список кандидатов на проверку.
-    /// Файлы не открываются — только перечисление каталога
-    /// (02_ARCHITECTURE.md, раздел 9).
+    /// Walks the folder and collects candidates for checking. No file is
+    /// opened; this is directory enumeration only.
     /// </summary>
     Task<DiscoveryResult> DiscoverAsync(
         string rootPath,
@@ -20,17 +19,16 @@ public interface IFileDiscoveryService
 }
 
 /// <summary>
-/// Обход папки собственным стеком, а не <c>Directory.EnumerateFiles(recursive)</c>.
+/// Walks with its own stack rather than <c>Directory.EnumerateFiles(recursive)</c>.
 /// </summary>
 /// <remarks>
-/// Причина: встроенный рекурсивный обход падает целиком на первой же папке,
-/// куда нет доступа, и не даёт сказать пользователю, какие именно папки пропущены.
-/// Свой обход переживает недоступную папку, продолжает работу и честно сообщает
-/// о ней (01_SPECIFICATION.md, раздел 9 — «честно сказать об этом пользователю»).
+/// The built-in recursive walk aborts entirely on the first inaccessible
+/// folder and cannot report which folders were skipped. This one survives a
+/// denied folder, carries on and reports it.
 /// </remarks>
 public sealed class FileDiscoveryService : IFileDiscoveryService
 {
-    /// <summary>Как часто сообщать о прогрессе обхода.</summary>
+    /// <summary>How often walk progress is reported.</summary>
     private const int ProgressReportEvery = 500;
 
     private static readonly EnumerationOptions EnumerationOptions = new()
@@ -51,7 +49,7 @@ public sealed class FileDiscoveryService : IFileDiscoveryService
         ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
         ArgumentNullException.ThrowIfNull(settings);
 
-        // Обход диска — операция синхронная и долгая: уводим её с потока интерфейса.
+        // Walking the disk is synchronous and slow; keep it off the UI thread.
         return Task.Run(() => Discover(rootPath, settings, progress, cancellationToken), cancellationToken);
     }
 
@@ -92,8 +90,8 @@ public sealed class FileDiscoveryService : IFileDiscoveryService
 
                     if (entry is DirectoryInfo directory)
                     {
-                        // Точки повторного разбора (симлинки, junction) пропускаем:
-                        // иначе обход может зациклиться на самом себе.
+                        // Reparse points (symlinks, junctions) are skipped, or
+                        // the walk can loop back on itself.
                         if (settings.Recursive && !directory.Attributes.HasFlag(FileAttributes.ReparsePoint))
                         {
                             pending.Push(directory.FullName);
@@ -182,7 +180,7 @@ public sealed class FileDiscoveryService : IFileDiscoveryService
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Размер — не повод прерывать обход; проверка узнает его сама.
+            // A missing size is no reason to stop; the check reads it later.
             return -1;
         }
     }

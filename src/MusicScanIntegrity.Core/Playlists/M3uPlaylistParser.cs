@@ -1,8 +1,8 @@
 namespace MusicScanIntegrity.Core.Playlists;
 
 /// <summary>
-/// M3U и M3U8 — простой построчный список путей.
-/// Строки, начинающиеся с «#», — служебные директивы (#EXTM3U, #EXTINF) и не пути.
+/// M3U and M3U8 are a plain line-by-line list of paths. Lines starting with
+/// "#" are directives (#EXTM3U, #EXTINF), not paths.
 /// </summary>
 public sealed class M3uPlaylistParser : IPlaylistParser
 {

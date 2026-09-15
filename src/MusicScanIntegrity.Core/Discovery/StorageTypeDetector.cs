@@ -3,27 +3,26 @@ using Microsoft.Win32.SafeHandles;
 
 namespace MusicScanIntegrity.Core.Discovery;
 
-/// <summary>Каким носителем оказался диск с проверяемой папкой.</summary>
+/// <summary>What kind of drive holds the scanned folder.</summary>
 public enum StorageType
 {
-    /// <summary>Определить не удалось — сеть, виртуальный диск, отказ в доступе.</summary>
+    /// <summary>Could not be determined: network, virtual disk, access denied.</summary>
     Unknown,
 
-    /// <summary>Диск с подвижной головкой: перемотка стоит времени.</summary>
+    /// <summary>Spinning disk, where seeking costs time.</summary>
     HardDisk,
 
-    /// <summary>Твердотельный: перемотка ничего не стоит.</summary>
+    /// <summary>Solid state, where seeking is free.</summary>
     SolidState,
 }
 
 /// <summary>
-/// Определяет тип носителя, на котором лежит папка.
+/// Detects the drive type a folder sits on.
 /// </summary>
 /// <remarks>
-/// Нужно ради одного решения: сколько файлов читать одновременно. На жёстком
-/// диске восемь параллельных чтений заставляют головку метаться между дорожками,
-/// и проверка идёт медленнее, чем в два потока. На твердотельном перемотки нет,
-/// и ограничивать нечего.
+/// Exists for one decision: how many files to read at once. On a spinning
+/// disk eight parallel reads make the head seek between tracks and run slower
+/// than two threads. An SSD has no such penalty.
 /// </remarks>
 public static class StorageTypeDetector
 {
@@ -34,9 +33,9 @@ public static class StorageTypeDetector
     private const uint FileShareReadWrite = 0x00000003;
     private const uint OpenExisting = 3;
 
-    /// <summary>Определяет тип носителя для пути.</summary>
-    /// <param name="path">Папка или файл.</param>
-    /// <returns>Тип носителя; <see cref="StorageType.Unknown" />, если выяснить не удалось.</returns>
+    /// <summary>Detects the drive type for a path.</summary>
+    /// <param name="path">Folder or file.</param>
+    /// <returns>The drive type, or <see cref="StorageType.Unknown" /> if it could not be determined.</returns>
     public static StorageType Detect(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -48,7 +47,7 @@ public static class StorageTypeDetector
         {
             string full = Path.GetFullPath(path);
 
-            // Сетевые пути к физическому диску отношения не имеют.
+            // Network paths have no bearing on a physical disk.
             if (full.StartsWith(@"\\", StringComparison.Ordinal))
             {
                 return StorageType.Unknown;
@@ -64,18 +63,17 @@ public static class StorageTypeDetector
         }
         catch (Exception)
         {
-            // Ответ этой проверки — подсказка, а не факт: она только выбирает
-            // число потоков. Любая неожиданность здесь означает «не знаю»,
-            // а не повод ронять проверку коллекции.
+            // The answer is a hint, not a fact: it only picks a thread count.
+            // Anything unexpected means "unknown" rather than a failed scan.
             return StorageType.Unknown;
         }
     }
 
-    /// <summary>Спрашивает у драйвера, стоит ли перемотка времени.</summary>
+    /// <summary>Asks the driver whether seeking incurs a penalty.</summary>
     private static StorageType QuerySeekPenalty(string device)
     {
-        // Нулевые права доступа: описание устройства читается и без права на
-        // чтение данных, а с ними Windows потребовала бы прав администратора.
+        // Zero access rights: the device description can be read without data
+        // read access, which would otherwise require administrator rights.
         using SafeFileHandle handle = CreateFile(
             device,
             GenericNone,

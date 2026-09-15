@@ -1,9 +1,9 @@
 ﻿namespace MusicScanIntegrity.Core.Playlists;
 
 /// <summary>
-/// CUE — текстовые директивы. Путь к аудио задаёт строка
-/// <c>FILE "имя.flac" WAVE</c>; дорожки (TRACK/INDEX) описывают позиции
-/// внутри того же файла и отдельными путями не являются.
+/// CUE is a set of text directives. The audio path comes from
+/// <c>FILE "name.flac" WAVE</c>; TRACK/INDEX entries mark positions inside
+/// that same file and are not separate paths.
 /// </summary>
 public sealed class CuePlaylistParser : IPlaylistParser
 {
@@ -36,13 +36,13 @@ public sealed class CuePlaylistParser : IPlaylistParser
     }
 
     /// <summary>
-    /// Достаёт метки дорожек: номер и время начала в секундах.
+    /// Extracts track marks: number and start offset in seconds.
     /// </summary>
-    /// <param name="content">Текст cue-листа.</param>
-    /// <returns>Метки в порядке появления.</returns>
+    /// <param name="content">Cue sheet text.</param>
+    /// <returns>Marks in the order they appear.</returns>
     /// <remarks>
-    /// Время записано как «минуты:секунды:кадры», где кадр — одна
-    /// семьдесятпятая секунды: так размечают компакт-диски.
+    /// Times are written as minutes:seconds:frames, where a frame is a
+    /// seventy-fifth of a second — the CD convention.
     /// </remarks>
     public static IReadOnlyList<CueMark> ParseMarks(string content)
     {
@@ -81,7 +81,7 @@ public sealed class CuePlaylistParser : IPlaylistParser
         return marks;
     }
 
-    /// <summary>Разбирает время вида «12:34:56».</summary>
+    /// <summary>Parses a "12:34:56" timestamp.</summary>
     private static bool TryParseTime(string value, out double seconds)
     {
         seconds = 0;
@@ -100,8 +100,8 @@ public sealed class CuePlaylistParser : IPlaylistParser
     }
 
     /// <summary>
-    /// Достаёт имя файла из строки FILE. Имя обычно в кавычках, но встречаются
-    /// файлы без кавычек — тогда путём считается всё до последнего слова-типа
+    /// Pulls the file name out of a FILE line. It is normally quoted, but
+    /// unquoted ones exist; then everything up to the trailing type word
     /// (WAVE, MP3, BINARY, AIFF, MOTOROLA).
     /// </summary>
     private static string? ExtractFilePath(string line)
@@ -124,7 +124,6 @@ public sealed class CuePlaylistParser : IPlaylistParser
     }
 }
 
-/// <summary>Метка дорожки внутри cue-листа.</summary>
-/// <param name="Track">Номер дорожки.</param>
-/// <param name="Seconds">Время начала от начала файла.</param>
+/// <summary>A track mark inside a cue sheet.</summary>
+/// <param name="Seconds">Start offset from the beginning of the file.</param>
 public readonly record struct CueMark(int Track, double Seconds);
