@@ -3,14 +3,13 @@ using System.Buffers.Binary;
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка контейнера MP4 (M4A, ALAC, AAC) по структуре его блоков.
+/// Validates the MP4 container (M4A, ALAC, AAC) by its box structure.
 /// </summary>
 /// <remarks>
-/// Контрольных сумм в MP4 нет, поэтому здесь проверяется другое: файл состоит из
-/// блоков, каждый объявляет свою длину, и длины должны сойтись ровно к концу
-/// файла. Недокачанный файл на этом и попадается — последний блок обещает
-/// больше данных, чем осталось. Отсутствие обязательных блоков означает, что
-/// разрушено начало.
+/// MP4 has no checksums, so something else is verified: the file is a series
+/// of boxes, each declaring its length, and those lengths must land exactly at
+/// the end. A partial download fails here — the last box promises more data
+/// than remains. Missing mandatory boxes mean the start is damaged.
 /// </remarks>
 internal sealed class Mp4Validator : IContainerValidator
 {
@@ -69,13 +68,13 @@ internal sealed class Mp4Validator : IContainerValidator
             switch (size)
             {
                 case 1 when window.Ensure(16):
-                    // Единица в поле длины означает, что настоящая длина — следом, восемью байтами.
+                    // A length of 1 means the real 64-bit length follows.
                     size = (long)BinaryPrimitives.ReadUInt64BigEndian(window.Peek(16)[8..]);
                     headerSize = 16;
                     break;
 
                 case 0:
-                    // Ноль означает «до конца файла».
+                    // Zero means "to the end of the file".
                     size = remaining;
                     break;
             }

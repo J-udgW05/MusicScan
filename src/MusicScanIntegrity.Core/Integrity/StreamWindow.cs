@@ -1,15 +1,14 @@
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Скользящее окно над потоком: даёт разборщикам смотреть вперёд на несколько
-/// байт, не читая файл целиком в память.
+/// A sliding window over a stream, letting validators look ahead without
+/// reading the whole file into memory.
 /// </summary>
 /// <remarks>
-/// Проверять кадры и страницы приходится последовательно, но с заглядыванием
-/// вперёд — то на заголовок, то на весь кадр, чтобы посчитать по нему сумму.
-/// Читать ради этого файл целиком нельзя: в коллекциях попадаются образы дисков
-/// на несколько гигабайт. Окно держит в памяти только то, что нужно текущему
-/// кадру, и растёт лишь когда кадр действительно большой.
+/// Frames and pages are checked in order but need look-ahead — a header here,
+/// a whole frame there to checksum it. Reading the file whole is not an option:
+/// collections contain multi-gigabyte disc images. The window holds only what
+/// the current frame needs and grows only for genuinely large frames.
 /// </remarks>
 internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 1024)
 {
@@ -19,20 +18,19 @@ internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 102
     private long _consumed;
     private bool _endOfStream;
 
-    /// <summary>Смещение текущей позиции от начала файла.</summary>
+    /// <summary>Offset of the current position from the start of the file.</summary>
     public long Position => _consumed;
 
-    /// <summary>Сколько байт уже лежит в окне и готово к чтению.</summary>
+    /// <summary>How many bytes are buffered and ready to read.</summary>
     public int Available => _end - _start;
 
-    /// <summary>Поток закончился, и в окне ничего не осталось.</summary>
+    /// <summary>The stream ended and the window is empty.</summary>
     public bool AtEnd => _endOfStream && Available == 0;
 
     /// <summary>
-    /// Добивает окно до нужного числа байт.
+    /// Tops the window up to the requested number of bytes.
     /// </summary>
-    /// <param name="count">Сколько байт должно быть доступно.</param>
-    /// <returns><see langword="false" />, если файл закончился раньше.</returns>
+    /// <returns><see langword="false" /> when the file ended first.</returns>
     public bool Ensure(int count)
     {
         if (count <= Available)
@@ -57,14 +55,12 @@ internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 102
         return Available >= count;
     }
 
-    /// <summary>Показывает начало окна, не сдвигая позицию.</summary>
-    /// <param name="count">Сколько байт нужно; больше доступного не вернётся.</param>
-    /// <returns>Участок буфера.</returns>
+    /// <summary>Peeks at the start of the window without advancing.</summary>
+    /// <param name="count">Bytes wanted; never more than is available.</param>
     public ReadOnlySpan<byte> Peek(int count) =>
         _buffer.AsSpan(_start, Math.Min(count, Available));
 
-    /// <summary>Сдвигает позицию вперёд по уже прочитанным байтам.</summary>
-    /// <param name="count">На сколько байт сдвинуться.</param>
+    /// <summary>Advances the position over bytes already read.</summary>
     public void Advance(int count)
     {
         int step = Math.Min(count, Available);
@@ -73,10 +69,9 @@ internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 102
     }
 
     /// <summary>
-    /// Пропускает произвольное число байт, при возможности перепрыгивая по потоку.
+    /// Skips an arbitrary number of bytes, seeking when the stream allows.
     /// </summary>
-    /// <param name="count">Сколько байт пропустить.</param>
-    /// <returns><see langword="false" />, если файл закончился раньше.</returns>
+    /// <returns><see langword="false" /> when the file ended first.</returns>
     public bool Skip(long count)
     {
         if (count <= 0)
@@ -110,7 +105,7 @@ internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 102
             return true;
         }
 
-        // Поток без перемотки — дочитываем вручную.
+        // Non-seekable stream; read through manually.
         while (remaining > 0)
         {
             if (!Ensure(1))
@@ -126,15 +121,15 @@ internal sealed class StreamWindow(Stream stream, int initialCapacity = 64 * 102
         return true;
     }
 
-    /// <summary>Освобождает место в буфере: сдвигает остаток к началу и при нужде растит его.</summary>
+    /// <summary>Makes room: moves the remainder to the front and grows the buffer if needed.</summary>
     private void MakeRoom(int count)
     {
         if (_buffer.Length >= count)
         {
-            // Места хватит, если сдвинуть остаток к началу: после сдвига
-            // свободен весь буфер, а не только его хвост. Сравнивать с хвостом
-            // значило бы заводить новый буфер того же размера на каждом кадре,
-            // который не поместился в остаток, — а таких на большом файле сотни.
+            // Moving the remainder to the front frees the whole buffer, not
+            // just its tail. Comparing against the tail instead would allocate
+            // a new buffer of the same size for every frame that did not fit —
+            // hundreds of them on a large file.
             if (_start > 0)
             {
                 Compact();

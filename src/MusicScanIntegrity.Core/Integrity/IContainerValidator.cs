@@ -1,32 +1,28 @@
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Разборщик одного семейства форматов: читает файл его собственными правилами
-/// и говорит, сошлись ли контрольные суммы.
+/// Validator for one family of formats: reads the file by its own rules and
+/// reports whether the checksums match.
 /// </summary>
 /// <remarks>
-/// Это не декодирование: звук не восстанавливается, читаются только заголовки,
-/// границы кадров и суммы. Поэтому проверка упирается в скорость диска, а не
-/// в процессор, и даёт точный ответ там, где декодер даёт лишь «открылось».
+/// This is not decoding: no audio is reconstructed, only headers, frame
+/// boundaries and checksums are read. It is therefore bound by disk speed
+/// rather than CPU, and definite where a decoder only says "it opened".
 /// </remarks>
 internal interface IContainerValidator
 {
-    /// <summary>Название формата для сообщений.</summary>
+    /// <summary>Format name used in messages.</summary>
     string Format { get; }
 
-    /// <summary>Начальные байты, по которым файл опознаётся как свой.</summary>
-    /// <param name="header">Первые байты файла.</param>
-    /// <returns><see langword="true" />, если разборщик берётся за файл.</returns>
+    /// <summary>Whether the leading bytes identify a file this validator handles.</summary>
     bool Matches(ReadOnlySpan<byte> header);
 
-    /// <summary>Проверяет открытый файл.</summary>
-    /// <param name="stream">Поток с начала файла.</param>
-    /// <param name="bounds">Где внутри файла лежат аудиоданные: без тегов.</param>
-    /// <param name="cancellationToken">Отмена: стоп или таймаут по файлу.</param>
-    /// <returns>Вердикт.</returns>
+    /// <summary>Validates an open file.</summary>
+    /// <param name="stream">Stream positioned at the start of the file.</param>
+    /// <param name="bounds">Where the audio data sits, excluding tags.</param>
     /// <remarks>
-    /// Смещения в вердикте считаются от начала файла, а не от начала потока:
-    /// человек ищет место повреждения в файле целиком.
+    /// Offsets in the verdict are measured from the start of the file, not the
+    /// stream: that is where the reader looks for the damage.
     /// </remarks>
     ContainerValidation Validate(Stream stream, ContainerBounds bounds, CancellationToken cancellationToken);
 }

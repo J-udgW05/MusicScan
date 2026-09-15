@@ -1,38 +1,34 @@
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Где внутри файла лежат сами аудиоданные: без тегов в начале и в конце.
+/// Where the audio data sits inside a file, excluding leading and trailing tags.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Теги — законная часть файла, но не часть потока. Разборщик, который считает
-/// границы от нулевого байта, принял бы ID3 в начале за разрушенный заголовок,
-/// а APEv2 в конце — за мусор после последнего кадра. И то, и другое — ложная
-/// тревога на исправном файле, а это худшее, что программа может сказать.
+/// Tags are a legitimate part of a file but not of the stream. A validator
+/// measuring from byte zero would read a leading ID3 as a broken header and a
+/// trailing APEv2 as garbage after the last frame — both false alarms on a
+/// healthy file, which is the worst thing this program can say.
 /// </para>
 /// <para>
-/// Считается один раз, до выбора разборщика: границы у всех форматов ищутся
-/// одинаково, и повторять это в каждом разборщике значило бы держать шесть
-/// копий одного кода, часть из которых рано или поздно разойдётся.
+/// Computed once, before a validator is chosen: every format locates its tags
+/// the same way, and repeating it per validator would mean six copies that
+/// eventually drift apart.
 /// </para>
 /// </remarks>
-/// <param name="FileLength">Полный размер файла на диске.</param>
-/// <param name="AudioStart">Первый байт после тегов в начале.</param>
-/// <param name="AudioEnd">Первый байт тегов в конце; при их отсутствии — конец файла.</param>
+/// <param name="AudioStart">First byte after the leading tags.</param>
+/// <param name="AudioEnd">First byte of the trailing tags, or the end of the file.</param>
 internal readonly record struct ContainerBounds(long FileLength, long AudioStart, long AudioEnd)
 {
-    /// <summary>Сколько байт занимает сам поток.</summary>
+    /// <summary>Length of the stream itself.</summary>
     public long AudioLength => AudioEnd - AudioStart;
 
-    /// <summary>Границы файла целиком — когда теги искать незачем.</summary>
-    /// <param name="fileLength">Размер файла.</param>
-    /// <returns>Границы от нуля до конца.</returns>
+    /// <summary>Bounds spanning the whole file, when tags need not be found.</summary>
     public static ContainerBounds Whole(long fileLength) => new(fileLength, 0, fileLength);
 
-    /// <summary>Находит границы аудиоданных в открытом файле.</summary>
-    /// <param name="stream">Поток с возможностью перемотки; позиция восстанавливается.</param>
-    /// <param name="fileLength">Размер файла.</param>
-    /// <returns>Границы; при неожиданных значениях — файл целиком.</returns>
+    /// <summary>Locates the audio data in an open file.</summary>
+    /// <param name="stream">Seekable stream; the position is restored.</param>
+    /// <returns>The bounds, or the whole file when the values look wrong.</returns>
     public static ContainerBounds Measure(Stream stream, long fileLength)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -49,9 +45,9 @@ internal readonly record struct ContainerBounds(long FileLength, long AudioStart
             long start = LeadingTagLength(stream, fileLength);
             long end = fileLength - TagBoundaries.TrailingTags(stream, fileLength);
 
-            // Тег, объявивший себя больше файла, — сам по себе повреждение, и
-            // разбирать такой файл должен разборщик, а не эта мерка. Отдаём
-            // файл целиком: пусть он и скажет, что именно не так.
+            // A tag claiming to be larger than the file is damage in itself,
+            // and diagnosing it belongs to the validator rather than here.
+            // Hand over the whole file and let it say what is wrong.
             if (start < 0 || end <= start || start >= fileLength || end > fileLength)
             {
                 return Whole(fileLength);

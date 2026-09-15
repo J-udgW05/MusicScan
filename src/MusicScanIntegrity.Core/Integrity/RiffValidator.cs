@@ -3,13 +3,13 @@ using System.Buffers.Binary;
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка контейнера RIFF (WAV и AIFF) по цепочке чанков.
+/// Validates the RIFF container (WAV and AIFF) by walking its chunks.
 /// </summary>
 /// <remarks>
-/// В WAV нет контрольных сумм: это несжатые отсчёты, записанные подряд. Зато
-/// длины объявлены дважды — в заголовке файла и в заголовке чанка с данными.
-/// Именно они и ловят самую частую беду несжатого звука: файл, скопированный
-/// не до конца. Заявленная длина осталась прежней, а данных меньше.
+/// WAV has no checksums — it is raw samples written back to back — but the
+/// lengths are declared twice, in the file header and in the data chunk header.
+/// Those catch the commonest failure of uncompressed audio: a file copied only
+/// part way, where the declared length stayed but the data did not.
 /// </remarks>
 internal sealed class RiffValidator : IContainerValidator
 {
@@ -47,13 +47,13 @@ internal sealed class RiffValidator : IContainerValidator
             ? BinaryPrimitives.ReadUInt32LittleEndian(header[4..8])
             : BinaryPrimitives.ReadUInt32BigEndian(header[4..8]);
 
-        // Ноль и «все единицы» в поле длины означают «длина не известна»: так
-        // пишут заголовок те, кто записывает звук в поток и не может вернуться
-        // назад, чтобы проставить размер. Это не обрыв, и объявлять такой файл
-        // повреждённым нельзя — цепочка частей проверится и без объявленной длины.
+        // Zero and all-ones mean "length unknown": that is how the header is
+        // written by anything streaming audio that cannot seek back to fill the
+        // size in. It is not a truncation, and the chunk chain verifies without
+        // a declared length anyway.
         bool declaredKnown = declared is not (0 or uint.MaxValue);
 
-        // Объявленная длина считается от девятого байта, поэтому к ней прибавляем восемь.
+        // The declared length is measured from byte nine, hence the plus eight.
         long declaredEnd = riffStart + declared + 8;
 
         if (declaredKnown && declaredEnd > bounds.FileLength)
@@ -106,7 +106,7 @@ internal sealed class RiffValidator : IContainerValidator
                     truncated: true);
             }
 
-            // Чанки выравниваются по чётной границе.
+            // Chunks are aligned to an even boundary.
             long step = 8 + size + (size % 2);
             if (!window.Skip(step))
             {

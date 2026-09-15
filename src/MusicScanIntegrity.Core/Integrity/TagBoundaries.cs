@@ -1,19 +1,18 @@
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Границы тегов в начале и в конце файла.
+/// Sizes of the tag blocks at the start and end of a file.
 /// </summary>
 /// <remarks>
-/// Теги — законная часть файла, но не часть аудиопотока. Без их учёта разборщик
-/// принял бы ID3 в начале за мусор перед первым кадром, а APEv2 в конце — за
-/// хвост после последнего. Оба вывода были бы ложной тревогой, поэтому границы
-/// считаются до обхода кадров.
+/// Tags belong to the file but not to the audio stream. Ignoring them would
+/// make a leading ID3 look like garbage before the first frame and a trailing
+/// APEv2 like leftovers after the last, so the bounds are measured before the
+/// frames are walked.
 /// </remarks>
 internal static class TagBoundaries
 {
-    /// <summary>Длина тега ID3v2 в начале файла; 0, если его там нет.</summary>
-    /// <param name="header">Первые байты файла (нужно не меньше десяти).</param>
-    /// <returns>Сколько байт занимает тег вместе с заголовком.</returns>
+    /// <summary>Length of a leading ID3v2 tag including its header; 0 if absent.</summary>
+    /// <param name="header">First bytes of the file; at least ten are needed.</param>
     public static long LeadingId3(ReadOnlySpan<byte> header)
     {
         if (header.Length < 10 || header[0] != 'I' || header[1] != 'D' || header[2] != '3')
@@ -21,7 +20,7 @@ internal static class TagBoundaries
             return 0;
         }
 
-        // Размер записан «синхробезопасно»: в каждом байте значащие только младшие семь бит.
+        // The size is synch-safe: only the low seven bits of each byte count.
         long size = ((long)(header[6] & 0x7F) << 21)
             | ((long)(header[7] & 0x7F) << 14)
             | ((long)(header[8] & 0x7F) << 7)
@@ -32,11 +31,9 @@ internal static class TagBoundaries
     }
 
     /// <summary>
-    /// Сколько байт в конце файла занимают теги: ID3v1, APEv2 и их сочетание.
+    /// Size of the trailing tag block: ID3v1, APEv2 or both.
     /// </summary>
-    /// <param name="stream">Поток с возможностью перемотки.</param>
-    /// <param name="fileLength">Длина файла.</param>
-    /// <returns>Размер хвоста из тегов.</returns>
+    /// <param name="stream">Seekable stream.</param>
     public static long TrailingTags(Stream stream, long fileLength)
     {
         if (!stream.CanSeek)
@@ -49,8 +46,8 @@ internal static class TagBoundaries
 
         try
         {
-            // Теги идут вплотную друг к другу, порядок не задан жёстко —
-            // поэтому снимаем их по одному, пока с конца находится знакомый.
+            // Tags sit back to back in no fixed order, so they are peeled off
+            // one at a time while a known one is found at the end.
             while (true)
             {
                 long end = fileLength - trailing;
@@ -69,7 +66,7 @@ internal static class TagBoundaries
                         long size = BitConverter.ToUInt32(footer, 12);
                         uint flags = BitConverter.ToUInt32(footer, 20);
 
-                        // Бит 31 флагов означает, что у тега есть ещё и заголовок.
+                        // Flag bit 31 means the tag also carries a header.
                         long total = size + ((flags & 0x80000000) != 0 ? 32 : 0);
 
                         if (total > 0 && total <= end)

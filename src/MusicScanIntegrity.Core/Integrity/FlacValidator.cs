@@ -1,30 +1,30 @@
 ﻿namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка FLAC его собственными контрольными суммами.
+/// Validates FLAC against its own checksums.
 /// </summary>
 /// <remarks>
 /// <para>
-/// У каждого кадра FLAC есть CRC-8 заголовка и CRC-16 всего кадра. Их сверка
-/// отвечает на вопрос точно: файл совпадает с тем, что закодировали, или нет.
-/// Декодер такого ответа не даёт — он говорит лишь «открылось».
+/// Every FLAC frame carries a CRC-8 over its header and a CRC-16 over the
+/// whole frame. Verifying those answers the question exactly: the file either
+/// matches what was encoded or it does not. A decoder cannot say that much.
 /// </para>
 /// <para>
-/// Границу кадра в FLAC не записывают: она видна только по началу следующего.
-/// Поэтому обход идёт так: разбирается заголовок, дальше ищется следующая
-/// подпись кадра, и на каждой догадке о границе сверяется CRC-16. Совпадение
-/// суммы и есть доказательство, что граница найдена верно — ложная подпись
-/// внутри данных сумму не даст.
+/// FLAC does not record frame boundaries; a boundary is only visible once the
+/// next frame starts. So the walk parses a header, hunts for the next frame
+/// signature and verifies the CRC-16 at each candidate boundary. A matching
+/// checksum is the proof that the boundary is right — a false signature inside
+/// the data will not produce one.
 /// </para>
 /// <para>
-/// MD5 распакованного звука из <c>STREAMINFO</c> здесь не проверяется: для этого
-/// нужно распаковать файл целиком и собрать отсчёты ровно в том виде, в каком их
-/// считал кодировщик. Это работа декодера, а не разборщика.
+/// The decoded-audio MD5 in <c>STREAMINFO</c> is deliberately not verified:
+/// that would require decompressing the file and reassembling the samples
+/// exactly as the encoder saw them, which is a decoder's job.
 /// </para>
 /// </remarks>
 internal sealed class FlacValidator : IContainerValidator
 {
-    /// <summary>Предел поиска границы кадра, когда размер не известен из заголовка.</summary>
+    /// <summary>Search limit for a frame boundary when the header gives no size.</summary>
     private const int MaxFrameScan = 1024 * 1024;
 
     /// <inheritdoc />
@@ -76,7 +76,7 @@ internal sealed class FlacValidator : IContainerValidator
         return WalkFrames(window, info, audioEnd, cancellationToken);
     }
 
-    /// <summary>Читает блоки метаданных до первого помеченного как последний.</summary>
+    /// <summary>Reads metadata blocks up to the one flagged as last.</summary>
     private StreamInfo? ReadMetadata(StreamWindow window, out ContainerValidation? failure)
     {
         failure = null;
@@ -97,7 +97,7 @@ internal sealed class FlacValidator : IContainerValidator
             int length = (header[1] << 16) | (header[2] << 8) | header[3];
             window.Advance(4);
 
-            // Тип 127 объявлен недопустимым в самом формате.
+            // Type 127 is declared invalid by the format itself.
             if (type == 127)
             {
                 failure = ContainerValidation.Damaged(
@@ -138,8 +138,8 @@ internal sealed class FlacValidator : IContainerValidator
                 return info;
             }
 
-            // Разумный предел: в исправном файле блоков единицы, а бесконечный
-            // цикл на разрушенном заголовке недопустим.
+            // A sane cap: a healthy file has a handful of blocks, and a
+            // damaged header must not spin forever.
             if (blocks > 1024)
             {
                 failure = ContainerValidation.Damaged(
@@ -152,7 +152,7 @@ internal sealed class FlacValidator : IContainerValidator
         }
     }
 
-    /// <summary>Обходит кадры, сверяя CRC-16 каждого.</summary>
+    /// <summary>Walks the frames, verifying each CRC-16.</summary>
     private ContainerValidation WalkFrames(
         StreamWindow window,
         StreamInfo info,
@@ -205,8 +205,8 @@ internal sealed class FlacValidator : IContainerValidator
 
             if (frameLength <= 0)
             {
-                // Отдельно назвать обрыв и мусор в хвосте нельзя: и то, и другое
-                // выглядит как кадр, который не заканчивается там, где должен.
+                // Truncation and trailing garbage cannot be told apart: both
+                // look like a frame that does not end where it should.
                 return ContainerValidation.Damaged(
                     Format,
                     reachesEnd
@@ -225,8 +225,8 @@ internal sealed class FlacValidator : IContainerValidator
             bytesInFrames += frameLength;
         }
 
-        // Заявленное число отсчётов — второй, независимый признак обрыва:
-        // суммы могут сойтись у всех кадров, которые остались в обрезанном файле.
+        // The declared sample count is a second, independent truncation
+        // signal: every frame left in a cut file can still checksum correctly.
         if (info.TotalSamples > 0 && samples < info.TotalSamples)
         {
             int lost = (int)Math.Round((info.TotalSamples - samples) / (double)Math.Max(1, info.SampleRate));
@@ -243,14 +243,14 @@ internal sealed class FlacValidator : IContainerValidator
     }
 
     /// <summary>
-    /// Предел длины кадра: заявленный в описании потока, а если там ноль —
-    /// вчетверо больше среднего из уже прочитанных кадров.
+    /// Frame length cap: the value declared in STREAMINFO, or four times the
+    /// mean of the frames read so far when that is zero.
     /// </summary>
     /// <remarks>
-    /// Без предела нули, дописанные в конец файла, сходят за продолжение
-    /// последнего кадра: сумма CRC-16, посчитанная по кадру вместе с его же
-    /// суммой, равна нулю, и дописанные нули её не меняют. Заявленный размер
-    /// кадра эту лазейку закрывает.
+    /// Without a cap, zeroes appended to the file pass as a continuation of
+    /// the last frame: the CRC-16 of a frame taken together with its own
+    /// checksum is zero, and appended zeroes leave it there. The declared frame
+    /// size closes that loophole.
     /// </remarks>
     private static int FrameCap(StreamInfo info, int frames, long bytesInFrames)
     {
@@ -263,13 +263,13 @@ internal sealed class FlacValidator : IContainerValidator
     }
 
     /// <summary>
-    /// Ищет конец кадра: перебирает подписи следующего кадра и проверяет по CRC-16,
-    /// что граница именно здесь.
+    /// Finds the end of a frame by trying each next-frame signature and
+    /// confirming the boundary with the CRC-16.
     /// </summary>
-    /// <returns>Длина кадра или -1, если сумма нигде не сошлась.</returns>
+    /// <returns>Frame length, or -1 when no checksum matched.</returns>
     private static int FindFrameEnd(ReadOnlySpan<byte> span, int headerLength, bool reachesEnd, int cap)
     {
-        // Минимум: заголовок, хоть какие-то данные и два байта суммы.
+        // The minimum: a header, some data and two checksum bytes.
         int minimum = headerLength + 3;
 
         ushort crc = 0;
@@ -312,7 +312,7 @@ internal sealed class FlacValidator : IContainerValidator
         return -1;
     }
 
-    /// <summary>Разбирает заголовок кадра и сверяет его CRC-8.</summary>
+    /// <summary>Parses a frame header and verifies its CRC-8.</summary>
     private static bool TryParseFrameHeader(ReadOnlySpan<byte> span, out int length, out int blockSize)
     {
         length = 0;
@@ -389,8 +389,8 @@ internal sealed class FlacValidator : IContainerValidator
     }
 
     /// <summary>
-    /// Пропускает номер кадра или отсчёта — он записан по правилам UTF-8,
-    /// только длиной до семи байт.
+    /// Skips the frame or sample number, which is UTF-8 encoded but up to
+    /// seven bytes long.
     /// </summary>
     private static bool TrySkipCodedNumber(ReadOnlySpan<byte> span, ref int position)
     {
@@ -408,7 +408,7 @@ internal sealed class FlacValidator : IContainerValidator
         }
         else if (first < 0xC0)
         {
-            // Байт-продолжение на месте первого — заголовок разрушен.
+            // A continuation byte in first position means a damaged header.
             return false;
         }
         else if (first < 0xE0)
@@ -470,8 +470,8 @@ internal sealed class FlacValidator : IContainerValidator
         int minFrame = (block[4] << 16) | (block[5] << 8) | block[6];
         int maxFrame = (block[7] << 16) | (block[8] << 8) | block[9];
 
-        // Двадцать бит частоты, три канала, пять разрядности и тридцать шесть
-        // отсчётов упакованы подряд — читаем их одним 64-битным словом.
+        // Twenty bits of sample rate, three of channels, five of bit depth and
+        // thirty-six of sample count sit back to back; read as one 64-bit word.
         ulong packed = 0;
         for (int i = 10; i < 18; i++)
         {
@@ -490,7 +490,7 @@ internal sealed class FlacValidator : IContainerValidator
     private ContainerValidation Truncated(string message, long offset) =>
         ContainerValidation.Damaged(Format, message, $"Смещение {offset} Б", offset: offset, truncated: true);
 
-    /// <summary>Разбор блока STREAMINFO.</summary>
+    /// <summary>Parses the STREAMINFO block.</summary>
     private sealed record StreamInfo(
         int MinFrameSize,
         int MaxFrameSize,

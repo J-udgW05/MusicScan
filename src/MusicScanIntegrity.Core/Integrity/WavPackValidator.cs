@@ -3,19 +3,19 @@ using System.Buffers.Binary;
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка WavPack по цепочке блоков.
+/// Validates WavPack by walking its block chain.
 /// </summary>
 /// <remarks>
-/// У каждого блока WavPack есть своя контрольная сумма, но считается она по
-/// <em>распакованным</em> отсчётам — сверить её, не написав собственный
-/// распаковщик, невозможно. Поэтому здесь проверяется цепочка: каждый блок
-/// объявляет длину, и блоки должны лечь ровно до конца файла. Это ловит обрыв
-/// и мусор, но слабее настоящей сверки сумм, и вердикт об этом честно
-/// сообщает.
+/// Every WavPack block carries a checksum, but it covers the
+/// <em>decompressed</em> samples and cannot be verified without writing a
+/// decoder. What is checked instead is the chain: each block declares a length
+/// and the blocks must land exactly at the end of the file. That catches
+/// truncation and garbage but is weaker than real checksum verification, and
+/// the verdict says so.
 /// </remarks>
 internal sealed class WavPackValidator : IContainerValidator
 {
-    /// <summary>Заголовок блока: подпись, длина и служебные поля.</summary>
+    /// <summary>Block header: signature, length and control fields.</summary>
     private const int BlockHeaderSize = 32;
 
     /// <inheritdoc />
@@ -76,7 +76,7 @@ internal sealed class WavPackValidator : IContainerValidator
                     blockPosition);
             }
 
-            // Длина записана без первых восьми байт самого заголовка.
+            // The length excludes the first eight bytes of the header itself.
             long size = BinaryPrimitives.ReadUInt32LittleEndian(header[4..8]) + 8L;
 
             if (size < BlockHeaderSize)

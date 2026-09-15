@@ -1,21 +1,21 @@
 ﻿namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка контейнера Ogg (Vorbis, Opus, FLAC в Ogg) по контрольным суммам страниц.
+/// Validates the Ogg container (Vorbis, Opus, FLAC-in-Ogg) by page checksums.
 /// </summary>
 /// <remarks>
-/// В Ogg всё делится на страницы, и у каждой есть CRC-32 по всей странице
-/// целиком. Проверка не требует ни распаковки, ни знания того, какой поток
-/// внутри: страницы читаются подряд, сумма считается заново и сверяется с
-/// записанной. Заодно видно обрыв: у последней страницы каждого потока должен
-/// стоять признак конца, и если его нет — файл дописан не до конца.
+/// Ogg divides everything into pages, each carrying a CRC-32 over the whole
+/// page. Verifying needs neither decompression nor knowledge of the stream
+/// inside: pages are read in order, the checksum recomputed and compared. It
+/// also reveals truncation — the last page of each stream must carry the
+/// end-of-stream flag, and a missing one means the file was never finished.
 /// </remarks>
 internal sealed class OggValidator : IContainerValidator
 {
-    /// <summary>Заголовок страницы без таблицы отрезков.</summary>
+    /// <summary>Page header without the segment table.</summary>
     private const int HeaderSize = 27;
 
-    /// <summary>Наибольший возможный размер страницы: заголовок, таблица и 255 отрезков по 255 байт.</summary>
+    /// <summary>Largest possible page: header, table and 255 segments of 255 bytes.</summary>
     private const int MaxPageSize = HeaderSize + 255 + (255 * 255);
 
     /// <inheritdoc />
@@ -155,8 +155,8 @@ internal sealed class OggValidator : IContainerValidator
                 truncated: true);
         }
 
-        // Признак конца ставится на последней странице каждого потока. Его
-        // отсутствие означает ровно одно: файл дописан не до конца.
+        // The end-of-stream flag sits on the last page of each stream. Its
+        // absence means exactly one thing: the file was never finished.
         foreach ((uint serial, StreamState state) in streams)
         {
             if (!state.SawEnd)
@@ -173,7 +173,7 @@ internal sealed class OggValidator : IContainerValidator
         return ContainerValidation.Verified(Format, pages);
     }
 
-    /// <summary>Следит за порядком страниц внутри каждого потока.</summary>
+    /// <summary>Tracks page ordering within each stream.</summary>
     private ContainerValidation? Track(
         Dictionary<uint, StreamState> streams,
         uint serial,
@@ -191,7 +191,7 @@ internal sealed class OggValidator : IContainerValidator
 
             if (!isBegin)
             {
-                // Поток начинается не с первой страницы — начало файла потеряно.
+                // The stream does not start at page one; the beginning is lost.
                 return ContainerValidation.Damaged(
                     Format,
                     "Начало файла потеряно: поток начинается не с первой страницы.",
@@ -215,15 +215,15 @@ internal sealed class OggValidator : IContainerValidator
         return null;
     }
 
-    /// <summary>Считает CRC-32 страницы, временно обнуляя записанное в ней поле суммы.</summary>
+    /// <summary>Computes the page CRC-32 with the stored checksum field zeroed.</summary>
     private static uint ComputeCrc(ReadOnlySpan<byte> page)
     {
         uint crc = 0;
 
         for (int i = 0; i < page.Length; i++)
         {
-            // Четыре байта самой суммы при подсчёте считаются нулями —
-            // иначе результат зависел бы от того, что в них уже записано.
+            // The four checksum bytes count as zero, or the result would
+            // depend on what is already stored there.
             byte value = i is >= 22 and < 26 ? (byte)0 : page[i];
             crc = Crc.Ogg32Update(crc, value);
         }
@@ -234,16 +234,16 @@ internal sealed class OggValidator : IContainerValidator
     private static uint ReadUInt32(ReadOnlySpan<byte> data) =>
         (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
 
-    /// <summary>Состояние одного логического потока внутри контейнера.</summary>
+    /// <summary>State of one logical stream inside the container.</summary>
     private sealed class StreamState
     {
-        /// <summary>Номер страницы, которую ждём следующей.</summary>
+        /// <summary>Sequence number expected next.</summary>
         public uint Expected { get; set; }
 
-        /// <summary>Сколько страниц потока встретилось.</summary>
+        /// <summary>How many pages of this stream were seen.</summary>
         public int Pages { get; set; }
 
-        /// <summary>Встретилась страница с признаком конца потока.</summary>
+        /// <summary>A page carrying the end-of-stream flag was seen.</summary>
         public bool SawEnd { get; set; }
     }
 }

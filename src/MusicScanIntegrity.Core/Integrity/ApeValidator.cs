@@ -3,21 +3,21 @@ using System.Buffers.Binary;
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка Monkey's Audio (APE) по описанию файла в его заголовке.
+/// Validates Monkey's Audio (APE) against the descriptor in its header.
 /// </summary>
 /// <remarks>
-/// Начиная с версии 3.98 файл открывается описанием, где перечислены длины всех
-/// его частей: заголовка, таблицы перемоток, служебных данных, сжатого звука и
-/// хвоста. Сумма этих длин должна совпасть с размером файла — на этом и
-/// попадается обрыв. Контрольная сумма MD5 в описании считается по
-/// распакованному звуку, поэтому без распаковщика её не сверить.
+/// From version 3.98 the file opens with a descriptor listing the length of
+/// every part: header, seek table, wav header, compressed audio and terminator.
+/// Those lengths must add up to the file size, which is what catches a
+/// truncation. The MD5 in the descriptor covers the decompressed audio and
+/// cannot be verified without a decoder.
 /// </remarks>
 internal sealed class ApeValidator : IContainerValidator
 {
-    /// <summary>Размер описания файла для версий 3.98 и новее.</summary>
+    /// <summary>Descriptor size for version 3.98 and later.</summary>
     private const int DescriptorSize = 52;
 
-    /// <summary>Версия, начиная с которой у файла есть описание.</summary>
+    /// <summary>First version that carries a descriptor.</summary>
     private const int DescriptorVersion = 3980;
 
     /// <inheritdoc />
@@ -60,7 +60,7 @@ internal sealed class ApeValidator : IContainerValidator
 
         if (version < DescriptorVersion)
         {
-            // У старых версий описания нет, и складывать нечего.
+            // Older versions have no descriptor, so there is nothing to add up.
             return ContainerValidation.StructureOnly(
                 Format,
                 1,

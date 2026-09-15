@@ -1,44 +1,44 @@
 ﻿namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка MP3: обход кадров, сверка их длин и контрольных сумм там, где они есть.
+/// Validates MP3 by walking frames, checking their lengths and any checksums.
 /// </summary>
 /// <remarks>
 /// <para>
-/// В MP3 нет общей контрольной суммы файла. Есть длина каждого кадра, посчитанная
-/// из его заголовка: если она верна, следующий кадр начинается ровно там, где
-/// обещано. Разрыв этой цепочки — надёжный признак повреждения, и находит он
-/// именно то, что чаще всего случается: недокачанный файл и мусор в середине.
+/// MP3 has no whole-file checksum. What it has is a per-frame length derived
+/// from the header: if it is right, the next frame begins exactly where
+/// promised. A break in that chain is a reliable damage signal, and it catches
+/// what actually happens — partial downloads and garbage in the middle.
 /// </para>
 /// <para>
-/// Часть кадров бывает «защищённой» — тогда в кадре лежит CRC-16 по заголовку и
-/// служебным данным, и её можно сверить по-настоящему. Такие кадры считаются
-/// отдельно: файл, где сумма сошлась, проверен строже, чем тот, где сверять
-/// было нечего.
+/// Some frames are protected and carry a CRC-16 over the header and side info,
+/// which can be verified for real. Those are counted separately: a file whose
+/// checksums matched has been checked more strictly than one with nothing to
+/// verify.
 /// </para>
 /// <para>
-/// Заголовок Xing/Info в начале хранит число кадров. Если их меньше обещанного,
-/// файл обрывается — даже когда все оставшиеся кадры целы.
+/// The leading Xing/Info header stores the frame count. Fewer frames than
+/// promised means truncation, even when every remaining frame is intact.
 /// </para>
 /// </remarks>
 internal sealed class Mp3Validator : IContainerValidator
 {
-    /// <summary>Сколько мусора между кадрами считается ещё допустимым.</summary>
+    /// <summary>How much junk between frames is still tolerated.</summary>
     /// <remarks>
-    /// Ноль тут не годится: в реальных файлах между тегом и первым кадром или
-    /// после последнего кадра попадаются короткие огрызки, а объявлять из-за
-    /// них файл повреждённым — ложная тревога.
+    /// Zero will not do: real files carry short stubs between the tag and the
+    /// first frame, or after the last one, and condemning a file over those
+    /// would be a false alarm.
     /// </remarks>
     private const int JunkTolerance = 2048;
 
     private static readonly int[][] Bitrates =
     [
-        // MPEG 1: слой I, слой II, слой III
+        // MPEG 1: layer I, layer II, layer III
         [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0],
         [0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0],
         [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0],
 
-        // MPEG 2 и 2.5: слой I, слои II и III
+        // MPEG 2 and 2.5: layer I, layers II and III
         [0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0],
         [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0],
     ];
@@ -91,7 +91,7 @@ internal sealed class Mp3Validator : IContainerValidator
 
             if (!window.Ensure(4) || remaining < 4)
             {
-                // Хвост короче заголовка кадра — это огрызок, а не кадр.
+                // A tail shorter than a frame header is a stub, not a frame.
                 junkBytes += remaining;
                 break;
             }
@@ -163,8 +163,8 @@ internal sealed class Mp3Validator : IContainerValidator
                 firstErrorOffset < 0 ? null : firstErrorOffset);
         }
 
-        // Заголовок Xing/Info пишет число кадров вместе с собой, поэтому
-        // сравниваем с ним же — с точностью до одного кадра.
+        // The Xing/Info header counts itself among the frames, so compare
+        // within a tolerance of one.
         if (declaredFrames > 0 && frames < declaredFrames - 1)
         {
             return ContainerValidation.Damaged(
@@ -186,7 +186,7 @@ internal sealed class Mp3Validator : IContainerValidator
                 $"Кадров {frames}; контрольных сумм в файле нет — проверена только цепочка кадров");
     }
 
-    /// <summary>Читает число кадров из заголовка Xing/Info, если он есть.</summary>
+    /// <summary>Reads the frame count from the Xing/Info header when present.</summary>
     private static int ReadDeclaredFrames(StreamWindow window, FrameHeader header)
     {
         int offset = 4 + (header.HasCrc ? 2 : 0) + header.SideInfoSize;
@@ -206,7 +206,7 @@ internal sealed class Mp3Validator : IContainerValidator
 
         uint flags = ReadBigEndian(frame[(offset + 4)..]);
 
-        // Младший бит флагов означает, что дальше записано число кадров.
+        // The low flag bit means a frame count follows.
         return (flags & 0x01) == 0 ? 0 : (int)ReadBigEndian(frame[(offset + 8)..]);
     }
 
@@ -214,8 +214,8 @@ internal sealed class Mp3Validator : IContainerValidator
     {
         ushort stored = (ushort)((frame[4] << 8) | frame[5]);
 
-        // Сумма считается по двум последним байтам заголовка и служебным данным,
-        // но не по самой сумме — её в подсчёт не берут.
+        // The checksum covers the last two header bytes and the side info, but
+        // not the checksum field itself.
         Span<byte> covered = stackalloc byte[2 + header.CrcCoverage];
         frame[2..4].CopyTo(covered);
         frame[6..(6 + header.CrcCoverage)].CopyTo(covered[2..]);
@@ -240,7 +240,7 @@ internal sealed class Mp3Validator : IContainerValidator
         int padding = (data[2] >> 1) & 0x01;
         int channelMode = data[3] >> 6;
 
-        // Значение 1 у версии и 0 у слоя объявлены недопустимыми в самом формате.
+        // Version 1 and layer 0 are declared invalid by the format itself.
         if (versionCode == 1 || layerCode == 0 || sampleRateIndex == 3 || bitrateIndex is 0 or 15)
         {
             return false;
@@ -286,20 +286,19 @@ internal sealed class Mp3Validator : IContainerValidator
     private static uint ReadBigEndian(ReadOnlySpan<byte> data) =>
         ((uint)data[0] << 24) | ((uint)data[1] << 16) | ((uint)data[2] << 8) | data[3];
 
-    /// <summary>Разобранный заголовок кадра.</summary>
-    /// <param name="Length">Полная длина кадра в байтах.</param>
-    /// <param name="HasCrc">В кадре есть контрольная сумма.</param>
-    /// <param name="SideInfoSize">Размер служебных данных перед звуком.</param>
-    /// <param name="Layer">Слой MPEG: 1, 2 или 3.</param>
+    /// <summary>A parsed frame header.</summary>
+    /// <param name="Length">Total frame length in bytes.</param>
+    /// <param name="SideInfoSize">Size of the side info before the audio.</param>
+    /// <param name="Layer">MPEG layer: 1, 2 or 3.</param>
     private readonly record struct FrameHeader(int Length, bool HasCrc, int SideInfoSize, int Layer)
     {
         /// <summary>
-        /// Сколько байт после суммы она покрывает. Для слоёв I и II состав
-        /// покрытия другой, поэтому там сумма не сверяется.
+        /// How many bytes after the checksum it covers. Layers I and II cover
+        /// a different range, so their checksums are not verified.
         /// </summary>
         public int CrcCoverage => Layer == 3 ? SideInfoSize : 0;
 
-        /// <summary>Сумму этого кадра можно сверить.</summary>
+        /// <summary>This frame's checksum can be verified.</summary>
         public bool CanCheckCrc => HasCrc && Layer == 3 && SideInfoSize > 0;
     }
 }

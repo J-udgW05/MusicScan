@@ -1,30 +1,28 @@
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
-/// Проверка файла его собственными средствами: контрольными суммами формата и
-/// целостностью контейнера.
+/// Validates a file against its own format: checksums and container
+/// integrity.
 /// </summary>
 public interface IContainerIntegrityChecker
 {
-    /// <summary>Проверяет файл, выбрав разборщик по его содержимому.</summary>
-    /// <param name="filePath">Путь к файлу.</param>
-    /// <param name="cancellationToken">Отмена: стоп или таймаут по файлу.</param>
-    /// <returns>Вердикт; для незнакомых форматов — «разборщика нет».</returns>
+    /// <summary>Validates a file, picking the validator from its contents.</summary>
+    /// <returns>The verdict; unknown formats yield "no validator".</returns>
     ContainerValidation Check(string filePath, CancellationToken cancellationToken);
 }
 
 /// <inheritdoc cref="IContainerIntegrityChecker" />
 /// <remarks>
-/// Формат определяется по содержимому, а не по расширению: файл с именем
-/// «.flac» и данными MP3 внутри должен проверяться правилами MP3, иначе вердикт
-/// будет о несуществующем повреждении.
+/// The format comes from the contents, not the extension: a file named .flac
+/// holding MP3 data must be checked by MP3 rules, or the verdict would report
+/// damage that is not there.
 /// </remarks>
 public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
 {
     /// <summary>
-    /// Разборщики в порядке проверки. MP3 идёт последним: его подпись — всего
-    /// одиннадцать единичных бит, и она случайно встречается в начале других
-    /// форматов чаще, чем хотелось бы.
+    /// Validators in probe order. MP3 goes last: its signature is eleven set
+    /// bits, which turns up by accident at the start of other formats more
+    /// often than one would like.
     /// </summary>
     private static readonly IContainerValidator[] Validators =
     [
@@ -37,7 +35,7 @@ public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
         new Mp3Validator(),
     ];
 
-    /// <summary>Сколько байт читается для опознания формата.</summary>
+    /// <summary>Bytes read to identify the format.</summary>
     private const int HeaderSize = 16;
 
     /// <inheritdoc />
@@ -80,11 +78,11 @@ public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
         }
     }
 
-    /// <summary>Подбирает разборщик по подписи в начале аудиоданных.</summary>
+    /// <summary>Picks a validator by the signature at the start of the audio data.</summary>
     /// <remarks>
-    /// Подпись ищется там же, откуда потом читает разборщик, — за тегом, а не с
-    /// нулевого байта. Иначе формат опознавался бы по одному месту, а разбирался
-    /// с другого, и исправный файл с тегом объявлялся бы разрушенным.
+    /// The signature is read from where the validator will start — past the
+    /// tag, not at byte zero. Otherwise the format would be identified in one
+    /// place and parsed from another, condemning healthy tagged files.
     /// </remarks>
     private static IContainerValidator? SelectValidator(FileStream stream, ContainerBounds bounds)
     {

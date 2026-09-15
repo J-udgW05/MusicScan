@@ -1,56 +1,52 @@
 ﻿namespace MusicScanIntegrity.Core.Integrity;
 
-/// <summary>Чем закончилась проверка файла его собственными средствами.</summary>
+/// <summary>Outcome of validating a file against its own format.</summary>
 public enum ContainerVerdict
 {
-    /// <summary>Для этого формата разборщика нет — вердикта не будет.</summary>
+    /// <summary>No validator for this format; there is no verdict.</summary>
     NotSupported,
 
     /// <summary>
-    /// Структура цела, но контрольных сумм в формате нет или их нельзя
-    /// проверить без распаковки. Это слабее, чем «суммы сошлись».
+    /// Structure is intact, but the format carries no checksums, or they
+    /// cannot be verified without decompressing. Weaker than a matched sum.
     /// </summary>
     StructureOnly,
 
-    /// <summary>Контрольные суммы сошлись — файл совпадает с тем, что закодировали.</summary>
+    /// <summary>Checksums matched: the file is what was encoded.</summary>
     Verified,
 
-    /// <summary>Найдено повреждение: сумма не сошлась или структура порвана.</summary>
+    /// <summary>Damage found: a checksum mismatch or broken structure.</summary>
     Damaged,
 
-    /// <summary>Файл не удалось прочитать — о самом содержимом ничего не известно.</summary>
+    /// <summary>The file could not be read; nothing is known about its contents.</summary>
     Unreadable,
 }
 
-/// <summary>Чем именно испорчен файл — от этого зависит формулировка для человека.</summary>
+/// <summary>How the file is damaged, which decides the wording shown to the user.</summary>
 public enum ContainerDamage
 {
-    /// <summary>Повреждений нет.</summary>
+    /// <summary>No damage.</summary>
     None,
 
-    /// <summary>Разрушена структура: кадры, страницы или блоки не сходятся.</summary>
+    /// <summary>Broken structure: frames, pages or blocks do not line up.</summary>
     Structure,
 
-    /// <summary>Не сошлась контрольная сумма.</summary>
+    /// <summary>A checksum did not match.</summary>
     Checksum,
 
-    /// <summary>Файл обрывается: данных меньше, чем обещано заголовком.</summary>
+    /// <summary>Truncated: less data than the header promises.</summary>
     Truncation,
 }
 
 /// <summary>
-/// Результат проверки файла его собственными средствами: контрольными суммами
-/// и структурой контейнера.
+/// Result of validating a file against its own checksums and container
+/// structure.
 /// </summary>
-/// <param name="Verdict">Итог.</param>
-/// <param name="Format">Формат, как его определил разборщик.</param>
-/// <param name="Message">Человеческая формулировка для строки результата.</param>
-/// <param name="TechnicalDetail">Техническая причина: смещение, ожидаемая и полученная сумма.</param>
-/// <param name="UnitsChecked">Сколько кадров, страниц или блоков проверено.</param>
-/// <param name="ErrorOffset">Смещение первой найденной ошибки от начала файла.</param>
-/// <param name="Truncated">Файл обрывается на середине: не хватает данных, обещанных заголовком.</param>
-/// <param name="TrailingBytes">Сколько лишних байт осталось в хвосте после последнего кадра.</param>
-/// <param name="Damage">Вид повреждения.</param>
+/// <param name="Format">Format as the validator identified it.</param>
+/// <param name="TechnicalDetail">Offset plus expected and actual checksum.</param>
+/// <param name="UnitsChecked">How many frames, pages or blocks were checked.</param>
+/// <param name="ErrorOffset">Offset of the first error from the start of the file.</param>
+/// <param name="TrailingBytes">Extra bytes left after the last frame.</param>
 public sealed record ContainerValidation(
     ContainerVerdict Verdict,
     string Format,
@@ -62,19 +58,19 @@ public sealed record ContainerValidation(
     long TrailingBytes = 0,
     ContainerDamage Damage = ContainerDamage.None)
 {
-    /// <summary>Разборщика для формата нет.</summary>
+    /// <summary>No validator for the format.</summary>
     public static ContainerValidation NotSupported(string format) =>
         new(ContainerVerdict.NotSupported, format);
 
-    /// <summary>Суммы сошлись.</summary>
+    /// <summary>Checksums matched.</summary>
     public static ContainerValidation Verified(string format, int units, long trailing = 0) =>
         new(ContainerVerdict.Verified, format, UnitsChecked: units, TrailingBytes: trailing);
 
-    /// <summary>Структура цела, но сумм в формате нет.</summary>
+    /// <summary>Structure intact, but the format has no checksums.</summary>
     public static ContainerValidation StructureOnly(string format, int units, string? detail = null) =>
         new(ContainerVerdict.StructureOnly, format, TechnicalDetail: detail, UnitsChecked: units);
 
-    /// <summary>Найдено повреждение.</summary>
+    /// <summary>Damage was found.</summary>
     public static ContainerValidation Damaged(
         string format,
         string message,
@@ -93,7 +89,7 @@ public sealed record ContainerValidation(
             truncated,
             Damage: truncated ? ContainerDamage.Truncation : damage);
 
-    /// <summary>Файл не читается.</summary>
+    /// <summary>The file cannot be read.</summary>
     public static ContainerValidation Unreadable(string format, string detail) =>
         new(ContainerVerdict.Unreadable, format, TechnicalDetail: detail);
 }
