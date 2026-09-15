@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Threading;
 using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.App.ViewModels;
@@ -24,7 +24,8 @@ public sealed class SettingsSyncTests
         Sta.Run(() =>
         {
             FakeSettings settings = new();
-            SettingsViewModel viewModel = Create(settings);
+            using FakeHistory history = new();
+            SettingsViewModel viewModel = Create(settings, history);
 
             Assert.True(viewModel.CheckMetadata);
 
@@ -44,7 +45,8 @@ public sealed class SettingsSyncTests
         Sta.Run(() =>
         {
             FakeSettings settings = new();
-            SettingsViewModel viewModel = Create(settings);
+            using FakeHistory history = new();
+            SettingsViewModel viewModel = Create(settings, history);
 
             AppSettings changed = settings.Current.Clone();
             changed.CheckMetadata = false;
@@ -60,8 +62,8 @@ public sealed class SettingsSyncTests
         });
     }
 
-    private static SettingsViewModel Create(ISettingsService settings) =>
-        new(settings, new FakeTheme(), new FakeDialogs(), new FakeHistory());
+    private static SettingsViewModel Create(ISettingsService settings, FakeHistory history) =>
+        new(settings, new FakeTheme(), new FakeDialogs(), history);
 
     /// <summary>Прокручивает очередь диспетчера: перечитывание идёт через неё.</summary>
     private static void Pump()

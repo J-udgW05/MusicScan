@@ -173,7 +173,8 @@
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
                                     <TextBlock Style="{StaticResource Text.Base}" Text="Эффект Mica" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               TextWrapping="Wrap" Text="{Binding MicaNote}" />
+                                               TextWrapping="Wrap" Text="{Binding MicaNote}"
+                                               Visibility="{Binding MicaNote, Converter={StaticResource NotEmptyToVisibility}}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
@@ -189,9 +190,6 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
                                     <TextBlock Style="{StaticResource Text.Base}" Text="Анимации" />
-                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               TextWrapping="Wrap"
-                                               Text="плавное появление вкладок и переключателей" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"

@@ -195,9 +195,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// </remarks>
     public bool IsMicaSupported => _themeService.IsMicaSupported;
 
-    /// <summary>Пояснение под переключателем подложки.</summary>
+    /// <summary>
+    /// Пояснение под переключателем: показывается, только когда эффект
+    /// недоступен и надо объяснить погасший тумблер.
+    /// </summary>
     public string MicaNote => IsMicaSupported
-        ? "фон окна подхватывает обои рабочего стола, как в параметрах Windows 11"
+        ? string.Empty
         : "недоступно: подложку умеет рисовать только Windows 11";
 
     // ── Проверка ─────────────────────────────────────────────────────────
