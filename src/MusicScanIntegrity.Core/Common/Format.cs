@@ -3,14 +3,14 @@
 namespace MusicScanIntegrity.Core.Common;
 
 /// <summary>
-/// Единое форматирование чисел, размеров и времени.
-/// UI_SPEC.md, раздел 9: разряды — неразрывным пробелом, размеры — с запятой
-/// («24,1 МБ»), время проверки — как «18:42».
+/// Single place that formats numbers, sizes and durations: digit groups are
+/// separated by a non-breaking space, sizes carry one decimal ("24,1 МБ") and
+/// scan time reads as "18:42".
 /// </summary>
 public static class Format
 {
-    /// <summary>Неразрывный пробел — разделитель разрядов во всём интерфейсе и отчётах.</summary>
-    public const char NarrowSpace = '\u00A0';
+    /// <summary>Digit group separator used across the UI and the reports.</summary>
+    public const char NarrowSpace = ' ';
 
     private static readonly string[] SizeUnits = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
 
@@ -21,14 +21,14 @@ public static class Format
         NumberGroupSizes = [3],
     };
 
-    /// <summary>Секунды словами: 30 → «30 секунд».</summary>
+    /// <summary>Seconds in words: 30 → "30 секунд".</summary>
     public static string Seconds(int value) =>
         $"{value} {Plural(value, "секунда", "секунды", "секунд")}";
 
-    /// <summary>Целое число с разрядами: 12480 → «12 480».</summary>
+    /// <summary>Integer with digit groups: 12480 → "12 480".</summary>
     public static string Number(long value) => value.ToString("#,0", GroupedNumbers);
 
-    /// <summary>Размер файла в человеческом виде: 25 260 032 → «24,1 МБ».</summary>
+    /// <summary>File size in human form: 25 260 032 → "24,1 МБ".</summary>
     public static string Size(long bytes)
     {
         if (bytes < 0)
@@ -49,9 +49,9 @@ public static class Format
             unit++;
         }
 
-        // Байты и килобайты — всегда целые («42 КБ», «612 КБ»); мегабайты и выше —
-        // с одним знаком после запятой, пока число меньше сотни («24,1 МБ», «1,8 ГБ»),
-        // дальше снова целые («284 МБ»). Ровно так размеры выглядят в макете.
+        // Bytes and kilobytes stay whole ("42 КБ"); megabytes and above carry one
+        // decimal while below a hundred ("24,1 МБ", "1,8 ГБ") and go back to whole
+        // above it ("284 МБ"). This matches the design mock-up.
         string number = unit >= 2 && value < 100
             ? value.ToString("0.0", GroupedNumbers)
             : value.ToString("#,0", GroupedNumbers);
@@ -59,7 +59,7 @@ public static class Format
         return $"{number}{NarrowSpace}{SizeUnits[unit]}";
     }
 
-    /// <summary>Длительность как «18:42», а если больше часа — «1:18:42».</summary>
+    /// <summary>Duration as "18:42", or "1:18:42" past an hour.</summary>
     public static string Duration(TimeSpan value)
     {
         if (value < TimeSpan.Zero)
@@ -72,7 +72,7 @@ public static class Format
             : $"{(int)value.TotalMinutes}:{value.Seconds:00}";
     }
 
-    /// <summary>Длительность словами: «18 минут 42 секунды» — для диалога завершения.</summary>
+    /// <summary>Duration in words for the scan-finished dialog.</summary>
     public static string DurationWords(TimeSpan value)
     {
         if (value.TotalSeconds < 1)
@@ -100,7 +100,7 @@ public static class Format
         return string.Join(' ', parts);
     }
 
-    /// <summary>Русское склонение по числу: 1 файл / 2 файла / 5 файлов.</summary>
+    /// <summary>Russian plural agreement: 1 файл / 2 файла / 5 файлов.</summary>
     public static string Plural(long count, string one, string few, string many)
     {
         long abs = Math.Abs(count) % 100;
@@ -117,10 +117,10 @@ public static class Format
         };
     }
 
-    /// <summary>«12 480 файлов» — число вместе со склонённым словом.</summary>
+    /// <summary>Count with the agreeing noun: "12 480 файлов".</summary>
     public static string Files(long count) => $"{Number(count)} {Plural(count, "файл", "файла", "файлов")}";
 
-    /// <summary>Доля в процентах: «0,6 %».</summary>
+    /// <summary>Fraction as a percentage: "0,6 %".</summary>
     public static string Percent(double fraction) =>
         $"{(fraction * 100).ToString(fraction is > 0 and < 0.001 ? "0.000" : "0.#", GroupedNumbers)}{NarrowSpace}%";
 }

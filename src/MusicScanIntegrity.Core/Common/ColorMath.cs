@@ -3,37 +3,28 @@ using System.Globalization;
 namespace MusicScanIntegrity.Core.Common;
 
 /// <summary>
-/// Расчёты для выбора цвета: разбор кода, перевод между RGB и HSV, подмешивание
-/// цвета к поверхности темы.
+/// Colour maths for the status colour picker: hex parsing, RGB/HSV conversion
+/// and tinting a theme surface.
 /// </summary>
 /// <remarks>
-/// Расчёты живут в ядре, а не рядом с окном выбора цвета, по одной причине:
-/// окно нельзя провести мышью в автоматической проверке, а эти функции —
-/// можно. В окне остаётся только перенос координат курсора в доли.
+/// Lives in the core rather than next to the picker window so it can be unit
+/// tested; the window only maps cursor coordinates to shares.
 /// </remarks>
 public static class ColorMath
 {
-    /// <summary>Цвет как три составляющие 0…255.</summary>
-    /// <param name="R">Красная составляющая.</param>
-    /// <param name="G">Зелёная составляющая.</param>
-    /// <param name="B">Синяя составляющая.</param>
+    /// <summary>A colour as three 0…255 components.</summary>
     public readonly record struct Rgb(byte R, byte G, byte B)
     {
-        /// <summary>Записывает цвет как «#RRGGBB».</summary>
+        /// <summary>Formats the colour as "#RRGGBB".</summary>
         public override string ToString() =>
             string.Create(CultureInfo.InvariantCulture, $"#{R:X2}{G:X2}{B:X2}");
     }
 
-    /// <summary>Цвет как оттенок 0…360, насыщенность и яркость 0…1.</summary>
-    /// <param name="Hue">Оттенок в градусах.</param>
-    /// <param name="Saturation">Насыщенность.</param>
-    /// <param name="Value">Яркость.</param>
+    /// <summary>A colour as hue in degrees (0…360) with saturation and value in 0…1.</summary>
     public readonly record struct Hsv(double Hue, double Saturation, double Value);
 
-    /// <summary>Разбирает запись вида «#RRGGBB».</summary>
-    /// <param name="hex">Код цвета.</param>
-    /// <param name="color">Разобранный цвет.</param>
-    /// <returns><see langword="true" />, если запись понята.</returns>
+    /// <summary>Parses a "#RRGGBB" string.</summary>
+    /// <returns><see langword="true" /> if the string was understood.</returns>
     public static bool TryParse(string? hex, out Rgb color)
     {
         color = default;
@@ -60,9 +51,7 @@ public static class ColorMath
         return true;
     }
 
-    /// <summary>Переводит оттенок, насыщенность и яркость в составляющие цвета.</summary>
-    /// <param name="hsv">Исходные значения.</param>
-    /// <returns>Цвет в RGB.</returns>
+    /// <summary>Converts HSV to RGB.</summary>
     public static Rgb ToRgb(Hsv hsv)
     {
         double hue = hsv.Hue % 360;
@@ -94,9 +83,7 @@ public static class ColorMath
             Round((parts.B + shift) * 255));
     }
 
-    /// <summary>Переводит составляющие цвета в оттенок, насыщенность и яркость.</summary>
-    /// <param name="color">Исходный цвет.</param>
-    /// <returns>Значения HSV.</returns>
+    /// <summary>Converts RGB to HSV.</summary>
     public static Hsv ToHsv(Rgb color)
     {
         double r = color.R / 255.0;
@@ -132,17 +119,12 @@ public static class ColorMath
         return new Hsv(hue, max <= 0 ? 0 : delta / max, max);
     }
 
-    /// <summary>
-    /// Подложка метки: цвет, подмешанный к поверхности темы.
-    /// </summary>
-    /// <param name="color">Цвет статуса.</param>
-    /// <param name="surface">Цвет поверхности, на которой лежит метка.</param>
-    /// <param name="share">Доля цвета, 0…1.</param>
-    /// <returns>Цвет подложки.</returns>
+    /// <summary>Blends a status colour into a theme surface.</summary>
+    /// <param name="share">Share of the status colour, 0…1.</param>
     /// <remarks>
-    /// Доли подобраны по готовым токенам: светлая подложка «в порядке»
-    /// (#E8F6ED) — это примерно десятая часть цвета на белом, тёмная
-    /// (#1C3227) — примерно восьмая на фоне окна.
+    /// Shares are derived from the design tokens: the light "ok" badge
+    /// (#E8F6ED) is roughly a tenth of the colour over white, the dark one
+    /// (#1C3227) roughly an eighth over the window background.
     /// </remarks>
     public static Rgb Tint(Rgb color, Rgb surface, double share)
     {
@@ -157,10 +139,7 @@ public static class ColorMath
             Round(from + ((to - from) * share));
     }
 
-    /// <summary>Доля вдоль стороны: положение курсора, приведённое к 0…1.</summary>
-    /// <param name="position">Координата курсора внутри области.</param>
-    /// <param name="length">Длина стороны области.</param>
-    /// <returns>Доля от 0 до 1; для нулевой длины — 0.</returns>
+    /// <summary>Cursor position along an edge, clamped to 0…1; 0 for zero length.</summary>
     public static double Share(double position, double length) =>
         length <= 0 ? 0 : Math.Clamp(position / length, 0, 1);
 

@@ -1,29 +1,24 @@
 namespace MusicScanIntegrity.Core.Common;
 
 /// <summary>
-/// Куда программе можно писать свои файлы.
+/// Picks a folder the application may write to.
 /// </summary>
 /// <remarks>
+/// The build is portable — settings and the history database sit next to the
+/// executable so the folder can be copied and carried away — but it can also
+/// be installed into Program Files, where writing is denied. In that case
+/// everything moves to the user profile.
 /// <para>
-/// Программа переносимая: настройки и база истории лежат рядом с ней, папку
-/// можно скопировать целиком и унести. Но её же можно и установить — в
-/// <c>Program Files</c>, куда обычному пользователю писать не дают. Тогда всё,
-/// что программа хранит, уходит в профиль пользователя.
-/// </para>
-/// <para>
-/// Проверка делается записью, а не разбором прав: причин запрета много —
-/// <c>Program Files</c>, носитель только для чтения, политика безопасности, —
-/// и перечислять их бессмысленно. Важен один ответ: получилось или нет.
+/// Writability is probed by writing rather than by inspecting permissions:
+/// Program Files, read-only media and security policy all deny writes, and
+/// only the outcome matters.
 /// </para>
 /// </remarks>
 public static class WritableFolder
 {
-    /// <summary>Имя вложенной папки в профиле пользователя.</summary>
     private const string AppDataFolderName = "MusicScanIntegrity";
 
-    /// <summary>Можно ли писать в эту папку.</summary>
-    /// <param name="folder">Путь к папке; она создаётся, если её нет.</param>
-    /// <returns><see langword="true" />, если запись удалась.</returns>
+    /// <summary>Probes whether the folder accepts writes, creating it if needed.</summary>
     public static bool CanWriteTo(string folder)
     {
         try
@@ -43,19 +38,16 @@ public static class WritableFolder
     }
 
     /// <summary>
-    /// Папка рядом с программой, если туда можно писать; иначе — в профиле.
+    /// The folder next to the executable when writable, otherwise one inside
+    /// the user profile.
     /// </summary>
-    /// <param name="subFolder">Имя вложенной папки, например «config» или «data».</param>
-    /// <param name="roaming">
-    /// Класть запасную копию в перемещаемую часть профиля (<c>%APPDATA%</c>),
-    /// а не в локальную.
-    /// </param>
-    /// <returns>Путь к папке, в которую точно можно писать.</returns>
+    /// <param name="subFolder">Nested folder name, for example "config" or "data".</param>
+    /// <param name="roaming">Fall back to %APPDATA% instead of %LOCALAPPDATA%.</param>
     /// <remarks>
-    /// Настройки лежат в перемещаемой части, и это не вкусовщина: они там были
-    /// с самого начала, и переезд потерял бы настройки у всех, кто уже
-    /// пользуется программой. База истории — в локальной: она вырастает до
-    /// десятков мегабайт, и таскать её за профилем между машинами незачем.
+    /// Settings use the roaming profile because they always have: moving them
+    /// would lose the settings of every existing user. The history database is
+    /// local — it grows to tens of megabytes and has no business following a
+    /// profile between machines.
     /// </remarks>
     public static string Resolve(string subFolder, bool roaming = false)
     {
