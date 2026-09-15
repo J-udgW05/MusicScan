@@ -1,67 +1,52 @@
 namespace MusicScanIntegrity.Core.Settings;
 
 /// <summary>
-/// Что о зрительных эффектах говорит сама Windows.
+/// What Windows itself reports about visual effects.
 /// </summary>
-/// <param name="TransparencyEnabled">
-/// В «Персонализации → Цвета» включены эффекты прозрачности.
-/// </param>
-/// <param name="AnimationsEnabled">
-/// В «Специальных возможностях → Визуальные эффекты» включены эффекты анимации.
-/// </param>
-/// <param name="MicaSupported">
-/// Система вообще умеет рисовать подложку Mica: она появилась в Windows 11.
-/// </param>
+/// <param name="TransparencyEnabled">Transparency effects are on in Personalisation.</param>
+/// <param name="AnimationsEnabled">Animation effects are on in Accessibility.</param>
+/// <param name="MicaSupported">The OS can draw a Mica backdrop at all; Windows 11 and up.</param>
 public readonly record struct SystemEffects(
     bool TransparencyEnabled,
     bool AnimationsEnabled,
     bool MicaSupported)
 {
-    /// <summary>Ничего не поддерживается — значение по умолчанию для тестов и запасной путь.</summary>
+    /// <summary>Nothing supported; the default for tests and the fallback path.</summary>
     public static readonly SystemEffects None = new(false, false, false);
 }
 
 /// <summary>
-/// Решает, включены ли подложка и анимации.
+/// Decides whether the backdrop and animations are on.
 /// </summary>
 /// <remarks>
+/// Kept as pure functions so the rule — take the system setting on first run,
+/// honour the user's choice afterwards — can be tested for every combination
+/// without opening a window.
 /// <para>
-/// Вынесено отдельной чистой функцией не ради красоты: правило «при первом
-/// запуске берём из системы, дальше — то, что выбрал человек» легко описать
-/// словами и легко сломать в коде. Здесь его видно целиком и можно проверить
-/// на всех сочетаниях, не поднимая окна.
-/// </para>
-/// <para>
-/// Хранимое и действующее значения различаются намеренно. В файл пишется
-/// <em>намерение</em>: хочет человек подложку или нет. Рисуется она только
-/// если система умеет — на Windows 10 не умеет никто. Если хранить сразу
-/// действующее, то настройка, выключенная на десятке за невозможностью,
-/// осталась бы выключенной и после перехода на одиннадцатую, где всё есть.
+/// Stored and effective values differ on purpose. The file records the
+/// <em>intent</em>; the backdrop is only drawn where the OS supports it. Storing
+/// the effective value would leave the setting off after an upgrade from
+/// Windows 10, where it could never have been on.
 /// </para>
 /// </remarks>
 public static class VisualEffects
 {
-    /// <summary>Хочет ли человек подложку Mica.</summary>
-    /// <param name="stored">Что записано в настройках; <see langword="null" /> — выбора не было.</param>
-    /// <param name="system">Что говорит система.</param>
-    /// <returns>Намерение, которое и записывается в файл настроек.</returns>
+    /// <summary>Whether the user wants the Mica backdrop.</summary>
+    /// <param name="stored">Value from settings; <see langword="null" /> when never chosen.</param>
+    /// <returns>The intent, which is what gets written to the settings file.</returns>
     public static bool ResolveMicaPreference(bool? stored, SystemEffects system) =>
         stored ?? system.TransparencyEnabled;
 
-    /// <summary>Рисовать ли подложку на самом деле.</summary>
-    /// <param name="preference">Намерение из настроек.</param>
-    /// <param name="system">Что говорит система.</param>
-    /// <returns><see langword="true" />, если подложку и хотят, и могут показать.</returns>
+    /// <summary>Whether the backdrop is actually drawn.</summary>
+    /// <returns><see langword="true" /> when it is both wanted and supported.</returns>
     public static bool IsMicaEffective(bool preference, SystemEffects system) =>
         preference && system.MicaSupported;
 
-    /// <summary>Нужны ли анимации.</summary>
-    /// <param name="stored">Что записано в настройках; <see langword="null" /> — выбора не было.</param>
-    /// <param name="system">Что говорит система.</param>
-    /// <returns>Значение, которое и записывается в файл настроек.</returns>
+    /// <summary>Whether animations are on.</summary>
+    /// <param name="stored">Value from settings; <see langword="null" /> when never chosen.</param>
     /// <remarks>
-    /// Поддержки здесь спрашивать не у кого: анимации рисует сама программа,
-    /// и получиться они могут где угодно.
+    /// There is no support question here: the application draws the animations
+    /// itself, so they work anywhere.
     /// </remarks>
     public static bool ResolveAnimations(bool? stored, SystemEffects system) =>
         stored ?? system.AnimationsEnabled;

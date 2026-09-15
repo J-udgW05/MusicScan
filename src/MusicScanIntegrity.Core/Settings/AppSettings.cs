@@ -3,282 +3,244 @@
 namespace MusicScanIntegrity.Core.Settings;
 
 /// <summary>
-/// Все настройки пользователя. Разделы соответствуют окну настроек из референса
-/// («Общие», «Проверка», «Занятые файлы», «Форматы», «Отчёты», «Внешний вид»),
-/// значения по умолчанию — UI_SPEC.md, раздел 7.
+/// Every user setting. Sections mirror the settings window: general, scanning,
+/// locked files, formats, reports and appearance.
 /// </summary>
 /// <remarks>
-/// Класс намеренно плоский и сериализуемый в JSON: файл настроек должен оставаться
-/// читаемым и восстановимым вручную. Свойства с сеттерами, а не record — окно
-/// настроек правит поля по одному.
+/// Deliberately flat and JSON-serializable: the settings file has to stay
+/// readable and repairable by hand. Settable properties rather than a record,
+/// because the settings window edits one field at a time.
 /// </remarks>
 public sealed class AppSettings
 {
-    /// <summary>Версия формата файла настроек — на случай будущих миграций.</summary>
+    /// <summary>Settings file format version, for future migrations.</summary>
     public int SchemaVersion { get; set; } = 1;
 
-    // ── Общие ────────────────────────────────────────────────────────────────
+    // ── General ──────────────────────────────────────────────────────────────
 
-    /// <summary>Запоминать последнюю папку и подставлять её при запуске.</summary>
+    /// <summary>Remember the last folder and offer it at startup.</summary>
     public bool RememberLastFolder { get; set; } = true;
 
-    /// <summary>Последняя выбранная папка.</summary>
+    /// <summary>Last folder the user picked.</summary>
     public string? LastFolder { get; set; }
 
-    /// <summary>
-    /// Предлагать начать проверку сразу после выбора папки
-    /// (02_ARCHITECTURE.md, раздел 9).
-    /// </summary>
+    /// <summary>Offer to start the scan as soon as a folder is picked.</summary>
     public bool OfferStartAfterFolderSelected { get; set; } = true;
 
-    /// <summary>Показывать приветствие при первом запуске.</summary>
+    /// <summary>Show the welcome tip on first run.</summary>
     public bool ShowFirstRunTip { get; set; } = true;
 
-    /// <summary>Системный звук по завершении проверки.</summary>
+    /// <summary>Play the system sound when the scan finishes.</summary>
     public bool SoundOnFinish { get; set; }
 
-    // ── Проверка ─────────────────────────────────────────────────────────────
+    // ── Scanning ─────────────────────────────────────────────────────────────
 
-    /// <summary>Рекурсивный обход подпапок.</summary>
+    /// <summary>Walk subfolders.</summary>
     public bool Recursive { get; set; } = true;
 
-    /// <summary>
-    /// Проверять теги. Выключено по умолчанию: отсутствие тегов — не повреждение
-    /// (03_IMPLEMENTATION_GUIDE.md, раздел 2).
-    /// </summary>
+    /// <summary>Check tags. Off by default: missing tags are not damage.</summary>
     public bool CheckMetadata { get; set; }
 
-    /// <summary>Искать отсутствующие пути внутри плейлистов.</summary>
+    /// <summary>Look for missing paths inside playlists.</summary>
     public bool CheckPlaylists { get; set; } = true;
 
-    /// <summary>
-    /// Насколько глубоко читать файл декодером.
-    /// </summary>
+    /// <summary>How much of each file the decoder reads.</summary>
     /// <remarks>
-    /// По умолчанию выборочная: начало, конец и несколько мест в середине.
-    /// Только начало (как было раньше) не слышит повреждения в середине трека,
-    /// а полное декодирование коллекции занимает часы.
+    /// Sampled by default. Reading only the start misses damage in the middle
+    /// of a track; decoding a whole collection takes hours.
     /// </remarks>
     public CheckDepth CheckDepth { get; set; } = CheckDepth.Sampled;
 
-    /// <summary>
-    /// Замечать сплошную тишину и провалы внутри трека.
-    /// </summary>
+    /// <summary>Report digital silence and dropouts inside a track.</summary>
     /// <remarks>
-    /// Включено по умолчанию: файл, который декодируется в тишину, формально
-    /// исправен, а слушать в нём нечего. Считается по тем же отсчётам, что уже
-    /// прошли через декодер, поэтому ничего не стоит.
+    /// On by default: a file that decodes to silence is formally healthy and
+    /// has nothing to listen to. Measured from samples the decoder already
+    /// produced, so it costs nothing.
     /// </remarks>
     public bool DetectSilence { get; set; } = true;
 
-    /// <summary>
-    /// Замечать перегрузку и постоянную составляющую.
-    /// </summary>
+    /// <summary>Report clipping and DC offset.</summary>
     /// <remarks>
-    /// Выключено по умолчанию, и намеренно: у современных мастерингов отсчёты
-    /// упираются в предел шкалы сплошь и рядом, это их обычное состояние.
-    /// Включённая по умолчанию проверка ругалась бы на половину коллекции.
+    /// Off by default on purpose: modern masters hit the top of the scale all
+    /// the time, so enabling this would flag half of a typical collection.
     /// </remarks>
     public bool DetectClipping { get; set; }
 
-    /// <summary>
-    /// Искать признаки перекодирования: обрезанный сверху спектр.
-    /// </summary>
+    /// <summary>Look for signs of re-encoding: a spectrum cut off at the top.</summary>
     /// <remarks>
-    /// Результат — подозрение, а не приговор: у старых записей и намеренно
-    /// узкополосных вещей верхних частот нет и без всякого перекодирования.
-    /// Поэтому замечание жёлтое и формулируется словом «похоже».
+    /// The result is a suspicion, not a verdict: old and deliberately
+    /// narrow-band recordings lack top end without any re-encoding, which is
+    /// why the finding is a warning worded as "looks like".
     /// </remarks>
     public bool DetectTranscode { get; set; } = true;
 
-    /// <summary>
-    /// Разбирать альбомы по папкам и искать повторяющиеся треки.
-    /// </summary>
+    /// <summary>Inspect albums folder by folder and look for duplicates.</summary>
     /// <remarks>
-    /// Считается по готовым результатам, файлы второй раз не читаются. Часть
-    /// проверок работает только при включённых тегах: без них не видно ни
-    /// номеров дорожек, ни названий альбомов.
+    /// Computed from results already in hand; no file is read twice. Some of
+    /// these checks need tags, which carry the track numbers and album names.
     /// </remarks>
     public bool InspectCollection { get; set; } = true;
 
-    /// <summary>
-    /// Следить за порчей: считать отпечаток каждого файла и хранить историю.
-    /// </summary>
+    /// <summary>Track corruption: fingerprint every file and keep the history.</summary>
     /// <remarks>
-    /// Выключено по умолчанию, потому что стоит дорого: первая проверка читает
-    /// каждый файл целиком и заводит базу рядом с программой. Зато появляется
-    /// то, что иначе не увидеть, — содержимое изменилось, а размер и дата
-    /// прежние. Так выглядит сбойный диск.
+    /// Off by default because it is expensive: the first scan reads every file
+    /// whole and creates a database. In exchange it catches what nothing else
+    /// does — contents changed while size and date stayed put, which is what a
+    /// failing disk looks like.
     /// </remarks>
     public bool TrackChanges { get; set; }
 
-    /// <summary>Сверять расширение с реальным содержимым файла.</summary>
+    /// <summary>Verify the extension against the actual contents.</summary>
     public bool VerifyExtensionMatchesContent { get; set; } = true;
 
-    /// <summary>
-    /// Проверять файл его собственными контрольными суммами и структурой.
-    /// </summary>
+    /// <summary>Validate the file against its own checksums and structure.</summary>
     /// <remarks>
-    /// Включено по умолчанию: это единственная проверка, дающая точный ответ
-    /// вместо «декодер открыл файл». Читается весь файл, но без распаковки,
-    /// поэтому упирается в скорость диска, а не в процессор.
+    /// On by default: the only check that gives a definite answer rather than
+    /// "the decoder opened it". Reads the whole file but does not decompress,
+    /// so it is bound by disk speed rather than CPU.
     /// </remarks>
     public bool VerifyContainerIntegrity { get; set; } = true;
 
-    /// <summary>
-    /// Порог «большого файла» в мегабайтах. 0 означает «без ограничений».
-    /// Готовые варианты: 100, 500, 1024, 2048, 5120, 0.
-    /// </summary>
+    /// <summary>Large-file threshold in megabytes; 0 means no limit.</summary>
     public int LargeFileThresholdMb { get; set; } = 500;
 
-    /// <summary>Таймаут проверки одного файла в секундах.</summary>
+    /// <summary>Per-file timeout in seconds.</summary>
     public int FileTimeoutSeconds { get; set; } = 60;
 
-    /// <summary>Параллельность выбирается автоматически по числу ядер.</summary>
+    /// <summary>Derive the thread count from the number of cores.</summary>
     public bool AutoParallelism { get; set; } = true;
 
-    /// <summary>Параллельность, заданная вручную (когда <see cref="AutoParallelism"/> выключено).</summary>
+    /// <summary>Manual thread count, used when <see cref="AutoParallelism"/> is off.</summary>
     public int ManualParallelism { get; set; } = 4;
 
-    /// <summary>
-    /// Учитывать тип диска при выборе числа потоков.
-    /// </summary>
+    /// <summary>Take the drive type into account when choosing the thread count.</summary>
     /// <remarks>
-    /// На жёстком диске восемь параллельных чтений заставляют головку метаться
-    /// между дорожками, и проверка идёт медленнее, чем в два потока. На
-    /// твердотельном перемотки нет, и ограничивать нечего.
+    /// On a spinning disk eight parallel reads make the head seek back and
+    /// forth, which is slower than two threads. An SSD has no such penalty.
     /// </remarks>
     public bool RespectDriveType { get; set; } = true;
 
-    /// <summary>Предупреждать о больших файлах до начала их проверки.</summary>
+    /// <summary>Warn about large files before checking them.</summary>
     public bool WarnAboutLargeFiles { get; set; } = true;
 
-    // ── Занятые файлы ────────────────────────────────────────────────────────
+    // ── Locked files ─────────────────────────────────────────────────────────
 
-    /// <summary>Что делать по умолчанию с занятым файлом.</summary>
+    /// <summary>Default action for a locked file.</summary>
     public LockedFileAction LockedFileAction { get; set; } = LockedFileAction.Ask;
 
-    /// <summary>Сколько секунд ждать освобождения перед повторной попыткой.</summary>
+    /// <summary>Seconds to wait for the lock to clear before retrying.</summary>
     public int LockedWaitSeconds { get; set; } = 30;
 
-    /// <summary>Сколько раз повторять попытку.</summary>
+    /// <summary>How many times to retry.</summary>
     public int LockedRetryCount { get; set; } = 3;
 
-    /// <summary>Пытаться определить программу-владельца занятого файла.</summary>
+    /// <summary>Try to identify the process holding the file.</summary>
     public bool DetectOwnerProcess { get; set; } = true;
 
     /// <summary>
-    /// Предлагать закрыть программу-владельца. Выключено по умолчанию:
-    /// закрытие чужого процесса потенциально опасно.
+    /// Offer to close the owning process. Off by default: closing someone
+    /// else's process can lose their work.
     /// </summary>
     public bool OfferCloseOwner { get; set; }
 
-    /// <summary>Показывать в вопросе флажок «поступать так же со всеми занятыми файлами».</summary>
+    /// <summary>Show the "apply to all locked files" checkbox in the prompt.</summary>
     public bool AllowApplyToAllLocked { get; set; } = true;
 
-    // ── Форматы ──────────────────────────────────────────────────────────────
+    // ── Formats ──────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Расширения аудио, выключенные пользователем. По умолчанию включены все
-    /// из 01_SPECIFICATION.md, раздел 4. Хранятся именно исключения, чтобы новые
-    /// поддерживаемые форматы включались автоматически.
+    /// Audio extensions the user turned off. Exclusions are stored rather than
+    /// inclusions so newly supported formats are enabled automatically.
     /// </summary>
     public List<string> DisabledExtensions { get; set; } = [];
 
-    /// <summary>Дополнительные расширения, добавленные пользователем (например «.mpc»).</summary>
+    /// <summary>Extra extensions added by the user, for example ".mpc".</summary>
     public List<string> CustomExtensions { get; set; } = [];
 
     /// <summary>
-    /// Экспериментальная поддержка образов дисков ISO (SACD).
-    /// Выключена по умолчанию: обычный .iso — это не аудиофайл.
+    /// Experimental ISO (SACD) disc image support. Off by default: an ordinary
+    /// .iso is not an audio file.
     /// </summary>
     public bool EnableIsoSacd { get; set; }
 
-    // ── Отчёты ───────────────────────────────────────────────────────────────
+    // ── Reports ──────────────────────────────────────────────────────────────
 
-    /// <summary>Формат отчёта по умолчанию.</summary>
+    /// <summary>Default report format.</summary>
     public ReportFormat DefaultReportFormat { get; set; } = ReportFormat.Html;
 
-    /// <summary>Папка, куда сохраняются отчёты. Пусто — «Документы».</summary>
+    /// <summary>Folder reports are saved to; empty means Documents.</summary>
     public string? ReportsFolder { get; set; }
 
-    /// <summary>Включать в отчёт файлы со статусом «в порядке».</summary>
+    /// <summary>Include files with the "ok" status in the report.</summary>
     public bool IncludeOkFilesInReport { get; set; }
 
-    /// <summary>Открывать отчёт сразу после сохранения.</summary>
+    /// <summary>Open the report as soon as it is saved.</summary>
     public bool OpenReportAfterSave { get; set; } = true;
 
-    // ── Внешний вид ──────────────────────────────────────────────────────────
+    // ── Appearance ───────────────────────────────────────────────────────────
 
-    /// <summary>Тема оформления.</summary>
+    /// <summary>Application theme.</summary>
     public AppTheme Theme { get; set; } = AppTheme.System;
 
     /// <summary>
-    /// Пользовательские цвета статусов в формате «#RRGGBB».
-    /// Пустое значение означает «взять цвет из темы» (UI_SPEC.md, раздел 1).
+    /// User status colours as "#RRGGBB"; empty means take the theme colour.
     /// </summary>
     public StatusColorOverrides StatusColors { get; set; } = new();
 
-    /// <summary>Плотность строк в таблице результатов.</summary>
+    /// <summary>Row density of the results table.</summary>
     public ListDensity ListDensity { get; set; } = ListDensity.Normal;
 
-    /// <summary>Показывать полные пути (иначе путь сокращается с начала).</summary>
+    /// <summary>Show full paths; otherwise paths are trimmed from the left.</summary>
     public bool ShowFullPaths { get; set; } = true;
 
-    /// <summary>Моноширинный шрифт для путей.</summary>
+    /// <summary>Use a monospaced font for paths.</summary>
     public bool MonospacePaths { get; set; } = true;
 
-    /// <summary>Показывать строку состояния внизу окна.</summary>
+    /// <summary>Show the status bar at the bottom of the window.</summary>
     public bool ShowStatusBar { get; set; } = true;
 
-    /// <summary>
-    /// Подложка Mica под окном; <see langword="null" /> — выбора ещё не было.
-    /// </summary>
+    /// <summary>Mica backdrop; <see langword="null" /> means never chosen.</summary>
     /// <remarks>
-    /// Три значения, а не два, и это принципиально. «Ещё не выбирали» и
-    /// «выключено пользователем» — разные вещи: в первом случае при первом
-    /// запуске надо посмотреть, включены ли эффекты в самой Windows, во втором
-    /// смотреть некуда, решение уже принято. Пустое значение разрешается один
-    /// раз при запуске и тут же записывается в файл.
+    /// Three states rather than two, and that matters: "never asked" and
+    /// "turned off by the user" are different. The first means first run should
+    /// look at the Windows effects setting; the second means the decision is
+    /// already made. A null is resolved once at startup and written back.
     /// </remarks>
     public bool? MicaEffect { get; set; }
 
-    /// <summary>
-    /// Анимации; <see langword="null" /> — выбора ещё не было.
-    /// </summary>
+    /// <summary>Animations; <see langword="null" /> means never chosen.</summary>
     /// <remarks>
-    /// Смысл трёх значений тот же, что у <see cref="MicaEffect" />: при первом
-    /// запуске берётся системная настройка «Эффекты анимации», дальше — то, что
-    /// выбрал человек.
+    /// Same three states as <see cref="MicaEffect" />: first run takes the
+    /// Windows animation setting, afterwards the user's choice stands.
     /// </remarks>
     public bool? Animations { get; set; }
 
-    // ── Производные значения ─────────────────────────────────────────────────
+    // ── Derived values ───────────────────────────────────────────────────────
 
     /// <summary>
-    /// Сколько файлов проверять одновременно. «Авто» — по числу ядер,
-    /// но не больше восьми (UI_SPEC.md, раздел 7).
+    /// How many files are checked at once. Automatic means one per core,
+    /// capped at eight.
     /// </summary>
     [JsonIgnore]
     public int EffectiveParallelism => AutoParallelism
         ? Math.Clamp(Environment.ProcessorCount, 1, 8)
         : Math.Clamp(ManualParallelism, 1, 64);
 
-    /// <summary>Наибольшее число потоков на диске с подвижной головкой.</summary>
+    /// <summary>Thread cap for a spinning disk.</summary>
     public const int HardDiskParallelism = 2;
 
-    /// <summary>Порог «большого файла» в байтах; <see langword="null"/> — без ограничений.</summary>
+    /// <summary>Large-file threshold in bytes; <see langword="null"/> means no limit.</summary>
     [JsonIgnore]
     public long? LargeFileThresholdBytes =>
         LargeFileThresholdMb <= 0 ? null : (long)LargeFileThresholdMb * 1024 * 1024;
 
-    /// <summary>Таймаут проверки одного файла.</summary>
+    /// <summary>Per-file timeout.</summary>
     [JsonIgnore]
     public TimeSpan FileTimeout => TimeSpan.FromSeconds(Math.Clamp(FileTimeoutSeconds, 1, 3600));
 
     /// <summary>
-    /// Глубокая копия. Окно настроек правит копию и применяет её только по «Сохранить»,
-    /// поэтому списки тоже должны копироваться, а не разделяться ссылкой.
+    /// Deep copy. The settings window edits a draft and applies it only on
+    /// save, so the lists must be copied rather than shared by reference.
     /// </summary>
     public AppSettings Clone() => new()
     {
@@ -329,25 +291,25 @@ public sealed class AppSettings
     };
 }
 
-/// <summary>Пользовательские цвета статусов; <see langword="null"/> — цвет из темы.</summary>
+/// <summary>User status colours; <see langword="null"/> means the theme colour.</summary>
 public sealed class StatusColorOverrides
 {
-    /// <summary>Цвет статуса «в порядке».</summary>
+    /// <summary>Colour of the "ok" status.</summary>
     public string? Ok { get; set; }
 
-    /// <summary>Цвет статуса «повреждён».</summary>
+    /// <summary>Colour of the "corrupted" status.</summary>
     public string? Corrupted { get; set; }
 
-    /// <summary>Цвет статуса «предупреждение».</summary>
+    /// <summary>Colour of the "warning" status.</summary>
     public string? Warning { get; set; }
 
-    /// <summary>Цвет статуса «пропущен».</summary>
+    /// <summary>Colour of the "skipped" status.</summary>
     public string? Skipped { get; set; }
 
-    /// <summary>Все цвета сброшены к теме.</summary>
+    /// <summary>Every colour is left at the theme default.</summary>
     public bool IsEmpty => Ok is null && Corrupted is null && Warning is null && Skipped is null;
 
-    /// <summary>Копия значений.</summary>
+    /// <summary>Copy of the values.</summary>
     public StatusColorOverrides Clone() => new()
     {
         Ok = Ok,

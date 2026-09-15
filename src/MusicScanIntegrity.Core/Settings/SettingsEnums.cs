@@ -1,69 +1,69 @@
 ﻿namespace MusicScanIntegrity.Core.Settings;
 
-/// <summary>Тема оформления.</summary>
+/// <summary>Application theme.</summary>
 public enum AppTheme
 {
-    /// <summary>Следовать системной теме Windows.</summary>
+    /// <summary>Follow the Windows theme.</summary>
     System,
 
-    /// <summary>Всегда светлая.</summary>
+    /// <summary>Always light.</summary>
     Light,
 
-    /// <summary>Всегда тёмная.</summary>
+    /// <summary>Always dark.</summary>
     Dark,
 }
 
-/// <summary>Что делать, когда файл занят другой программой.</summary>
+/// <summary>What to do when a file is locked by another process.</summary>
 public enum LockedFileAction
 {
-    /// <summary>Спрашивать пользователя (по умолчанию). Вопросы задаются по одному.</summary>
+    /// <summary>Ask the user, one file at a time. The default.</summary>
     Ask,
 
-    /// <summary>Всегда пропускать.</summary>
+    /// <summary>Always skip.</summary>
     Skip,
 
-    /// <summary>Подождать освобождения и повторить.</summary>
+    /// <summary>Wait for the lock to clear and retry.</summary>
     Wait,
 
-    /// <summary>Сделать временную копию и проверить её.</summary>
+    /// <summary>Check a temporary copy instead.</summary>
     TempCopy,
 
-    /// <summary>Показать программу-владельца и предложить её закрыть.</summary>
+    /// <summary>Name the owning process and offer to close it.</summary>
     CloseOwner,
 }
 
-/// <summary>Формат экспортируемого отчёта.</summary>
+/// <summary>Export format of the report.</summary>
 public enum ReportFormat
 {
-    /// <summary>Оформленная HTML-страница с той же цветовой маркировкой.</summary>
+    /// <summary>Styled HTML page carrying the same status colours.</summary>
     Html,
 
-    /// <summary>Таблица CSV для Excel и дальнейшей обработки.</summary>
+    /// <summary>CSV table for Excel and further processing.</summary>
     Csv,
 
-    /// <summary>Простой текстовый список для чтения глазами.</summary>
+    /// <summary>Plain text list for reading.</summary>
     Text,
 }
 
-/// <summary>Насколько глубоко читать каждый файл декодером.</summary>
+/// <summary>How much of each file the decoder reads.</summary>
 public enum CheckDepth
 {
-    /// <summary>Только начало — две секунды. Быстро, но середину не слышит.</summary>
+    /// <summary>The first two seconds only. Fast, but deaf to the middle.</summary>
     Quick,
 
-    /// <summary>Начало, конец и несколько мест в середине.</summary>
+    /// <summary>Start, end and a few places in between.</summary>
     Sampled,
 
-    /// <summary>Файл целиком. Самый точный ответ и самая долгая проверка.</summary>
+    /// <summary>The whole file. Most accurate and slowest.</summary>
     Full,
 }
 
-/// <summary>Плотность строк в таблице результатов.</summary>
+/// <summary>Row density of the results table.</summary>
 public enum ListDensity
 {
-    /// <summary>Обычная.</summary>
+    /// <summary>Normal.</summary>
     Normal,
 
-    /// <summary>Компактная.</summary>
+    /// <summary>Compact.</summary>
     Compact,
 }

@@ -5,15 +5,13 @@ using System.Text.Json.Serialization;
 namespace MusicScanIntegrity.Core.Settings;
 
 /// <summary>
-/// Настройки в JSON-файле рядом с программой (портативная сборка) либо,
-/// если папка программы недоступна на запись, — в %APPDATA%.
+/// Settings in a JSON file next to the executable, or in %APPDATA% when that
+/// folder is not writable.
 /// </summary>
 /// <remarks>
-/// Решение по неоднозначности: 01_SPECIFICATION.md говорит «в отдельном файле
-/// конфигурации у пользователя на компьютере», а референс — «рядом с программой,
-/// портативная сборка ничего не пишет в реестр». Приоритет отдан переносимости:
-/// сначала пробуем папку программы, и только если туда писать нельзя
-/// (Program Files, флешка только для чтения) — уходим в %APPDATA%.
+/// Portability wins: the application folder is tried first so the build can be
+/// carried on a stick, and only a read-only location (Program Files, read-only
+/// media) pushes the file into the profile.
 /// </remarks>
 public sealed class JsonSettingsService : ISettingsService
 {
@@ -23,7 +21,7 @@ public sealed class JsonSettingsService : ISettingsService
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
-        // Кириллица в путях должна остаться читаемой, а не превратиться в \uXXXX.
+        // Cyrillic paths must stay readable instead of turning into \uXXXX.
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
         Converters = { new JsonStringEnumConverter() },
@@ -33,8 +31,7 @@ public sealed class JsonSettingsService : ISettingsService
 
     private readonly SemaphoreSlim _fileLock = new(1, 1);
 
-    /// <summary>Создаёт службу настроек.</summary>
-    /// <param name="settingsFilePath">Явный путь к файлу (используется в тестах).</param>
+    /// <param name="settingsFilePath">Explicit file path; used by tests.</param>
     public JsonSettingsService(string? settingsFilePath = null)
     {
         SettingsFilePath = settingsFilePath ?? ResolveDefaultPath();
@@ -75,7 +72,7 @@ public sealed class JsonSettingsService : ISettingsService
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // Повреждённый файл настроек не должен мешать запуску программы.
+            // A damaged settings file must not stop the application starting.
             Current = new AppSettings();
             TryBackupCorruptedFile();
             await WriteAsync(Current, cancellationToken).ConfigureAwait(false);
@@ -119,8 +116,8 @@ public sealed class JsonSettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Приводит загруженные значения в допустимые пределы: файл настроек
-    /// правится вручную, и там может оказаться что угодно.
+    /// Clamps loaded values into valid ranges: the file is hand-editable and
+    /// may contain anything.
     /// </summary>
     internal static AppSettings Sanitize(AppSettings settings)
     {
@@ -144,7 +141,7 @@ public sealed class JsonSettingsService : ISettingsService
         return settings;
     }
 
-    /// <summary>Приводит расширение к виду «.flac».</summary>
+    /// <summary>Normalises an extension to the ".flac" form.</summary>
     internal static string NormalizeExtension(string value)
     {
         string trimmed = value.Trim().Trim('*').ToLowerInvariant();
@@ -161,8 +158,8 @@ public sealed class JsonSettingsService : ISettingsService
                 Directory.CreateDirectory(folder);
             }
 
-            // Пишем через временный файл: обрыв записи не должен оставить
-            // пользователя с наполовину записанным (то есть нечитаемым) конфигом.
+            // Written through a temporary file: an interrupted write must not
+            // leave a half-written, unreadable config behind.
             string tempPath = SettingsFilePath + ".tmp";
             string json = JsonSerializer.Serialize(settings, SerializerOptions);
             await File.WriteAllTextAsync(tempPath, json, cancellationToken).ConfigureAwait(false);
@@ -170,22 +167,20 @@ public sealed class JsonSettingsService : ISettingsService
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // Настройки сохраняются сами, после каждого переключателя, и делать
-            // это молча — осознанный выбор: окно с ошибкой на каждый щелчок
-            // мешало бы работать. Место записи при этом выбрано так, чтобы
-            // сюда попадать было почти не за что: если папка программы закрыта
-            // на запись, ResolveDefaultPath заранее уводит файл в %APPDATA%.
-            // Путь к нему показан в самих настройках — там и видно, куда смотреть.
+            // Settings save themselves after every toggle, and failing
+            // silently is deliberate: a dialog on each click would be
+            // unusable. Reaching here is unlikely anyway — ResolveDefaultPath
+            // has already moved the file to %APPDATA% if the application
+            // folder is read-only, and the settings window shows the path.
             _ = ex;
         }
     }
 
-    /// <summary>Откладывает нечитаемый файл настроек в сторону.</summary>
+    /// <summary>Moves an unreadable settings file aside.</summary>
     /// <remarks>
-    /// Это подстраховка, а не обязательный шаг: настройки уже сброшены на
-    /// значения по умолчанию, и работать программа будет в любом случае.
-    /// Копия нужна на случай, если пользователь захочет посмотреть, что там
-    /// испортилось. Не вышло — не беда.
+    /// Best effort only: settings have already fallen back to defaults and the
+    /// application will run regardless. The copy is kept in case the user wants
+    /// to see what went wrong.
     /// </remarks>
     private void TryBackupCorruptedFile()
     {
@@ -200,7 +195,7 @@ public sealed class JsonSettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Папка программы, если в неё можно писать; иначе %APPDATA%\MusicScanIntegrity.
+    /// The application folder when writable, otherwise %APPDATA%\MusicScanIntegrity.
     /// </summary>
     internal static string ResolveDefaultPath() =>
         Path.Combine(Common.WritableFolder.Resolve(PortableFolderName, roaming: true), FileName);
