@@ -1,10 +1,4 @@
-﻿<!--
-    Высота окна — по содержимому, как у остальных окон программы. Раньше
-    стояли фиксированные 640 px, и текст не помещался ровно на три пикселя:
-    справка открывалась с полосой прокрутки на ровном месте.
-    MaxHeight — страховка на низких экранах.
--->
-<ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.HelpDialog"
+﻿<ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.HelpDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
@@ -120,9 +114,9 @@
 
                 <TextBlock Style="{StaticResource Text.Eyebrow}" Text="КАК ЭТО РАБОТАЕТ" Margin="0,20,0,0" />
                 <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,10,0,0" TextWrapping="Wrap"
-                           Text="Программа не просто смотрит на расширение — она пытается декодировать первые две секунды каждого файла. Если декодер не справился, файл действительно повреждён. Проверка идёт в несколько потоков, окно при этом остаётся отзывчивым: паузу и остановку можно нажать в любой момент." />
+                           Text="Программа не просто смотрит на расширение - а пытается декодировать первые две секунды каждого файла. Если декодер не справился, файл действительно повреждён. Проверка идёт в несколько потоков." />
                 <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,8,0,0" TextWrapping="Wrap"
-                           Text="Плейлисты (M3U, M3U8, PLS, CUE) проверяются иначе: у них смотрят только, существуют ли файлы, на которые они ссылаются. Один и тот же файл, встретившийся и в папке, и в плейлисте, получает один статус." />
+                           Text="Плейлисты (M3U, M3U8, PLS, CUE) проверяются иначе: в них проверяет только, существуют ли файлы, на которые они ссылаются. Один и тот же файл, встретившийся и в папке, и в плейлисте, получает один статус." />
 
                 <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ГОРЯЧИЕ КЛАВИШИ" Margin="0,20,0,0" />
                 <StackPanel Margin="0,10,0,0">
