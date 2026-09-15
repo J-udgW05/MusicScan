@@ -4,42 +4,41 @@ using MusicScanIntegrity.Core.Models;
 namespace MusicScanIntegrity.Core.Analysis;
 
 /// <summary>
-/// Разбирает коллекцию целиком: альбомы по папкам и повторы по всей проверке.
+/// Inspects the collection as a whole: albums per folder and duplicates across the scan.
 /// </summary>
 /// <remarks>
-/// Работает по уже готовым результатам, второй раз файлы не читает. Замечания
-/// получаются не о файле, а о папке или о паре файлов, поэтому и хранятся
-/// отдельно от списка результатов.
+/// Works from finished results and reads no file twice. The findings concern a
+/// folder or a pair of files rather than a single file, which is why they are
+/// kept apart from the results list.
 /// </remarks>
 public static class CollectionInspector
 {
-    /// <summary>Меньше этого числа файлов папка альбомом не считается.</summary>
+    /// <summary>Below this many files a folder is not treated as an album.</summary>
     private const int MinAlbumFiles = 3;
 
     /// <summary>
-    /// Какая доля файлов должна иметь номер дорожки, чтобы судить о пропусках.
+    /// Share of files that must carry a track number before gaps are judged.
     /// </summary>
     private const double NumberedShare = 0.7;
 
-    /// <summary>Сколько пропущенных номеров показывать в подробностях.</summary>
+    /// <summary>How many missing numbers to list in the details.</summary>
     private const int MaxListed = 12;
 
     /// <summary>
-    /// Наибольший номер дорожки, который ещё считается номером.
+    /// Largest value still treated as a track number.
     /// </summary>
     /// <remarks>
-    /// На компакт-диске дорожек не больше 99, в самых длинных сборниках — сотни.
-    /// Номер за этой границей означает не альбом на миллион дорожек, а
-    /// испорченный тег: программа для того и написана, чтобы такие встречать.
-    /// Считать по нему пропуски нельзя — получился бы список из миллиона
-    /// «недостающих» дорожек, а до этого миллион чисел в памяти.
+    /// A CD holds at most 99 tracks and the longest compilations run to
+    /// hundreds. A number beyond this bound means a broken tag, not an album
+    /// with a million tracks. Honouring it would allocate a million integers
+    /// and emit a million "missing track" findings.
     /// </remarks>
     private const int MaxTrackNumber = 999;
 
-    /// <summary>Разбирает результаты проверки.</summary>
-    /// <param name="results">Результаты по файлам.</param>
-    /// <param name="findDuplicates">Искать повторяющиеся треки.</param>
-    /// <returns>Замечания по папкам и повторам.</returns>
+    /// <summary>Inspects the scan results.</summary>
+    /// <param name="results">Per-file results.</param>
+    /// <param name="findDuplicates">Look for duplicate tracks.</param>
+    /// <returns>Findings about folders and duplicates.</returns>
     public static IReadOnlyList<CollectionFinding> Inspect(
         IReadOnlyList<FileCheckResult> results,
         bool findDuplicates = true)
@@ -76,7 +75,7 @@ public static class CollectionInspector
         CheckCover(folder, files, findings);
     }
 
-    /// <summary>Ищет пропуски в нумерации дорожек.</summary>
+    /// <summary>Looks for gaps in track numbering.</summary>
     private static void CheckTrackNumbers(string folder, IReadOnlyList<FileCheckResult> files, List<CollectionFinding> findings)
     {
         int[] numbers = [.. files
@@ -85,14 +84,14 @@ public static class CollectionInspector
             .Distinct()
             .Order()];
 
-        // Судить о пропусках можно, только когда пронумеровано почти всё:
-        // иначе «пропуском» окажется папка, где номера просто не проставлены.
+        // Gaps can only be judged when almost everything is numbered;
+        // otherwise an unnumbered folder looks like one big gap.
         if (numbers.Length < MinAlbumFiles || (double)numbers.Length / files.Count < NumberedShare)
         {
             return;
         }
 
-        // Номер вне разумных пределов — это сломанный тег, а не край альбома.
+        // A number outside sane bounds is a broken tag, not the album's end.
         if (numbers[^1] > MaxTrackNumber)
         {
             return;
@@ -118,7 +117,7 @@ public static class CollectionInspector
             $"Найдено {numbers.Length} из {numbers[^1]} по нумерации в тегах"));
     }
 
-    /// <summary>Замечает разнобой форматов внутри одной папки.</summary>
+    /// <summary>Notices mixed formats inside one folder.</summary>
     private static void CheckFormats(string folder, IReadOnlyList<FileCheckResult> files, List<CollectionFinding> findings)
     {
         string[] formats = [.. files
@@ -139,7 +138,7 @@ public static class CollectionInspector
             "Обычно так выходит, когда часть альбома докачали в другом качестве"));
     }
 
-    /// <summary>Замечает разные значения тега «альбом» в одной папке.</summary>
+    /// <summary>Notices differing album tags inside one folder.</summary>
     private static void CheckAlbumTags(string folder, IReadOnlyList<FileCheckResult> files, List<CollectionFinding> findings)
     {
         string[] albums = [.. files
@@ -160,10 +159,10 @@ public static class CollectionInspector
             albums.Length > 3 ? $"Всего разных значений тега: {albums.Length}" : null));
     }
 
-    /// <summary>Замечает папку без единой обложки.</summary>
+    /// <summary>Notices a folder without any cover art.</summary>
     private static void CheckCover(string folder, IReadOnlyList<FileCheckResult> files, List<CollectionFinding> findings)
     {
-        // Говорить об обложке имеет смысл, только если теги вообще читались.
+        // Cover art is only worth reporting when tags were read at all.
         if (!files.Any(f => f.Metadata is not null) || files.Any(f => f.Metadata?.HasCover == true))
         {
             return;
@@ -204,8 +203,8 @@ public static class CollectionInspector
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Папку не прочитать — считаем, что обложка есть: лишнее замечание
-            // хуже пропущенного.
+            // Unreadable folder: assume cover art exists. A false finding is
+            // worse than a missed one.
             return true;
         }
 
@@ -213,12 +212,12 @@ public static class CollectionInspector
     }
 
     /// <summary>
-    /// Ищет один и тот же трек в разных местах.
+    /// Looks for the same track in more than one place.
     /// </summary>
     /// <remarks>
-    /// Совпадать должны исполнитель, название и длительность с точностью до
-    /// секунды. По одним тегам сравнивать нельзя: у концертных и студийных
-    /// версий названия совпадают, а треки разные.
+    /// Artist, title and duration must match to the second. Tags alone are not
+    /// enough: live and studio versions share a title but are different
+    /// recordings.
     /// </remarks>
     private static void FindDuplicates(IReadOnlyList<FileCheckResult> results, List<CollectionFinding> findings)
     {

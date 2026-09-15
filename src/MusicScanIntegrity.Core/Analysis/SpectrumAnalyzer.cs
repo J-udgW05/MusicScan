@@ -1,64 +1,64 @@
 ﻿namespace MusicScanIntegrity.Core.Analysis;
 
 /// <summary>
-/// До какой частоты в файле есть звук.
+/// How high the audio in a file reaches.
 /// </summary>
-/// <param name="CutoffHz">Верхняя граница энергии в герцах.</param>
-/// <param name="NyquistHz">Наибольшая частота, которую вообще может хранить файл.</param>
-/// <param name="Blocks">Сколько кусков усреднено.</param>
+/// <param name="CutoffHz">Upper energy edge in hertz.</param>
+/// <param name="NyquistHz">Highest frequency the file could store at all.</param>
+/// <param name="Blocks">How many blocks were measured.</param>
 public sealed record SpectrumProfile(double CutoffHz, double NyquistHz, int Blocks)
 {
-    /// <summary>Ничего не измеряли.</summary>
+    /// <summary>Nothing was measured.</summary>
     public static readonly SpectrumProfile Empty = new(0, 0, 0);
 
-    /// <summary>Измерения достаточно, чтобы о чём-то говорить.</summary>
+    /// <summary>Enough was measured to draw a conclusion.</summary>
     /// <remarks>
-    /// Меньше восьми кусков — это доли секунды звука: на таком отрезке верхняя
-    /// граница скачет от одного тихого места, и выводы делать нельзя.
+    /// Fewer than eight blocks is a fraction of a second, where a single quiet
+    /// passage moves the edge and no conclusion holds.
     /// </remarks>
     public bool IsReliable => Blocks >= 8 && NyquistHz > 0;
 
-    /// <summary>Доля занятой полосы: 1 — звук доходит до предела формата.</summary>
+    /// <summary>Occupied share of the band; 1 means the audio reaches the format limit.</summary>
     public double BandShare => NyquistHz <= 0 ? 0 : CutoffHz / NyquistHz;
 }
 
 /// <summary>
-/// Считает усреднённый спектр по кускам звука и находит его верхнюю границу.
+/// Measures the spectrum of audio blocks and finds its upper edge.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Смысл в одном вопросе: докуда в файле есть звук. Сжатие с потерями срезает
-/// верх — 320 кбит/с примерно на 20 кГц, 128 кбит/с около 16 кГц. Поэтому
-/// «лослесс» с границей 16 кГц почти наверняка собран из MP3. Слово «почти»
-/// здесь принципиально: у старых и намеренно узкополосных записей верха нет и
-/// без всякого перекодирования, поэтому вывод — подозрение, а не приговор.
+/// Answers one question: how high does the audio reach. Lossy compression cuts
+/// the top — 320 kbps near 20 kHz, 128 kbps near 16 kHz — so a "lossless" file
+/// stopping at 16 kHz was almost certainly built from MP3. Almost: old and
+/// deliberately narrow-band recordings lack top end without any re-encoding, so
+/// the conclusion is a suspicion rather than a verdict.
 /// </para>
 /// <para>
-/// Граница считается по каждому куску отдельно, а в итог идёт наибольшая.
-/// Усреднение здесь было бы ошибкой: в симфонии тихих мест больше, чем громких,
-/// и среднее по ним показывало бы отсутствие верхов там, где они есть в
-/// кульминациях. Вопрос ведь не «много ли верхов», а «бывают ли они вообще» —
-/// у файла, собранного из сжатого, их не бывает нигде.
+/// The edge is computed per block and the largest one wins. Averaging would be
+/// wrong: a symphony has more quiet passages than loud ones, and the mean would
+/// show missing top end where the climaxes have it. The question is not how
+/// much top end there is but whether it ever appears — in a file built from a
+/// lossy source it never does.
 /// </para>
 /// </remarks>
 public sealed class SpectrumAnalyzer(int sampleRate, int channels)
 {
-    /// <summary>Длина куска: 4096 отсчётов дают шаг около 11 Гц при 44,1 кГц.</summary>
+    /// <summary>Block size; 4096 samples give about 11 Hz resolution at 44.1 kHz.</summary>
     private const int BlockSize = 4096;
 
-    /// <summary>Сколько кусков усреднять — больше не нужно, разброс уже сглажен.</summary>
+    /// <summary>How many blocks to measure; beyond this the spread is already smooth.</summary>
     private const int MaxBlocks = 64;
 
     /// <summary>
-    /// Насколько тише самой громкой полосы может быть край спектра, чтобы его
-    /// ещё считали звуком: −65 дБ.
+    /// How far below the loudest bin the spectral edge may sit and still count
+    /// as audio: −65 dB.
     /// </summary>
     private const double EdgeThreshold = 3.16e-7;
 
-    /// <summary>Сколько полос подряд должны быть выше порога — защита от одиночных всплесков.</summary>
+    /// <summary>Consecutive bins required above the threshold; guards against single spikes.</summary>
     private const int EdgeRun = 3;
 
-    /// <summary>Ниже этой средней громкости кусок слишком тих, чтобы судить по нему о полосе.</summary>
+    /// <summary>Below this mean level a block is too quiet to judge bandwidth.</summary>
     private const double QuietBlockRms = 0.005;
 
     private readonly double[] _window = Fft.HannWindow(BlockSize);
@@ -71,8 +71,8 @@ public sealed class SpectrumAnalyzer(int sampleRate, int channels)
     private int _blocks;
     private double _highestCutoff;
 
-    /// <summary>Добавляет очередную порцию отсчётов (чередующиеся каналы).</summary>
-    /// <param name="samples">Отсчёты в диапазоне −1…1.</param>
+    /// <summary>Feeds in the next batch of interleaved samples.</summary>
+    /// <param name="samples">Samples in the −1…1 range.</param>
     public void Add(ReadOnlySpan<float> samples)
     {
         if (_blocks >= MaxBlocks || channels <= 0)
@@ -82,8 +82,8 @@ public sealed class SpectrumAnalyzer(int sampleRate, int channels)
 
         for (int i = 0; i + channels <= samples.Length; i += channels)
         {
-            // Каналы складываются в один: спектр интересует по содержанию,
-            // а не по стереокартине, и одного канала хватает.
+            // Channels are summed: the spectrum is about content rather than
+            // the stereo image, so one channel is enough.
             double sum = 0;
             for (int c = 0; c < channels; c++)
             {
@@ -107,13 +107,13 @@ public sealed class SpectrumAnalyzer(int sampleRate, int channels)
         }
     }
 
-    /// <summary>Собирает итог: до какой частоты в звуке есть энергия.</summary>
-    /// <returns>Профиль спектра.</returns>
+    /// <summary>Produces the result: how high the audio carries energy.</summary>
+    /// <returns>The spectral profile.</returns>
     public SpectrumProfile Build() => _blocks == 0 || sampleRate <= 0
         ? SpectrumProfile.Empty
         : new SpectrumProfile(_highestCutoff, sampleRate / 2.0, _blocks);
 
-    /// <summary>Считает спектр одного куска и запоминает его верхнюю границу.</summary>
+    /// <summary>Computes one block's spectrum and records its upper edge.</summary>
     private void Accumulate()
     {
         double squareSum = 0;
@@ -125,8 +125,8 @@ public sealed class SpectrumAnalyzer(int sampleRate, int channels)
             _imaginary[i] = 0;
         }
 
-        // Тихий кусок ничего не говорит о полосе: верхов в нём нет просто
-        // потому, что там нечему звучать.
+        // A quiet block says nothing about bandwidth: it lacks top end simply
+        // because there is nothing sounding.
         if (Math.Sqrt(squareSum / BlockSize) < QuietBlockRms)
         {
             return;
@@ -167,7 +167,7 @@ public sealed class SpectrumAnalyzer(int sampleRate, int channels)
                     continue;
                 }
 
-                // Граница — верхняя из подряд идущих полос выше порога.
+                // The edge is the highest of the consecutive bins above the threshold.
                 double cutoff = Math.Min((bin + EdgeRun - 1) * nyquist / (_power.Length - 1), nyquist);
 
                 if (cutoff > _highestCutoff)

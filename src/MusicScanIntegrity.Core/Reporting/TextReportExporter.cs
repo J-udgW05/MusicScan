@@ -5,7 +5,7 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
 
-/// <summary>Простой текстовый список — «читать глазами».</summary>
+/// <summary>Plain text list, meant to be read directly.</summary>
 public sealed class TextReportExporter : IReportExporter
 {
     private const int RuleWidth = 78;
@@ -84,7 +84,7 @@ public sealed class TextReportExporter : IReportExporter
             await writer.WriteLineAsync().ConfigureAwait(false);
         }
 
-        // Файлы группируются по статусу: сначала то, ради чего отчёт и открывают.
+        // Grouped by status, starting with what the report is opened for.
         foreach (CheckStatus status in (CheckStatus[])[CheckStatus.Corrupted, CheckStatus.Warning, CheckStatus.Skipped, CheckStatus.Ok])
         {
             cancellationToken.ThrowIfCancellationRequested();

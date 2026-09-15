@@ -6,12 +6,12 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
 
-/// <summary>Отчёт-таблица для Excel и дальнейшей обработки.</summary>
+/// <summary>Tabular report for Excel and further processing.</summary>
 /// <remarks>
-/// Решение по неоднозначности: разделителем взята точка с запятой, а файл пишется
-/// в UTF-8 с BOM. Русский Excel по умолчанию ждёт именно «;» (запятая у него —
-/// десятичный разделитель), а BOM нужен, чтобы кириллица открылась без «кракозябр».
-/// Первой строкой идёт директива «sep=;» — её понимает и Excel, и LibreOffice.
+/// Semicolon separated and written as UTF-8 with a BOM: a Russian Excel
+/// expects ";" by default, since the comma is its decimal separator, and the
+/// BOM keeps Cyrillic readable. The leading "sep=;" directive is understood by
+/// both Excel and LibreOffice.
 /// </remarks>
 public sealed class CsvReportExporter : IReportExporter
 {
@@ -33,8 +33,8 @@ public sealed class CsvReportExporter : IReportExporter
 
         await writer.WriteLineAsync($"sep={Separator}").ConfigureAwait(false);
 
-        // Сводка идёт отдельным блоком перед таблицей: спецификация требует,
-        // чтобы она была в любом отчёте (01_SPECIFICATION.md, раздел 8).
+        // The summary is a block of its own before the table; every report
+        // format carries one.
         ScanSummary summary = data.Summary;
         await WriteRowAsync(writer, ["Отчёт", ReportData.ProductName]).ConfigureAwait(false);
         await WriteRowAsync(writer, ["Папка", summary.RootPath]).ConfigureAwait(false);
@@ -135,21 +135,20 @@ public sealed class CsvReportExporter : IReportExporter
         writer.WriteLineAsync(string.Join(Separator, cells.Select(Escape)));
 
     /// <summary>
-    /// Знаки, с которых табличные программы начинают считать ячейку формулой.
+    /// Characters that make spreadsheet programs treat a cell as a formula.
     /// </summary>
     private static readonly char[] FormulaStarters = ['=', '+', '-', '@', '\t', '\r'];
 
     /// <summary>
-    /// Экранирование по RFC 4180: ячейка берётся в кавычки, если содержит
-    /// разделитель, кавычку или перенос строки; внутренние кавычки удваиваются.
+    /// RFC 4180 escaping: a cell is quoted when it contains the separator, a
+    /// quote or a line break, and inner quotes are doubled.
     /// </summary>
     /// <remarks>
-    /// Перед этим ячейка, начинающаяся со знака формулы, получает апостроф.
-    /// В отчёт попадают имена файлов, а имя придумывали не мы: файл, названный
-    /// <c>=HYPERLINK(...)</c>, при открытии отчёта в Excel или LibreOffice
-    /// выполнился бы как формула. Апостроф — принятая защита от этого: он
-    /// говорит «это текст» и в самой ячейке не показывается. Цена — имена,
-    /// начинающиеся с минуса, в отчёте будут с апострофом.
+    /// Before that, a cell starting with a formula character gets a leading
+    /// apostrophe. The report carries file names we did not choose: a file
+    /// called <c>=HYPERLINK(...)</c> would execute as a formula when the report
+    /// is opened. The apostrophe marks the cell as text and is not displayed.
+    /// The cost is that names starting with a minus keep the apostrophe.
     /// </remarks>
     internal static string Escape(string? value)
     {

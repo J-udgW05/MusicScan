@@ -3,42 +3,42 @@
 namespace MusicScanIntegrity.Core.Analysis;
 
 /// <summary>
-/// Распознаёт кракозябры в тегах — текст, прочитанный не в той кодировке.
+/// Detects mojibake in tags: text decoded with the wrong code page.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Беда старых русских коллекций: кириллица, записанная в CP1251, прочитана как
-/// западноевропейская таблица — «Привет» превращается в «Ïðèâåò». Или наоборот:
-/// UTF-8 прочитан побайтно, и получается «ÐŸÑ€Ð¸Ð²ÐµÑ‚». Файл при этом цел, а
-/// подписи в плеере нечитаемы.
+/// The classic failure of older collections: Cyrillic written as CP1251 and
+/// read as Western European turns "Привет" into "Ïðèâåò"; UTF-8 read byte by
+/// byte turns it into "ÐŸÑ€Ð¸Ð²ÐµÑ‚". The file is intact, but the labels in a
+/// player are unreadable.
 /// </para>
 /// <para>
-/// Это эвристика, поэтому правила подобраны так, чтобы молчать на честных
-/// названиях: «Café», «Motörhead», «Björk» и «Ça va» кракозябрами не считаются —
-/// одиночная буква с надстрочным знаком в обычном тексте дела не портит.
+/// A heuristic, so the rules are tuned to stay quiet on genuine titles:
+/// "Café", "Motörhead", "Björk" and "Ça va" are not mojibake — a lone accented
+/// letter in ordinary text is fine.
 /// </para>
 /// </remarks>
 public static class TextIntegrity
 {
-    /// <summary>Знак, которым система заменяет то, что не смогла прочитать.</summary>
+    /// <summary>The replacement character used for undecodable bytes.</summary>
     private const char Replacement = '�';
 
-    /// <summary>Доля «латиницы с надстрочными знаками», после которой текст считается сломанным.</summary>
+    /// <summary>Share of accented Latin letters above which the text counts as broken.</summary>
     private const double AccentShare = 0.6;
 
-    /// <summary>Короче этого текст не разбираем: на двух буквах ошибиться слишком легко.</summary>
+    /// <summary>Shorter text is not judged; two letters are too easy to get wrong.</summary>
     private const int MinLength = 4;
 
-    /// <summary>Похож ли текст на прочитанный не в той кодировке.</summary>
-    /// <param name="value">Строка из тега.</param>
-    /// <returns><see langword="true" />, если это похоже на кракозябры.</returns>
+    /// <summary>Whether the text looks decoded with the wrong code page.</summary>
+    /// <param name="value">Tag string.</param>
+    /// <returns><see langword="true" /> when it looks like mojibake.</returns>
     public static bool LooksBroken(string? value) => Describe(value) is not null;
 
     /// <summary>
-    /// Объясняет, что именно не так с текстом.
+    /// Explains what exactly is wrong with the text.
     /// </summary>
-    /// <param name="value">Строка из тега.</param>
-    /// <returns>Описание проблемы или <see langword="null" />, если текст в порядке.</returns>
+    /// <param name="value">Tag string.</param>
+    /// <returns>A description, or <see langword="null" /> when the text is fine.</returns>
     public static string? Describe(string? value)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Length < MinLength)
@@ -51,8 +51,8 @@ public static class TextIntegrity
             return "в тексте есть знаки, которые система не смогла прочитать";
         }
 
-        // UTF-8, прочитанный побайтно: кириллица превращается в «Ð» и «Ñ»
-        // с довеском из служебной части таблицы.
+        // UTF-8 read byte by byte: Cyrillic becomes "Ð" and "Ñ" followed by
+        // characters from the control range of the table.
         if (HasUtf8Wreckage(value))
         {
             return "похоже на UTF-8, прочитанный побайтно";
@@ -79,8 +79,8 @@ public static class TextIntegrity
             }
             else if (symbol is >= '\u0080' and <= '\u00BF')
             {
-                // Служебная часть таблицы: в названиях не встречается, а при побайтном
-                // чтении UTF-8 идёт сразу за буквами вроде Ð и Ñ.
+                // The control range never occurs in titles, but follows
+                // letters like Ð and Ñ when UTF-8 is read byte by byte.
                 tail = true;
             }
         }
@@ -102,8 +102,8 @@ public static class TextIntegrity
 
             letters++;
 
-            // Латиница с надстрочными знаками — та самая таблица, в которую
-            // превращается кириллица при неверном чтении.
+            // Accented Latin is exactly what Cyrillic turns into when read
+            // through the wrong table.
             if (symbol is >= 'À' and <= 'ÿ' && symbol != '×' && symbol != '÷')
             {
                 accented++;
@@ -113,9 +113,9 @@ public static class TextIntegrity
         return letters >= MinLength && (double)accented / letters >= AccentShare;
     }
 
-    /// <summary>Собирает список полей, в которых текст выглядит сломанным.</summary>
-    /// <param name="fields">Пары «название поля — значение».</param>
-    /// <returns>Названия полей с кракозябрами.</returns>
+    /// <summary>Lists the fields whose text looks broken.</summary>
+    /// <param name="fields">Field name and value pairs.</param>
+    /// <returns>Names of the fields containing mojibake.</returns>
     public static IReadOnlyList<string> BrokenFields(params (string Name, string? Value)[] fields)
     {
         ArgumentNullException.ThrowIfNull(fields);

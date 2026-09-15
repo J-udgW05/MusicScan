@@ -1,20 +1,20 @@
 namespace MusicScanIntegrity.Core.Analysis;
 
 /// <summary>
-/// Быстрое преобразование Фурье по основанию два.
+/// Radix-2 fast Fourier transform.
 /// </summary>
 /// <remarks>
-/// Своя реализация, а не пакет: алгоритм умещается в полсотни строк, проверяется
-/// на сигналах с заранее известным ответом и не тянет в переносимую сборку
-/// лишнюю зависимость ради одной задачи — посмотреть, до какой частоты в файле
-/// есть звук.
+/// Hand-written rather than a package: the algorithm fits in fifty lines, is
+/// testable against signals with known answers, and avoids pulling a
+/// dependency into a portable build for one job — finding how high the audio
+/// reaches.
 /// </remarks>
 public static class Fft
 {
-    /// <summary>Считает преобразование на месте.</summary>
-    /// <param name="real">Действительная часть; длина — степень двойки.</param>
-    /// <param name="imaginary">Мнимая часть той же длины.</param>
-    /// <exception cref="ArgumentException">Длины не совпадают или не степень двойки.</exception>
+    /// <summary>Transforms in place.</summary>
+    /// <param name="real">Real part; the length must be a power of two.</param>
+    /// <param name="imaginary">Imaginary part of the same length.</param>
+    /// <exception cref="ArgumentException">Lengths differ or are not a power of two.</exception>
     public static void Forward(Span<double> real, Span<double> imaginary)
     {
         int length = real.Length;
@@ -63,16 +63,16 @@ public static class Fft
         }
     }
 
-    /// <summary>Окно Ханна: сглаживает края куска, иначе они дают ложные частоты.</summary>
-    /// <param name="length">Длина окна; ноль и единица допустимы.</param>
-    /// <returns>Коэффициенты окна.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Длина отрицательна.</exception>
+    /// <summary>Hann window; smooths block edges that would otherwise create false frequencies.</summary>
+    /// <param name="length">Window length; zero and one are allowed.</param>
+    /// <returns>Window coefficients.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">The length is negative.</exception>
     public static double[] HannWindow(int length)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(length);
 
-        // Окно из одного отсчёта делить не на что: формула требует длину больше
-        // единицы. Единица — принятый ответ: одиночный отсчёт остаётся собой.
+        // A single-sample window has nothing to divide by: the formula needs a
+        // length above one. Returning 1 leaves the lone sample unchanged.
         if (length <= 1)
         {
             return length == 0 ? [] : [1];
@@ -88,7 +88,7 @@ public static class Fft
         return window;
     }
 
-    /// <summary>Переставляет отсчёты в порядке обратных двоичных индексов.</summary>
+    /// <summary>Reorders samples by bit-reversed index.</summary>
     private static void Reorder(Span<double> real, Span<double> imaginary)
     {
         int length = real.Length;

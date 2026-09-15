@@ -3,11 +3,8 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
 
-/// <summary>Данные, из которых собирается отчёт.</summary>
-/// <param name="Summary">Сводка по проверке.</param>
-/// <param name="Results">Результаты по файлам (уже отфильтрованные по настройкам отчёта).</param>
-/// <param name="Playlists">Результаты по плейлистам.</param>
-/// <param name="GeneratedAt">Момент формирования отчёта.</param>
+/// <summary>The data a report is built from.</summary>
+/// <param name="Results">Per-file results, already filtered by the report settings.</param>
 public sealed record ReportData(
     ScanSummary Summary,
     IReadOnlyList<FileCheckResult> Results,
@@ -15,22 +12,22 @@ public sealed record ReportData(
     DateTimeOffset GeneratedAt,
     IReadOnlyList<CollectionFinding>? Findings = null)
 {
-    /// <summary>Название программы — попадает в заголовок отчёта.</summary>
+    /// <summary>Product name, used in the report heading.</summary>
     public const string ProductName = "Music Scan Integrity";
 }
 
-/// <summary>Формирование отчёта одного формата.</summary>
+/// <summary>Renders a report in one format.</summary>
 public interface IReportExporter
 {
-    /// <summary>Формат, который умеет этот экспортёр.</summary>
+    /// <summary>The format this exporter handles.</summary>
     ReportFormat Format { get; }
 
-    /// <summary>Расширение файла отчёта, например «.html».</summary>
+    /// <summary>Report file extension, for example ".html".</summary>
     string FileExtension { get; }
 
     /// <summary>
-    /// Пишет отчёт в поток. Экспорт не должен блокировать интерфейс,
-    /// поэтому метод асинхронный (02_ARCHITECTURE.md, раздел 7).
+    /// Writes the report to a stream. Asynchronous so exporting never blocks
+    /// the UI.
     /// </summary>
     Task WriteAsync(ReportData data, Stream output, CancellationToken cancellationToken = default);
 }

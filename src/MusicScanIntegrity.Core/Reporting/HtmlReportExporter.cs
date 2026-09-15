@@ -6,13 +6,12 @@ using MusicScanIntegrity.Core.Settings;
 namespace MusicScanIntegrity.Core.Reporting;
 
 /// <summary>
-/// Оформленная HTML-страница с той же цветовой маркировкой, что и в программе.
+/// Styled HTML page carrying the same status colours as the application.
 /// </summary>
 /// <remarks>
-/// Цветовые токены и типографика взяты из UI_SPEC.md (разделы 1, 3, 11), поэтому
-/// отчёт узнаваемо выглядит как сама программа, включая тёмную тему.
-/// Все данные проходят через <see cref="WebUtility.HtmlEncode"/>: кавычки и угловые
-/// скобки в именах файлов не должны ломать разметку (02_ARCHITECTURE.md, раздел 7).
+/// Colour tokens and typography match the application, dark theme included.
+/// Everything passes through <see cref="WebUtility.HtmlEncode"/>: quotes and
+/// angle brackets in file names must not break the markup.
 /// </remarks>
 public sealed class HtmlReportExporter : IReportExporter
 {
@@ -75,7 +74,7 @@ public sealed class HtmlReportExporter : IReportExporter
         await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    /// <summary>Безопасный текст: любые «живые» символы разметки становятся обычным текстом.</summary>
+    /// <summary>Escapes markup characters into plain text.</summary>
     internal static string E(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
 
     private static string StatusClass(CheckStatus status) => status switch
@@ -280,8 +279,8 @@ public sealed class HtmlReportExporter : IReportExporter
         string css = StatusClass(result.Status);
         StringBuilder builder = new();
 
-        // Отбор идёт по этим трём признакам; строка для поиска сведена заранее,
-        // чтобы не склеивать её на каждое нажатие клавиши.
+        // Filtering uses these three attributes; the search string is built
+        // ahead of time rather than on every keystroke.
         builder.Append("<tr data-status=\"").Append(css)
                .Append("\" data-format=\"").Append(E(result.Format))
                .Append("\" data-find=\"").Append(E(SearchKey(result))).Append("\">")
@@ -310,20 +309,19 @@ public sealed class HtmlReportExporter : IReportExporter
         return builder.ToString();
     }
 
-    /// <summary>Строка, по которой ищет поле поиска: имя и путь в нижнем регистре.</summary>
+    /// <summary>What the search box matches against: name and path, lower-cased.</summary>
     private static string SearchKey(FileCheckResult result) =>
         (result.FileName + " " + result.DirectoryPath).ToLowerInvariant();
 
     /// <summary>
-    /// Панель отбора над таблицей: те же кнопки статусов и выбор формата,
-    /// что на вкладке «Результаты».
+    /// Filter bar above the table: the same status chips and format selector
+    /// as the results tab.
     /// </summary>
     /// <remarks>
-    /// Счётчики на кнопках считаются по строкам самой таблицы, а не по сводке
-    /// проверки. Разница настоящая: по умолчанию исправные файлы в отчёт не
-    /// попадают, и кнопка «В порядке» со счётчиком из сводки обещала бы пятьсот
-    /// строк, которых в файле нет. Кнопка выводится только для тех статусов,
-    /// что в таблице действительно есть, — нажимать на заведомо пустую незачем.
+    /// Chip counts come from the table rows, not the scan summary. The
+    /// difference is real: healthy files are excluded by default, so a chip
+    /// counting from the summary would promise rows the file does not contain.
+    /// Only statuses actually present in the table get a chip.
     /// </remarks>
     private static string Toolbar(ReportData data)
     {
@@ -336,9 +334,8 @@ public sealed class HtmlReportExporter : IReportExporter
                .Append("<div class=\"chips\" role=\"group\" aria-label=\"Отбор по статусу\">")
                .Append(Chip("all", "all", string.Empty, "Все", total));
 
-        // Подписи — названия категорий, как на вкладке «Результаты», а не
-        // названия статуса одного файла: на кнопке стоит «Повреждено», а не
-        // «Повреждён». Человек, открывший отчёт, должен видеть знакомые слова.
+        // Labels are category names, as on the results tab, rather than the
+        // status of a single file — the reader should see familiar wording.
         foreach ((CheckStatus status, string css, string label) in new[]
                  {
                      (CheckStatus.Ok, "ok", "В порядке"),
@@ -376,8 +373,8 @@ public sealed class HtmlReportExporter : IReportExporter
                .Append("<div id=\"shown\" class=\"shown\">Показаны все ")
                .Append(E(Common.Format.Files(total))).Append("</div>");
 
-        // Если исправные файлы в отчёт не включали, об этом надо сказать прямо:
-        // иначе число в таблице расходится со сводкой наверху без объяснения.
+        // When healthy files were excluded, say so: otherwise the table count
+        // disagrees with the summary above it for no visible reason.
         int okInReport = data.Results.Count(r => r.Status == CheckStatus.Ok);
         int okInScan = data.Summary.Counters.Ok;
 
@@ -391,7 +388,7 @@ public sealed class HtmlReportExporter : IReportExporter
         return builder.Append('\n').ToString();
     }
 
-    /// <summary>Одна кнопка отбора по статусу.</summary>
+    /// <summary>One status filter chip.</summary>
     private static string Chip(string value, string css, string glyph, string label, int count)
     {
         StringBuilder builder = new();
@@ -407,12 +404,12 @@ public sealed class HtmlReportExporter : IReportExporter
         return builder.Append(E(label)).Append("<b>").Append(count).Append("</b></button>").ToString();
     }
 
-    /// <summary>Хвост таблицы: пустая строка на случай, когда отбор ничего не нашёл.</summary>
+    /// <summary>Table tail: the empty row shown when the filter matches nothing.</summary>
     private static string TableTail(ReportData data) => data.Results.Count > 0
         ? "<tr id=\"none\" class=\"none\" hidden><td colspan=\"6\">Ничего не найдено — измените условия отбора.</td></tr>\n</tbody></table></div></section>\n"
         : "</tbody></table></div></section>\n";
 
-    /// <summary>Замечания по папкам и повторам — они не о файле, а о коллекции.</summary>
+    /// <summary>Findings about folders and duplicates rather than single files.</summary>
     private static string Findings(IReadOnlyList<CollectionFinding> findings, CancellationToken cancellationToken)
     {
         StringBuilder builder = new();
@@ -493,14 +490,14 @@ public sealed class HtmlReportExporter : IReportExporter
         """;
 
     /// <summary>
-    /// Отбор строк таблицы прямо в отчёте.
+    /// Row filtering inside the report itself.
     /// </summary>
     /// <remarks>
-    /// Обычный JavaScript без единой внешней ссылки: отчёт кладут на флешку,
-    /// шлют почтой и открывают без сети, поэтому подключать что-либо со стороны
-    /// нельзя — страница просто перестала бы работать. Скрытие делается
-    /// свойством hidden, а не перерисовкой таблицы: на полутысяче строк это
-    /// мгновенно и не ломает разметку.
+    /// Plain JavaScript with no external references: the report gets copied to
+    /// a stick, emailed and opened offline, so anything loaded from outside
+    /// would simply fail. Rows are hidden through the hidden property rather
+    /// than by rebuilding the table — instant on several hundred rows and it
+    /// does not disturb the markup.
     /// </remarks>
     private const string FilterScript = """
         <script>

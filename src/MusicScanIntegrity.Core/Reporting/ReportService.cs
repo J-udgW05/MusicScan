@@ -3,30 +3,30 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
 
-/// <summary>Сохранение отчётов.</summary>
+/// <summary>Saves reports.</summary>
 public interface IReportService
 {
-    /// <summary>Экспортёры по всем поддерживаемым форматам.</summary>
+    /// <summary>Exporters for every supported format.</summary>
     IReadOnlyList<IReportExporter> Exporters { get; }
 
-    /// <summary>Предлагаемое имя файла отчёта, например «musicscan_2026-09-02_2104.html».</summary>
+    /// <summary>Suggested report file name, for example "musicscan_2026-09-02_2104.html".</summary>
     string SuggestFileName(ReportFormat format, DateTimeOffset moment);
 
-    /// <summary>Папка для отчётов по умолчанию — из настроек либо «Документы».</summary>
+    /// <summary>Default report folder: from settings, or Documents.</summary>
     string ResolveDefaultFolder(AppSettings settings);
 
     /// <summary>
-    /// Папка, которую стоит запомнить после сохранения отчёта.
+    /// The folder worth remembering after a report is saved.
     /// </summary>
-    /// <param name="savedFilePath">Путь сохранённого отчёта.</param>
-    /// <param name="currentDefaultFolder">Папка, которая предлагалась по умолчанию.</param>
+    /// <param name="savedFilePath">Path the report was saved to.</param>
+    /// <param name="currentDefaultFolder">Folder that was offered as the default.</param>
     /// <returns>
-    /// Папка для записи в настройки или <see langword="null" />, если запоминать
-    /// нечего: путь пуст или человек сохранил туда же, куда и предлагалось.
+    /// The folder to store in settings, or <see langword="null" /> when there
+    /// is nothing to remember: the path is empty, or it matches the default.
     /// </returns>
     string? FolderToRemember(string savedFilePath, string currentDefaultFolder);
 
-    /// <summary>Сохраняет отчёт в файл.</summary>
+    /// <summary>Writes the report to a file.</summary>
     Task SaveAsync(
         ReportFormat format,
         string filePath,
@@ -34,8 +34,8 @@ public interface IReportService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Отбирает результаты для отчёта: по умолчанию только проблемные,
-    /// файлы «в порядке» включаются отдельной настройкой.
+    /// Selects the results for the report: problem files by default, healthy
+    /// ones only when the corresponding setting is on.
     /// </summary>
     IReadOnlyList<FileCheckResult> Filter(IEnumerable<FileCheckResult> results, AppSettings settings);
 }
@@ -45,11 +45,11 @@ public sealed class ReportService : IReportService
 {
     private readonly Dictionary<ReportFormat, IReportExporter> _byFormat;
 
-    /// <summary>Создаёт службу отчётов со стандартным набором экспортёров.</summary>
+    /// <summary>Creates the report service with the standard exporters.</summary>
     public ReportService(IEnumerable<IReportExporter>? exporters = null)
     {
 
-        // Пустой набор считается «не задан» — см. пояснение в PlaylistService.
+        // An empty set counts as "not supplied"; see PlaylistService.
         IReadOnlyList<IReportExporter> all = exporters?.ToArray() is { Length: > 0 } provided
             ? provided
             : [new HtmlReportExporter(), new CsvReportExporter(), new TextReportExporter()];
@@ -83,10 +83,10 @@ public sealed class ReportService : IReportService
 
     /// <inheritdoc />
     /// <remarks>
-    /// Сравнение по полному пути и без учёта регистра: в Windows «D:\Отчёты»
-    /// и «d:\отчёты\» — одна и та же папка, и записывать её второй раз незачем.
-    /// Незаписанное значение оставляет настройку прежней, то есть «как решит
-    /// программа», — это не то же самое, что записать туда «Документы».
+    /// Compared by full path, case-insensitively: on Windows "D:\Reports" and
+    /// "d:\reports\" are the same folder. Leaving the setting untouched means
+    /// "let the application decide", which is not the same as storing the
+    /// Documents folder in it.
     /// </remarks>
     public string? FolderToRemember(string savedFilePath, string currentDefaultFolder)
     {
@@ -105,7 +105,7 @@ public sealed class ReportService : IReportService
         return SamePlace(folder, currentDefaultFolder) ? null : folder;
     }
 
-    /// <summary>Один и тот же ли это каталог.</summary>
+    /// <summary>Whether these are the same directory.</summary>
     private static bool SamePlace(string first, string? second)
     {
         if (string.IsNullOrWhiteSpace(second))
@@ -122,7 +122,7 @@ public sealed class ReportService : IReportService
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {
-            // Строка вообще не похожа на путь — считаем, что это другое место.
+            // Not path-like at all; treat it as a different location.
             return false;
         }
     }
@@ -148,8 +148,8 @@ public sealed class ReportService : IReportService
             Directory.CreateDirectory(folder);
         }
 
-        // Пишем во временный файл рядом: если сохранение сорвётся, у пользователя
-        // не останется наполовину записанного отчёта вместо старого.
+        // Written to a temporary file alongside: a failed save must not leave
+        // a half-written report in place of the previous one.
         string tempPath = filePath + ".part";
 
         try
@@ -184,8 +184,8 @@ public sealed class ReportService : IReportService
             ? results
             : results.Where(r => r.Status != CheckStatus.Ok);
 
-        // Сначала повреждённые, потом предупреждения, потом пропущенные:
-        // отчёт открывают ради проблем, а не ради списка исправных файлов.
+        // Corrupted first, then warnings, then skipped: a report is opened for
+        // the problems, not for the list of healthy files.
         return [.. filtered
             .OrderByDescending(r => r.Status == CheckStatus.Corrupted)
             .ThenByDescending(r => r.Status == CheckStatus.Warning)
@@ -193,11 +193,11 @@ public sealed class ReportService : IReportService
             .ThenBy(r => r.FullPath, StringComparer.OrdinalIgnoreCase)];
     }
 
-    /// <summary>Убирает недописанный отчёт после неудачной выгрузки.</summary>
+    /// <summary>Removes a half-written report after a failed export.</summary>
     /// <remarks>
-    /// Об ошибке пользователю уже сказали — той, из-за которой выгрузка и
-    /// сорвалась. Второе сообщение, что вдобавок не стёрся обрывок файла,
-    /// ничего не добавит: он лежит там, куда пользователь сам указал путь.
+    /// The user has already been told about the failure itself. A second
+    /// message saying the fragment could not be deleted adds nothing — it sits
+    /// where they chose to save it.
     /// </remarks>
     private void TryDelete(string path)
     {
