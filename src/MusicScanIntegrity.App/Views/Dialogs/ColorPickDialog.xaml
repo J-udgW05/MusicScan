@@ -1,6 +1,6 @@
-﻿<!-- MinHeight=0: у FluentWindow минимум 320 точек, рассчитанный на главное окно.
-     Диалог растёт по содержимому, и этот минимум оставлял под кнопками пустую
-     полосу. Ширина не трогается: диалоги нарисованы под ту, что даёт FluentWindow. -->
+﻿<!-- MinHeight=0: FluentWindow defaults to 320, sized for the main window, which
+     left an empty strip under the buttons of a dialog that sizes to content.
+     Width is left alone: the dialogs are laid out for FluentWindow's width. -->
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.ColorPickDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -44,9 +44,9 @@
                 </StackPanel>
             </StackPanel>
 
-            <!-- Поле насыщенности и яркости: по горизонтали цвет разбавляется
-                 белым, по вертикали уходит в чёрный. Оттенок задаётся полосой
-                 ниже и подставляется в подложку этого поля. -->
+            <!-- Saturation/value field: horizontally the colour fades to white,
+                 vertically to black. The hue comes from the strip below and fills the
+                 field background. -->
             <Grid x:Name="Area" Height="150" Margin="0,16,0,0"
                   Cursor="Cross"
                   MouseLeftButtonDown="OnAreaDown" MouseMove="OnAreaMove" MouseLeftButtonUp="OnAreaUp">
@@ -82,7 +82,7 @@
                 </Canvas>
             </Grid>
 
-            <!-- Полоса оттенка. -->
+            <!-- Hue strip. -->
             <Grid x:Name="Hue" Height="18" Margin="0,12,0,0"
                   Cursor="Cross"
                   MouseLeftButtonDown="OnHueDown" MouseMove="OnHueMove" MouseLeftButtonUp="OnHueUp">

@@ -1,6 +1,6 @@
-﻿<!-- MinHeight=0: у FluentWindow минимум 320 точек, рассчитанный на главное окно.
-     Диалог растёт по содержимому, и этот минимум оставлял под кнопками пустую
-     полосу. Ширина не трогается: диалоги нарисованы под ту, что даёт FluentWindow. -->
+﻿<!-- MinHeight=0: FluentWindow defaults to 320, sized for the main window, which
+     left an empty strip under the buttons of a dialog that sizes to content.
+     Width is left alone: the dialogs are laid out for FluentWindow's width. -->
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.ScanFinishedDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -50,7 +50,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <!-- Четыре итоговых числа: цвет плюс слово. -->
+            <!-- Four totals: colour plus word. -->
             <UniformGrid Rows="2" Columns="2" Margin="0,16,0,0">
                 <Border CornerRadius="8" Padding="12" Margin="0,0,4,4"
                         Background="{DynamicResource Brush.ErrBg}"

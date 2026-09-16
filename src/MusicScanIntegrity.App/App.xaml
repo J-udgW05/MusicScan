@@ -6,12 +6,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Шаблоны окна и подложка Mica из WPF-UI. -->
+                <!-- Window templates and the Mica backdrop from WPF-UI. -->
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
 
-                <!-- Токены темы подставляет ThemeService при запуске:
-                     он же переключает их при смене темы без перезапуска. -->
+                <!-- Theme tokens are swapped in by ThemeService at startup, which also
+                     switches them on a theme change without a restart. -->
                 <ResourceDictionary Source="Resources/Tokens.Light.xaml" />
                 <ResourceDictionary Source="Resources/Typography.xaml" />
                 <ResourceDictionary Source="Resources/Icons.xaml" />
@@ -28,7 +28,7 @@
             <conv:InvertBoolConverter x:Key="InvertBool" />
             <conv:EnumDisplayConverter x:Key="EnumDisplay" />
 
-            <!-- Значения перечислений в списках показываются по-русски. -->
+            <!-- Display captions for enum values in drop-downs. -->
             <DataTemplate x:Key="EnumItemTemplate">
                 <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}" />
             </DataTemplate>
