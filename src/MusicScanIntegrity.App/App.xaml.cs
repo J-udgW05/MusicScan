@@ -18,28 +18,26 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App;
 
-/// <summary>Точка входа приложения: сборка зависимостей, запуск и корректное завершение.</summary>
+/// <summary>Application entry point: composition, startup and orderly shutdown.</summary>
 public partial class App : Application
 {
     private readonly IHost _host;
 
-    /// <summary>Создаёт приложение и собирает контейнер зависимостей.</summary>
     public App()
     {
-        // Журнала в программе нет: ничего не пишется ни на экран, ни на диск.
-        // Об ошибках говорят диалоги с технической причиной, поэтому провайдеры
-        // журнала хоста здесь просто не подключаются.
+        // The app keeps no log; errors surface through dialogs with the technical
+        // cause, so host logging providers are not registered.
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices(ConfigureServices)
             .Build();
     }
 
-    /// <summary>Настраивает зависимости. Вынесено отдельно, чтобы состав был виден целиком.</summary>
+    /// <summary>Registers services; kept separate so the whole composition is visible at once.</summary>
     private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
         services.AddSingleton<ISettingsService>(_ => new JsonSettingsService());
 
-        // Ядро проверки.
+        // Scanning core.
         services.AddSingleton<IAudioProbe, BassAudioProbe>();
         services.AddSingleton<IMetadataReader, TagLibMetadataReader>();
         services.AddSingleton<ILockOwnerDetector, RestartManagerLockDetector>();
@@ -59,15 +57,15 @@ public partial class App : Application
         services.AddSingleton<IReportExporter, TextReportExporter>();
         services.AddSingleton<IReportService, ReportService>();
 
-        // Вопросы о занятых файлах задаёт главное окно, но движок создаётся раньше
-        // него — прямая зависимость дала бы цикл. Переходник разрывает его:
-        // MainViewModel подставляет себя в Target в своём конструкторе.
+        // The main window asks the locked-file questions, but the engine is built
+        // before it, so a direct dependency would be a cycle. The relay breaks it:
+        // MainViewModel installs itself as Target in its constructor.
         services.AddSingleton<LockedFileDecisionRelay>();
         services.AddSingleton<ILockedFileDecisionProvider>(p => p.GetRequiredService<LockedFileDecisionRelay>());
         services.AddSingleton<IScanEngine, ScanEngine>();
         services.AddSingleton<MainViewModel>();
 
-        // Интерфейс.
+        // UI.
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ResultsViewModel>();
@@ -81,7 +79,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Непойманное исключение не должно ронять программу молча.
+        // An unhandled exception must not take the app down silently.
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
@@ -91,9 +89,8 @@ public partial class App : Application
 
         bool firstRun = await settings.LoadAsync();
 
-        // Эффекты, о которых человек ещё не высказывался, берутся из системы —
-        // и тут же записываются в файл. Дальше решает файл: если в Windows
-        // потом что-то переключат, программу это уже не касается.
+        // Effects the user has not decided on yet are taken from the system and
+        // written straight to the settings file. From then on the file decides.
         if (await ResolveVisualEffectsAsync(settings))
         {
             await settings.SaveAsync();
@@ -101,19 +98,18 @@ public partial class App : Application
 
         _host.Services.GetRequiredService<IThemeService>().Apply(settings.Current);
 
-        // Осиротевшие временные копии от аварийно завершённого запуска
-        // подчищаются на старте (03_IMPLEMENTATION_GUIDE.md, раздел 2).
+        // Clean up temporary copies orphaned by a crashed previous run.
         _host.Services.GetRequiredService<ITempCopyManager>().CleanupOrphans();
 
-        // Механизм декодирования запускается один раз: без него проверка невозможна,
-        // но программа при этом должна открыться и честно сказать, что не так.
+        // Start the decoder once. Scanning is impossible without it, but the app
+        // must still open and explain what went wrong.
         string? audioError = _host.Services.GetRequiredService<IAudioProbe>().Initialize();
 
         MainWindow window = _host.Services.GetRequiredService<MainWindow>();
         MainWindow = window;
 
-        // Подложка ставится до показа: если сделать это после, окно успевает
-        // мигнуть непрозрачным фоном.
+        // Apply the backdrop before showing the window, or it flashes an opaque
+        // background.
         _host.Services.GetRequiredService<IThemeService>().ApplyToWindow(window, withBackdrop: true);
         window.Show();
 
@@ -159,23 +155,21 @@ public partial class App : Application
         {
             await _host.Services.GetRequiredService<ISettingsService>().SaveAsync();
 
-            // Порядок здесь существенный. Сначала останавливается проверка,
-            // и только потом освобождается механизм декодирования: Bass.Free
-            // обрывает библиотеку целиком, и если рабочий поток в этот момент
-            // ещё читает файл, программа уходит не с исключением, а вместе
-            // с процессом. Раньше эти две строки стояли наоборот.
+            // Order matters: stop the scan before freeing the decoder. Bass.Free tears
+            // the library down whole, and a worker still reading a file takes the
+            // process with it rather than throwing. These lines used to be reversed.
             (_host.Services.GetRequiredService<IScanEngine>() as IDisposable)?.Dispose();
             (_host.Services.GetRequiredService<IAudioProbe>() as IDisposable)?.Dispose();
             _host.Services.GetRequiredService<MainViewModel>().Dispose();
             (_host.Services.GetRequiredService<IThemeService>() as IDisposable)?.Dispose();
 
-            // Даём фоновым задачам разумное время завершиться, но не ждём вечно.
+            // Give background tasks reasonable time to finish, but do not wait forever.
             using CancellationTokenSource shutdown = new(TimeSpan.FromSeconds(5));
             await _host.StopAsync(shutdown.Token);
         }
         catch (Exception)
         {
-            // Закрытие не должно падать — программа уже уходит.
+            // Shutdown must not throw; the app is exiting anyway.
         }
         finally
         {
@@ -184,11 +178,8 @@ public partial class App : Application
         }
     }
 
-    /// <summary>
-    /// Заполняет настройки эффектов, о которых ещё не спрашивали.
-    /// </summary>
-    /// <param name="settings">Служба настроек.</param>
-    /// <returns><see langword="true" />, если что-то заполнили и надо сохранить.</returns>
+    /// <summary>Fills in effect settings the user has never chosen.</summary>
+    /// <returns><see langword="true" /> when something was filled and needs saving.</returns>
     private static Task<bool> ResolveVisualEffectsAsync(ISettingsService settings)
     {
         AppSettings current = settings.Current;
@@ -219,16 +210,16 @@ public partial class App : Application
         }
         catch (Exception)
         {
-            // Показать сообщение не удалось — молча продолжаем.
+            // Could not show the message; carry on.
         }
 
-        // Программа не закрывается: одна ошибка не повод терять результаты.
+        // Keep running: one error is no reason to lose the results.
         e.Handled = true;
     }
 
     /// <summary>
-    /// Ошибка в фоновом потоке процесс не переживёт, поэтому единственное, что
-    /// здесь можно успеть, — сказать пользователю, отчего программа закрылась.
+    /// The process will not survive an exception on a background thread; all that
+    /// can be done is tell the user why the app is closing.
     /// </summary>
     private static void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
@@ -245,7 +236,7 @@ public partial class App : Application
         }
         catch (Exception)
         {
-            // Показать сообщение не удалось — процесс всё равно уже завершается.
+            // Could not show the message; the process is terminating anyway.
         }
     }
 }

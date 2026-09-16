@@ -9,45 +9,41 @@ using Wpf.Ui.Controls;
 
 namespace MusicScanIntegrity.App.Services;
 
-/// <summary>Переключение темы оформления и пользовательских цветов статусов.</summary>
+/// <summary>Switches the theme and applies user status colours.</summary>
 public interface IThemeService
 {
-    /// <summary>Тема, которая сейчас показана на экране (System уже разрешён в Light или Dark).</summary>
+    /// <summary>Theme currently on screen; System is already resolved to Light or Dark.</summary>
     AppTheme EffectiveTheme { get; }
 
-    /// <summary>Подложку Mica система умеет рисовать.</summary>
+    /// <summary>The OS can draw a Mica backdrop.</summary>
     bool IsMicaSupported { get; }
 
-    /// <summary>Применяет тему, цвета статусов, подложку и анимации из настроек.</summary>
+    /// <summary>Applies theme, status colours, backdrop and animations from settings.</summary>
     void Apply(AppSettings settings);
 
-    /// <summary>
-    /// Применяет оформление к только что открытому окну.
-    /// </summary>
-    /// <param name="window">Окно.</param>
+    /// <summary>Applies styling to a newly opened window.</summary>
     /// <param name="withBackdrop">
-    /// Ставить ли подложку. Диалогам она не положена: Mica — материал главного
-    /// окна, а всплывающему поверх него он даёт грязный полупрозрачный кисель.
+    /// Whether to apply the backdrop. Dialogs do not get one: Mica is the main
+    /// window's material, and on a window floating above it it turns into murky
+    /// translucency.
     /// </param>
     void ApplyToWindow(Window window, bool withBackdrop);
 
-    /// <summary>Цвет статуса по умолчанию для текущей темы — показывается в настройках.</summary>
+    /// <summary>Default status colour for the current theme, shown in settings.</summary>
     string DefaultColorHex(CheckStatus status);
 }
 
-/// <summary>
-/// Тема применяется подменой словаря токенов в ресурсах приложения.
-/// </summary>
+/// <summary>Applies the theme by swapping the token dictionary in application resources.</summary>
 /// <remarks>
-/// При выборе «как в системе» программа подписывается на смену системной темы
-/// и переключается без перезапуска (UI_SPEC.md, раздел 2).
+/// With "follow system" selected, the service listens for Windows theme changes
+/// and switches without a restart.
 /// </remarks>
 public sealed class ThemeService : IThemeService, IDisposable
 {
     private static readonly Uri LightTokens = new("pack://application:,,,/Resources/Tokens.Light.xaml");
     private static readonly Uri DarkTokens = new("pack://application:,,,/Resources/Tokens.Dark.xaml");
 
-    /// <summary>Цвета статусов по умолчанию — из таблицы токенов UI_SPEC.md, раздел 1.</summary>
+    /// <summary>Default status colours from the design tokens.</summary>
     private static readonly Dictionary<CheckStatus, (string Light, string Dark)> DefaultStatusColors = new()
     {
         [CheckStatus.Ok] = ("#0F7B3F", "#5EC27F"),
@@ -96,10 +92,9 @@ public sealed class ThemeService : IThemeService, IDisposable
 
         Collection<ResourceDictionary> dictionaries = Application.Current.Resources.MergedDictionaries;
 
-        // Словарь темы подменяется РОВНО на том месте, где он объявлен в App.xaml.
-        // Это принципиально: WPF ищет ресурсы в объединённых словарях с конца,
-        // поэтому вставка в начало списка не работала бы — светлые токены,
-        // объявленные в разметке, перебивали бы подставленные тёмные.
+        // Replace the theme dictionary exactly where App.xaml declares it. WPF
+        // resolves merged dictionaries from the end, so inserting at the front would
+        // let the light tokens in markup override the swapped-in dark ones.
         int index = _current is not null ? dictionaries.IndexOf(_current) : -1;
 
         if (index < 0)
@@ -113,15 +108,13 @@ public sealed class ThemeService : IThemeService, IDisposable
         }
         else
         {
-            // Словаря токенов в разметке нет — добавляем последним,
-            // чтобы он имел наивысший приоритет.
+            // No token dictionary in markup; append it last for top priority.
             dictionaries.Add(tokens);
         }
 
         _current = tokens;
 
-        // Библиотека WPF-UI рисует заголовок окна и подложку Mica — ей тоже
-        // нужно сообщить, какая сейчас тема.
+        // WPF-UI draws the title bar and the Mica backdrop and needs the theme too.
         Wpf.Ui.Appearance.ApplicationThemeManager.Apply(
             resolved == AppTheme.Dark
                 ? Wpf.Ui.Appearance.ApplicationTheme.Dark
@@ -129,7 +122,7 @@ public sealed class ThemeService : IThemeService, IDisposable
 
         SubscribeToSystemTheme(settings.Theme == AppTheme.System);
 
-        // Окна уже открыты — им нужно сообщить о смене подложки и анимаций.
+        // Windows already open need the new backdrop and animation settings.
         foreach (Window window in Application.Current?.Windows ?? [])
         {
             ApplyToWindow(window, withBackdrop: ReferenceEquals(window, Application.Current?.MainWindow));
@@ -149,11 +142,10 @@ public sealed class ThemeService : IThemeService, IDisposable
             return;
         }
 
-        // Свойство окна держим в согласии с действительностью, но полагаться
-        // на него нельзя: оно применяет подложку только когда значение
-        // меняется. Присвоение того же самого ничего не делает — а подложку к
-        // этому моменту мог переставить кто-то другой, и окно осталось бы
-        // с чужой. Поэтому ниже она ставится ещё и явно.
+        // Keep the window property truthful, but do not rely on it: it only applies
+        // the backdrop when the value changes. Assigning the same value does nothing,
+        // while something else may have replaced the backdrop meanwhile, so it is
+        // also applied explicitly below.
         if (window is FluentWindow fluent)
         {
             fluent.WindowBackdropType = _mica ? WindowBackdropType.Mica : WindowBackdropType.None;
@@ -163,8 +155,8 @@ public sealed class ThemeService : IThemeService, IDisposable
         {
             WindowBackdrop.ApplyBackdrop(window, WindowBackdropType.Mica);
 
-            // Подложку видно только сквозь окно: сама по себе ApplyBackdrop
-            // фона не трогает, и непрозрачная кисть закрывает её целиком.
+            // Mica only shows through the window: ApplyBackdrop leaves the background
+            // alone, and an opaque brush hides it completely.
             WindowBackdrop.RemoveBackground(window);
         }
         else
@@ -174,20 +166,15 @@ public sealed class ThemeService : IThemeService, IDisposable
         }
     }
 
-    /// <summary>
-    /// Делает поверхности полупрозрачными, чтобы подложку было видно.
-    /// </summary>
+    /// <summary>Makes surfaces translucent so the backdrop shows through.</summary>
     /// <remarks>
+    /// The page background goes fully transparent — that is the plane Mica shows
+    /// through. The title bar and toolbar get a light tint and cards a dense one,
+    /// mirroring the Windows 11 Settings window, where the backdrop sits under the
+    /// content rather than in it.
     /// <para>
-    /// Фон страницы уходит в ноль совсем — это и есть та плоскость, сквозь
-    /// которую смотрит Mica. Заголовок и панель инструментов получают лёгкий
-    /// налёт, карточки — плотный: ровно так устроено окно параметров Windows 11,
-    /// где подложка живёт под содержимым, а не в нём.
-    /// </para>
-    /// <para>
-    /// Значения непрозрачности разные для тёмной и светлой темы не для красоты:
-    /// светлый налёт на светлом фоне почти не виден, и карточку пришлось бы
-    /// искать глазами. Тёмная тема прощает больше, поэтому там слои тоньше.
+    /// Opacity differs per theme for legibility: a light tint on a light
+    /// background is nearly invisible, so the light theme needs denser layers.
     /// </para>
     /// </remarks>
     private static void ApplyMicaSurfaces(ResourceDictionary tokens, AppTheme theme)
@@ -205,9 +192,8 @@ public sealed class ThemeService : IThemeService, IDisposable
         byte cardAlpha = theme == AppTheme.Dark ? (byte)0xD8 : (byte)0xC8;
         byte chromeAlpha = theme == AppTheme.Dark ? (byte)0x66 : (byte)0x80;
 
-        // Оправа окна уходит в прозрачность целиком: заголовок, панель
-        // инструментов и линия под ними. Материал под ними один, и делить его
-        // швами незачем — в Windows 11 это сплошная поверхность.
+        // The window chrome goes fully transparent — title bar, toolbar and the line
+        // beneath. It is one material in Windows 11, with no seams.
         tokens["Brush.Chrome"] = Frozen(Colors.Transparent);
         tokens["Brush.ChromeLine"] = Frozen(Colors.Transparent);
 
@@ -231,7 +217,7 @@ public sealed class ThemeService : IThemeService, IDisposable
     /// <inheritdoc />
     public void Dispose() => SubscribeToSystemTheme(false);
 
-    /// <summary>Ищет словарь токенов темы среди объединённых словарей приложения.</summary>
+    /// <summary>Finds the theme token dictionary among the merged dictionaries.</summary>
     private static int IndexOfTokens(Collection<ResourceDictionary> dictionaries)
     {
         for (int i = 0; i < dictionaries.Count; i++)
@@ -247,7 +233,7 @@ public sealed class ThemeService : IThemeService, IDisposable
         return -1;
     }
 
-    /// <summary>Подменяет кисти статусов на выбранные пользователем.</summary>
+    /// <summary>Replaces status brushes with the user's colours.</summary>
     private static void ApplyOverrides(ResourceDictionary tokens, StatusColorOverrides overrides, AppTheme theme)
     {
         Set("Ok", overrides.Ok);
@@ -267,19 +253,19 @@ public sealed class ThemeService : IThemeService, IDisposable
                 Color color = (Color)ColorConverter.ConvertFromString(hex);
                 tokens["Brush." + key] = Frozen(color);
 
-                // Подложка метки выводится из самого цвета. Иначе выбранный
-                // фиолетовый «в порядке» оставался бы на зелёной подложке
-                // темы — метка выглядела бы сломанной, а не перекрашенной.
+                // Derive the badge background from the colour itself; otherwise a purple
+                // "ok" would sit on the theme's green badge and look broken rather than
+                // recoloured.
                 tokens["Brush." + key + "Bg"] = Frozen(Tint(color, theme));
             }
             catch (FormatException)
             {
-                // Некорректный цвет в файле настроек — остаётся цвет темы.
+                // Invalid colour in the settings file; keep the theme colour.
             }
         }
     }
 
-    /// <summary>Замороженная кисть: кисти темы читаются из разных потоков.</summary>
+    /// <summary>Frozen brush: theme brushes are read from several threads.</summary>
     private static SolidColorBrush Frozen(Color color)
     {
         SolidColorBrush brush = new(color);
@@ -287,7 +273,7 @@ public sealed class ThemeService : IThemeService, IDisposable
         return brush;
     }
 
-    /// <summary>Подложка метки: цвет, подмешанный к поверхности темы.</summary>
+    /// <summary>Badge background: the colour blended into the theme surface.</summary>
     private static Color Tint(Color color, AppTheme theme)
     {
         ColorMath.Rgb surface = theme == AppTheme.Dark
@@ -302,7 +288,7 @@ public sealed class ThemeService : IThemeService, IDisposable
         return Color.FromRgb(tinted.R, tinted.G, tinted.B);
     }
 
-    /// <summary>Читает системную настройку светлой/тёмной темы Windows.</summary>
+    /// <summary>Reads the Windows light/dark app theme setting.</summary>
     internal static bool IsSystemDark()
     {
         try
@@ -314,7 +300,7 @@ public sealed class ThemeService : IThemeService, IDisposable
         }
         catch (Exception)
         {
-            // Нет доступа к реестру — считаем тему светлой.
+            // No registry access; assume light.
             return false;
         }
     }
@@ -345,7 +331,7 @@ public sealed class ThemeService : IThemeService, IDisposable
             return;
         }
 
-        // Событие приходит не из потока интерфейса — возвращаемся в него.
+        // The event arrives off the UI thread; marshal back.
         Application.Current?.Dispatcher.BeginInvoke(() =>
         {
             if (_settings.Theme == AppTheme.System)

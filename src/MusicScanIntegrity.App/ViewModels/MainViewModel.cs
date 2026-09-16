@@ -19,14 +19,14 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
-/// <summary>Главное окно: панель инструментов, вкладки, ход проверки, статусная строка.</summary>
+/// <summary>Main window: toolbar, tabs, scan progress and status bar.</summary>
 public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisionProvider, IDisposable
 {
     private const int TabScan = 0;
     private const int TabResults = 1;
     private const int TabReport = 2;
 
-    /// <summary>Сколько предупреждений держать в живом списке на вкладке «Проверка».</summary>
+    /// <summary>How many warnings the live list on the scan tab keeps.</summary>
     private const int LiveWarningLimit = 50;
 
     private readonly ISettingsService _settingsService;
@@ -41,7 +41,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private DiscoveryResult? _lastDiscovery;
     private ScanSummary? _lastSummary;
 
-    /// <summary>Замечания по коллекции с последней проверки.</summary>
+    /// <summary>Collection findings from the last scan.</summary>
     private IReadOnlyList<CollectionFinding> _findings = [];
     private CancellationTokenSource? _discoveryCts;
     private TaskCompletionSource<LockedFileDecision>? _pendingAnswer;
@@ -50,18 +50,17 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private int _selectedTab;
 
     /// <summary>
-    /// Открыт экран настроек. Он лежит поверх содержимого вкладок в том же
-    /// окне: настройки — не этап работы, но и не повод уводить пользователя
-    /// в отдельное окно, которое потом надо искать на панели задач.
+    /// The settings screen is open. It overlays the tab content in the same window
+    /// rather than opening a separate window the user would have to find again.
     /// </summary>
     [ObservableProperty]
     private bool _isSettingsOpen;
 
-    /// <summary>Над окном тащат папку — зона перетаскивания подсвечивается.</summary>
+    /// <summary>A folder is being dragged over the window; the drop zone lights up.</summary>
     [ObservableProperty]
     private bool _isDragActive;
 
-    // Щелчок по вкладке уводит к работе — экран настроек при этом закрывается.
+    // Clicking a tab returns to work and closes the settings screen.
     partial void OnSelectedTabChanged(int value) => IsSettingsOpen = false;
 
     [ObservableProperty]
@@ -94,7 +93,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [ObservableProperty]
     private string _statusCounts = string.Empty;
 
-    // Счётчики сводки на вкладке «Проверка».
+    // Summary counters on the scan tab.
     [ObservableProperty]
     private string _totalFiles = "0";
 
@@ -113,7 +112,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [ObservableProperty]
     private string _skippedFiles = "0";
 
-    // Быстрые параметры в боковой колонке.
+    // Quick settings in the side column.
     [ObservableProperty]
     private bool _recursive = true;
 
@@ -126,7 +125,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [ObservableProperty]
     private SettingsViewModel.TimeoutOption _timeout = SettingsViewModel.TimeoutOptions[2];
 
-    // Карточка вопроса о занятом файле.
+    // Locked-file question card.
     [ObservableProperty]
     private bool _hasLockedQuestion;
 
@@ -148,19 +147,19 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [ObservableProperty]
     private bool _canApplyToAll;
 
-    /// <summary>Сколько предупреждений было всего, а не сколько влезло в список.</summary>
+    /// <summary>Total warnings raised, not just those that fit the list.</summary>
     [ObservableProperty]
     private int _liveWarningTotal;
 
-    /// <summary>Подпись под списком, когда показаны не все предупреждения.</summary>
+    /// <summary>Caption under the list when not every warning is shown.</summary>
     public string LiveWarningNote => LiveWarningTotal > LiveWarnings.Count
         ? $"Показаны последние {LiveWarnings.Count} — полный список на вкладке «Результаты»"
         : string.Empty;
 
     partial void OnLiveWarningTotalChanged(int value) => OnPropertyChanged(nameof(LiveWarningNote));
 
-    // Пояснения к вариантам решения: каждое считается по текущим настройкам
-    // и по самому файлу, чтобы цифры в них были настоящими, а не примерными.
+    // Explanations under each choice are computed from the current settings and
+    // the file itself, so the numbers in them are real rather than approximate.
     [ObservableProperty]
     private string _lockedWaitNote = string.Empty;
 
@@ -170,7 +169,6 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [ObservableProperty]
     private string _lockedOwnerNote = string.Empty;
 
-    /// <summary>Создаёт модель главного окна.</summary>
     public MainViewModel(
         ISettingsService settingsService,
         IFileDiscoveryService discovery,
@@ -198,7 +196,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         Report = report;
         Settings = settings;
 
-        // Движок спрашивает про занятые файлы через переходник — подставляем себя.
+        // The engine asks about locked files through the relay; install ourselves.
         lockedFileRelay.Target = this;
 
         _engine.ResultsReady += OnResultsReady;
@@ -213,34 +211,34 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         SyncQuickSettings();
     }
 
-    /// <summary>Вкладка «Результаты».</summary>
+    /// <summary>Results tab.</summary>
     public ResultsViewModel Results { get; }
 
-    /// <summary>Вкладка «Отчёт».</summary>
+    /// <summary>Report tab.</summary>
     public ReportViewModel Report { get; }
 
-    /// <summary>Вкладка «Настройки».</summary>
+    /// <summary>Settings screen.</summary>
     public SettingsViewModel Settings { get; }
 
-    /// <summary>Предупреждения, появляющиеся прямо по ходу проверки.</summary>
+    /// <summary>Warnings raised while the scan runs.</summary>
     public ObservableCollection<LiveWarningRow> LiveWarnings { get; } = [];
 
-    /// <summary>Подпись кнопки паузы меняется на «Продолжить», когда проверка стоит.</summary>
+    /// <summary>Pause button caption; reads "Resume" while paused.</summary>
     public string PauseButtonText => IsPaused ? "Продолжить" : "Пауза";
 
-    /// <summary>Значок кнопки паузы.</summary>
+    /// <summary>Pause button icon.</summary>
     public string PauseButtonIcon => IsPaused ? "play" : "pause";
 
-    /// <summary>Идёт ли проверка — от этого зависит подтверждение при закрытии окна.</summary>
+    /// <summary>A scan is running; closing the window then asks for confirmation.</summary>
     public bool IsBusy => IsScanning;
 
-    /// <summary>Доля выполнения для панели задач: 0…1.</summary>
+    /// <summary>Progress for the taskbar, 0 to 1.</summary>
     public double TaskbarProgress => Math.Clamp(Progress / 100.0, 0, 1);
 
     /// <summary>
-    /// Состояние индикатора в панели задач. Проверка идёт минутами, окно при
-    /// этом обычно свёрнуто, поэтому ход виден прямо на кнопке в панели:
-    /// зелёная полоса — идёт, жёлтая — пауза или ждём ответа про занятый файл.
+    /// Taskbar progress state. Scans take minutes and the window is usually
+    /// minimised: green while running, yellow when paused or waiting for a
+    /// locked-file answer.
     /// </summary>
     public TaskbarItemProgressState TaskbarState => !IsScanning
         ? TaskbarItemProgressState.None
@@ -252,9 +250,9 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
 
 
-    // ── Выбор папки ──────────────────────────────────────────────────────
+    // ── Folder selection ─────────────────────────────────────────────────
 
-    /// <summary>Открывает диалог выбора папки.</summary>
+    /// <summary>Opens the folder picker.</summary>
     [RelayCommand]
     private async Task PickFolderAsync()
     {
@@ -266,8 +264,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     }
 
     /// <summary>
-    /// Принимает папку (из диалога или перетаскиванием), сразу считает файлы
-    /// и предлагает начать проверку (02_ARCHITECTURE.md, раздел 9).
+    /// Accepts a folder from the picker or drag-and-drop, counts its files right
+    /// away and offers to start the scan.
     /// </summary>
     public async Task SetFolderAsync(string folder)
     {
@@ -279,14 +277,13 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         FolderPath = folder;
         IsOfferVisible = false;
 
-        // Папку выбирают, чтобы её проверить. Если это сделали с «Результатов»
-        // или «Отчёта», кнопка «Начать» осталась бы на другой вкладке.
+        // A folder is picked in order to scan it. If that happened on the results or
+        // report tab, the Start button would be left on another tab.
         SelectedTab = TabScan;
 
-        // И отдельно — закрыть настройки. Одной строки выше для этого мало:
-        // экран настроек закрывается по смене вкладки, а вкладка «Проверка»
-        // обычно уже выбрана, значение не меняется, и событие не приходит.
-        // Папку тогда выбирали из настроек и в них же и оставались.
+        // Close settings separately. Switching tabs is not enough: the scan tab is
+        // usually already selected, the value does not change and no event fires, so
+        // a folder picked from settings used to leave the user in settings.
         IsSettingsOpen = false;
 
         AppSettings settings = _settingsService.Current;
@@ -297,7 +294,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             await _settingsService.SaveAsync();
         }
 
-        // Предыдущий подсчёт мог ещё идти — прерываем его, прежде чем начать новый.
+        // A previous count may still be running; cancel it first.
         if (_discoveryCts is { } previous)
         {
             await previous.CancelAsync();
@@ -319,8 +316,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
                 : $"Найдено {CoreFormat.Number(result.AudioItems.Count)} подходящих " +
                   CoreFormat.Plural(result.AudioItems.Count, "файла", "файлов", "файлов");
 
-            // Про «заглянуть в настройки» здесь больше не говорится: кнопки
-            // настроек рядом с «Начать» нет, а параметры проверки — справа.
+            // No longer suggests "check the settings": there is no settings button next
+            // to Start, and the scan options are on the right.
             OfferSubtitle = result.Playlists.Count > 0
                 ? $"Ещё {CoreFormat.Number(result.Playlists.Count)} " +
                   $"{CoreFormat.Plural(result.Playlists.Count, "плейлист", "плейлиста", "плейлистов")}. " +
@@ -329,8 +326,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
             IsOfferVisible = settings.OfferStartAfterFolderSelected && result.AudioItems.Count > 0;
 
-            // Без этого кнопка «Начать» осталась бы неактивной: RelayCommand
-            // кэширует результат CanExecute и сам о новой папке не узнает.
+            // Without this Start stays disabled: RelayCommand caches CanExecute and does
+            // not learn about the new folder by itself.
             StartCommand.NotifyCanExecuteChanged();
 
             if (result.InaccessibleFolders.Count > 0)
@@ -340,16 +337,15 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
         catch (OperationCanceledException)
         {
-            // Пользователь выбрал другую папку, пока считали эту.
+            // The user picked another folder while this one was being counted.
         }
         catch (Exception ex)
         {
             _lastDiscovery = null;
             StartCommand.NotifyCanExecuteChanged();
 
-            // Макет на такой случай даёт три действия: скопировать путь,
-            // повторить и закрыть. Повтор здесь осмыслен — папка могла быть
-            // временно занята или не примонтирована.
+            // Three actions: copy path, retry and close. Retry makes sense because the
+            // folder may have been temporarily busy or not mounted.
             bool retry = await _dialogs.ConfirmAsync(
                 "Папку не удалось прочитать",
                 "Обойти эту папку не получилось. Проверьте, что она существует и доступна.",
@@ -367,15 +363,12 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
     }
 
-    // ── Управление проверкой ─────────────────────────────────────────────
+    // ── Scan control ─────────────────────────────────────────────────────
 
-    /// <summary>Запускает проверку.</summary>
-    /// <summary>
-    /// Приводит базу истории в соответствие с настройкой перед проверкой.
-    /// </summary>
+    /// <summary>Brings the history database in line with the setting before a scan.</summary>
     /// <remarks>
-    /// Открывается здесь, а не при запуске программы: если слежение выключено,
-    /// база не нужна и создавать её незачем.
+    /// Opened here rather than at startup: with tracking off the database is not
+    /// needed and should not be created.
     /// </remarks>
     private void PrepareHistory(AppSettings settings)
     {
@@ -389,6 +382,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
     }
 
+    /// <summary>Starts the scan.</summary>
     [RelayCommand(CanExecute = nameof(CanStart))]
     private async Task StartAsync()
     {
@@ -443,7 +437,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
     private bool CanStart() => !IsScanning && _lastDiscovery is { AudioItems.Count: > 0 };
 
-    /// <summary>Ставит проверку на паузу или продолжает её.</summary>
+    /// <summary>Pauses or resumes the scan.</summary>
     [RelayCommand(CanExecute = nameof(CanControl))]
     private void TogglePause()
     {
@@ -460,9 +454,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     }
 
     /// <summary>
-    /// Пересчитывает выбранную папку и сразу начинает проверку заново.
-    /// Нужна, когда содержимое папки поменялось после прошлой проверки:
-    /// выбирать тот же путь второй раз незачем.
+    /// Recounts the selected folder and restarts the scan, for when the folder
+    /// changed since the last run.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanRescan))]
     private async Task RescanAsync()
@@ -482,21 +475,21 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         !IsScanning && !string.IsNullOrWhiteSpace(FolderPath) && Directory.Exists(FolderPath);
 
     /// <summary>
-    /// Останавливает проверку без вопросов. Нужен закрытию окна: там про
-    /// остановку уже спросили, и второй такой же вопрос подряд — издевательство.
+    /// Stops the scan without asking. Used when closing the window, which has
+    /// already asked; a second identical question would be absurd.
     /// </summary>
     public void StopImmediately()
     {
-        // Программу закрывают: итоги показывать некому и незачем. Без этого
-        // флага поверх закрывающегося окна успевало всплыть окно «Проверка
-        // остановлена», и закрытие упиралось в него.
+        // The app is closing, so there is nobody to show a summary to. Without this
+        // flag a "Scan stopped" dialog popped up over the closing window and blocked
+        // the shutdown.
         _closing = true;
         _engine.Stop();
     }
 
     private bool _closing;
 
-    /// <summary>Останавливает проверку, спросив подтверждение.</summary>
+    /// <summary>Stops the scan after asking for confirmation.</summary>
     [RelayCommand(CanExecute = nameof(CanControl))]
     private async Task StopAsync()
     {
@@ -516,18 +509,13 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
     private bool CanControl() => IsScanning;
 
-    // ── Вопрос о занятом файле ───────────────────────────────────────────
+    // ── Locked-file question ─────────────────────────────────────────────
 
-    /// <summary>
-    /// Показывает вопрос о занятом файле карточкой на вкладке «Проверка».
-    /// </summary>
+    /// <summary>Shows the locked-file question as a card on the scan tab.</summary>
     /// <remarks>
-    /// Решение по неоднозначности: макет показывает вопрос и карточкой в боковой
-    /// колонке, и отдельным окном. Выбрана карточка — она не перекрывает окно и
-    /// не мешает смотреть на ход проверки, а очередь вопросов уже гарантирует,
-    /// что вопрос показывается ровно один (03_IMPLEMENTATION_GUIDE.md, раздел 2).
-    /// Если пользователь смотрит другую вкладку, программа переключает его на
-    /// «Проверку», чтобы вопрос не остался незамеченным.
+    /// A card rather than a window: it does not cover the progress, and the queue
+    /// already guarantees one question at a time. If another tab is open the app
+    /// switches to the scan tab so the question is not missed.
     /// </remarks>
     public Task<LockedFileDecision> AskAsync(LockedFileQuestion question, CancellationToken cancellationToken)
     {
@@ -551,9 +539,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             LockedCopyNote = $"{CoreFormat.Size(question.SizeBytes)} будет скопировано " +
                              "в %TEMP% и удалено после";
 
-            // Именно DisplayName: у записи LockOwner своего ToString() нет,
-            // и в подпись вываливалась вся структура целиком —
-            // «LockOwner { ProcessId = 11444, ProcessName = pwsh, … }».
+            // DisplayName explicitly: the LockOwner record has no custom ToString(), and
+            // the caption used to dump the whole record.
             LockedOwnerNote = question.Owner.Owners.Count > 0
                 ? "Запрос на закрытие получит: " +
                   string.Join(", ", question.Owner.Owners.Select(o => o.DisplayName))
@@ -570,7 +557,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         return answer.Task;
     }
 
-    /// <summary>Отвечает на вопрос о занятом файле.</summary>
+    /// <summary>Answers the locked-file question.</summary>
     [RelayCommand]
     private void AnswerLocked(string action)
     {
@@ -588,7 +575,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _pendingAnswer = null;
     }
 
-    /// <summary>Останавливает проверку прямо из вопроса о занятом файле.</summary>
+    /// <summary>Stops the scan from within the locked-file question.</summary>
     [RelayCommand]
     private void StopFromLocked()
     {
@@ -597,9 +584,9 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _pendingAnswer = null;
     }
 
-    // ── Отчёт ────────────────────────────────────────────────────────────
+    // ── Report ───────────────────────────────────────────────────────────
 
-    /// <summary>Сохраняет отчёт в выбранном формате.</summary>
+    /// <summary>Saves the report in the chosen format.</summary>
     [RelayCommand(CanExecute = nameof(CanExport))]
     private async Task ExportAsync()
     {
@@ -657,9 +644,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
         catch (Exception ex)
         {
-            // Ошибки асинхронной команды иначе просто теряются: библиотека MVVM
-            // складывает их в задачу и никому не показывает. Молчаливый отказ
-            // экспорта — худшее, что здесь может быть.
+            // Async command errors are otherwise swallowed: the MVVM toolkit stores them
+            // in the task and shows nobody. A silently failed export is the worst outcome.
             await _dialogs.ShowMessageAsync(
                 "Отчёт не сохранён",
                 "Сохранить отчёт не получилось. Проверьте, что папка доступна на запись и на диске есть место.",
@@ -668,19 +654,14 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
     }
 
-    /// <summary>
-    /// Запоминает папку, в которую человек сохранил отчёт.
-    /// </summary>
-    /// <param name="filePath">Путь сохранённого отчёта.</param>
+    /// <summary>Remembers the folder the user saved the report to.</summary>
     /// <remarks>
+    /// Written through the settings view model rather than directly: it keeps its
+    /// own draft and rewrites all settings from it on any toggle, which would
+    /// revert a value stored behind its back.
     /// <para>
-    /// Записывается через вью-модель настроек, а не прямо в настройки. У неё
-    /// свой черновик, и правка любого переключателя переписывает настройки
-    /// целиком из него — значение, положенное в обход, вернулось бы к старому.
-    /// </para>
-    /// <para>
-    /// Только после удачного сохранения: путь, по которому записать не вышло,
-    /// запоминать незачем — он будет подставляться и мешать каждый раз.
+    /// Only after a successful save — a path that could not be written to is not
+    /// worth offering again.
     /// </para>
     /// </remarks>
     private void RememberReportsFolder(string filePath)
@@ -697,19 +678,19 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
     private bool CanExport() => _lastSummary is not null && Results.TotalCount > 0;
 
-    // ── Панель инструментов ──────────────────────────────────────────────
+    // ── Toolbar ──────────────────────────────────────────────────────────
 
-    /// <summary>Открывает вкладку настроек.</summary>
+    /// <summary>Opens the settings screen.</summary>
     [RelayCommand]
     private void OpenSettings() => IsSettingsOpen = true;
 
-    /// <summary>Возвращает из настроек к работе.</summary>
+    /// <summary>Returns from settings to work.</summary>
     [RelayCommand]
     private void CloseSettings() => IsSettingsOpen = false;
 
     /// <summary>
-    /// Действие по строке живого предупреждения: либо убрать её из списка,
-    /// либо перейти к этому файлу на вкладке «Результаты».
+    /// Action on a live warning row: dismiss it, or jump to the file on the
+    /// results tab.
     /// </summary>
     [RelayCommand]
     private void LiveWarningAction(LiveWarningRow? row)
@@ -729,11 +710,11 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         SelectedTab = TabResults;
     }
 
-    /// <summary>Показывает справку.</summary>
+    /// <summary>Shows help.</summary>
     [RelayCommand]
     private void ShowHelp() => _dialogs.ShowHelp();
 
-    /// <summary>Показывает окно «О программе».</summary>
+    /// <summary>Shows the about window.</summary>
     [RelayCommand]
     private void ShowAbout()
     {
@@ -749,7 +730,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             plugins));
     }
 
-    /// <summary>Открывает папку файла из строки результатов.</summary>
+    /// <summary>Reveals the file from a results row in Explorer.</summary>
     [RelayCommand(CanExecute = nameof(HasRow))]
     private void RevealResult(FileResultViewModel? row)
     {
@@ -759,7 +740,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
     }
 
-    /// <summary>Открывает файл программой по умолчанию.</summary>
+    /// <summary>Opens the file with its default application.</summary>
     [RelayCommand(CanExecute = nameof(HasRow))]
     private void OpenResult(FileResultViewModel? row)
     {
@@ -769,16 +750,15 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
     }
 
-    // Проверки нужны меню: без них пункт остаётся включённым и по нажатию
-    // молча ничего не делает — а это неотличимо от сломанной программы.
+    // The menu needs these checks: otherwise the item stays enabled and silently
+    // does nothing, which is indistinguishable from a broken app.
     private static bool HasRow(FileResultViewModel? row) => row is not null;
 
     private static bool HasRows(System.Collections.IList? rows) => rows is { Count: > 0 };
 
     /// <summary>
-    /// Копирует пути выделенных строк — по одному на строку.
-    /// Принимает список, а не одну строку: выделить можно несколько файлов,
-    /// и переписывать их пути руками из таблицы было бы издевательством.
+    /// Copies the paths of the selected rows, one per line. Takes a list because
+    /// several rows can be selected.
     /// </summary>
     [RelayCommand(CanExecute = nameof(HasRows))]
     private void CopyResultPaths(System.Collections.IList? rows)
@@ -798,11 +778,11 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         }
         catch (Exception)
         {
-            // Буфер обмена занят другой программой — не повод падать.
+            // Clipboard held by another process; not worth crashing over.
         }
     }
 
-    // ── Реакция на события движка ────────────────────────────────────────
+    // ── Engine events ────────────────────────────────────────────────────
 
     private void OnResultsReady(object? sender, IReadOnlyList<FileCheckResult> batch) =>
         Application.Current?.Dispatcher.BeginInvoke(() => Results.AddRange(batch));
@@ -832,10 +812,9 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private void OnWarningRaised(object? sender, LiveWarning warning) =>
         Application.Current?.Dispatcher.BeginInvoke(() =>
         {
-            // Список живых предупреждений намеренно ограничен: он для внимания
-            // по ходу проверки, а полный разбор — на вкладке «Результаты».
-            // Счётчик считает все предупреждения, а список хранит только
-            // последние: иначе в шапке стояло бы «50» при трёх сотнях находок.
+            // The live list is capped on purpose; it is for attention during the scan,
+            // and the full picture is on the results tab. The counter counts every
+            // warning, otherwise the header would read "50" with three hundred findings.
             LiveWarningTotal++;
 
             if (LiveWarnings.Count >= LiveWarningLimit)
@@ -846,13 +825,11 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             LiveWarnings.Insert(0, new LiveWarningRow(warning.Title, warning.Path, warning.Code));
         });
 
-    /// <summary>
-    /// Разбирает готовые результаты: альбомы по папкам и повторы по коллекции.
-    /// </summary>
+    /// <summary>Inspects finished results: albums per folder and duplicates.</summary>
     /// <remarks>
-    /// Считается здесь, а не в движке: движок отдаёт результаты порциями и
-    /// целиком их не хранит, а список готовых результатов и так лежит на
-    /// вкладке «Результаты».
+    /// Done here rather than in the engine: the engine delivers results in
+    /// batches and does not keep them, while the results tab already holds the
+    /// full list.
     /// </remarks>
     private void UpdateCollectionFindings()
     {
@@ -880,8 +857,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             ExportCommand.NotifyCanExecuteChanged();
             StartCommand.NotifyCanExecuteChanged();
 
-            // Окно уже закрывается — ни итогов, ни звука, ни переходов
-            // по вкладкам. Результаты при этом собраны и сохранены.
+            // The window is closing: no summary, no sound, no tab switching. Results are
+            // still collected.
             if (_closing)
             {
                 return;
@@ -931,7 +908,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             copyPath: first.Path);
     }
 
-    // ── Быстрые параметры ────────────────────────────────────────────────
+    // ── Quick settings ───────────────────────────────────────────────────
 
     partial void OnRecursiveChanged(bool value) => UpdateSetting(s => s.Recursive = value);
 
@@ -995,9 +972,9 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             Timeout = SettingsViewModel.TimeoutOptions
                 .FirstOrDefault(o => o.Seconds == settings.FileTimeoutSeconds) ?? SettingsViewModel.TimeoutOptions[2];
 
-            // Формат и папка отчёта живут в настройках; вкладка их только
-            // показывает, а выбирает пользователь в окне сохранения. Раньше
-            // «Формат отчёта по умолчанию» из настроек ни на что не влиял.
+            // Report format and folder live in settings; the tab only displays them and
+            // the user chooses in the save dialog. The default format setting used to
+            // have no effect at all.
             Report.SelectedFormat = settings.DefaultReportFormat;
             Report.TargetFolder = _reports.ResolveDefaultFolder(settings);
         }
@@ -1008,7 +985,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
     }
 
-    /// <summary>Сокращает путь для однострочного показа под прогрессом.</summary>
+    /// <summary>Shortens a path for single-line display under the progress bar.</summary>
     private static string Shorten(string path)
     {
         const int maxLength = 90;
@@ -1034,20 +1011,17 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     }
 }
 
-/// <summary>Строка живого списка предупреждений.</summary>
-/// <param name="Title">Человеческая формулировка.</param>
-/// <param name="Path">Путь к файлу.</param>
-/// <param name="Code">Код замечания.</param>
+/// <summary>A row in the live warning list.</summary>
+/// <param name="Title">Human wording.</param>
 public sealed record LiveWarningRow(string Title, string Path, IssueCode Code)
 {
     /// <summary>
-    /// Подпись действия справа в строке. Большой файл — это предупреждение
-    /// «к сведению», по нему нечего смотреть, поэтому строку просто убирают.
-    /// Остальные замечания привязаны к конкретному файлу, и его можно открыть
-    /// в «Результатах».
+    /// Caption of the row action. A large file is informational with nothing to
+    /// look at, so the row is dismissed; other findings belong to a file that can
+    /// be opened on the results tab.
     /// </summary>
     public string ActionLabel => Code is IssueCode.LargeFile ? "Понятно" : "Показать";
 
-    /// <summary>Убирает ли действие строку из списка.</summary>
+    /// <summary>Whether the action dismisses the row.</summary>
     public bool ActionDismisses => Code is IssueCode.LargeFile;
 }

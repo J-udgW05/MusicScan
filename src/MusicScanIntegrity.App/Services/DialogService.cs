@@ -8,53 +8,48 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.Services;
 
-/// <summary>Диалоги и системные окна выбора.</summary>
+/// <summary>Dialogs and system pickers.</summary>
 public interface IDialogService
 {
-    /// <summary>Окно выбора папки; <see langword="null"/>, если пользователь отказался.</summary>
+    /// <summary>Folder picker; <see langword="null"/> when cancelled.</summary>
     string? PickFolder(string title, string? initialFolder);
 
-    /// <summary>Окно сохранения файла; <see langword="null"/>, если пользователь отказался.</summary>
+    /// <summary>Save file dialog; <see langword="null"/> when cancelled.</summary>
     string? PickSaveFile(string title, string filter, string suggestedName, string? initialFolder);
 
-    /// <summary>Выбор цвета в формате «#RRGGBB»; <see langword="null"/> при отказе.</summary>
+    /// <summary>Colour picker returning "#RRGGBB"; <see langword="null"/> when cancelled.</summary>
     string? PickColor(string title, string currentHex);
 
-    /// <summary>Вопрос «да / нет».</summary>
+    /// <summary>Yes/no question.</summary>
     Task<bool> ConfirmAsync(string title, string message, string confirmText, string cancelText, bool destructive = false, string? copyPath = null, string? technicalDetail = null, bool isError = false);
 
-    /// <summary>Сообщение с одной кнопкой.</summary>
+    /// <summary>Message with a single button.</summary>
     Task ShowMessageAsync(string title, string message, string? technicalDetail = null, bool isError = false, string? copyPath = null);
 
-    /// <summary>Диалог экспорта отчёта; <see langword="null"/> при отказе.</summary>
+    /// <summary>Report export dialog; <see langword="null"/> when cancelled.</summary>
     ExportChoice? AskExport(ExportContext context);
 
-    /// <summary>Итоги завершённой проверки.</summary>
+    /// <summary>Summary of a finished scan.</summary>
     Task<ScanFinishedAction> ShowScanFinishedAsync(ScanSummary summary);
 
-    /// <summary>Окно «О программе».</summary>
+    /// <summary>About window.</summary>
     void ShowAbout(AboutInfo info);
 
-    /// <summary>Окно справки.</summary>
+    /// <summary>Help window.</summary>
     void ShowHelp();
 
-    /// <summary>Приветствие при первом запуске; возвращает «не показывать больше».</summary>
+    /// <summary>First-run welcome; returns "do not show again".</summary>
     bool ShowFirstRun(out bool openFolderPicker);
 
-    /// <summary>Открывает проводник и выделяет файл.</summary>
+    /// <summary>Opens Explorer with the file selected.</summary>
     void RevealInExplorer(string path);
 
-    /// <summary>Открывает файл программой по умолчанию.</summary>
+    /// <summary>Opens the file with its default application.</summary>
     void OpenFile(string path);
 }
 
-/// <summary>Что пользователь выбрал в диалоге экспорта.</summary>
-/// <param name="Format">Формат отчёта.</param>
-/// <param name="FilePath">Куда сохранять.</param>
-/// <param name="IncludeCorrupted">Включить повреждённые файлы.</param>
-/// <param name="IncludeWarnings">Включить предупреждения.</param>
-/// <param name="IncludeOk">Включить файлы «в порядке».</param>
-/// <param name="IncludePlaylists">Включить битые ссылки плейлистов.</param>
+/// <summary>What the user chose in the export dialog.</summary>
+/// <param name="IncludePlaylists">Include broken playlist references.</param>
 public sealed record ExportChoice(
     ReportFormat Format,
     string FilePath,
@@ -63,18 +58,11 @@ public sealed record ExportChoice(
     bool IncludeOk,
     bool IncludePlaylists);
 
-/// <summary>Что показать в диалоге экспорта.</summary>
-/// <param name="Settings">Текущие настройки.</param>
-/// <param name="CorruptedCount">Сколько повреждённых файлов.</param>
-/// <param name="WarningCount">Сколько предупреждений.</param>
-/// <param name="OkCount">Сколько файлов «в порядке».</param>
-/// <param name="PlaylistMissingCount">Сколько битых ссылок в плейлистах.</param>
-/// <param name="SuggestedName">Предлагаемое имя файла.</param>
-/// <param name="DefaultFolder">Папка по умолчанию.</param>
+/// <summary>What the export dialog shows.</summary>
 /// <param name="Format">
-/// Формат, с которым открыть диалог. Это выбор со вкладки «Отчёт», а не
-/// значение по умолчанию из настроек: пользователь выбрал карточку формата,
-/// нажал «Сохранить…» — и диалог обязан открыться на том же формате.
+/// Format to open the dialog on. This is the choice made on the report tab,
+/// not the default from settings: the user picked a format card and pressed
+/// Save, so the dialog must open on that same format.
 /// </param>
 public sealed record ExportContext(
     AppSettings Settings,
@@ -86,27 +74,25 @@ public sealed record ExportContext(
     string DefaultFolder,
     ReportFormat Format);
 
-/// <summary>Что пользователь выбрал в окне «Проверка завершена».</summary>
+/// <summary>What the user chose in the scan-finished dialog.</summary>
 public enum ScanFinishedAction
 {
-    /// <summary>Закрыл окно.</summary>
+    /// <summary>Closed the dialog.</summary>
     Close,
 
-    /// <summary>Перейти к результатам.</summary>
+    /// <summary>Go to the results.</summary>
     GoToResults,
 
-    /// <summary>Перейти к отчёту.</summary>
+    /// <summary>Go to the report.</summary>
     GoToReport,
 
-    /// <summary>Открыть проверенную папку.</summary>
+    /// <summary>Open the scanned folder.</summary>
     OpenFolder,
 }
 
-/// <summary>Сведения для окна «О программе».</summary>
-/// <param name="Version">Версия сборки.</param>
-/// <param name="BuildDate">Дата сборки.</param>
-/// <param name="AudioEngine">Состояние механизма декодирования.</param>
-/// <param name="Plugins">Загруженные плагины форматов.</param>
+/// <summary>Information for the about window.</summary>
+/// <param name="AudioEngine">Decoder status.</param>
+/// <param name="Plugins">Loaded format plug-ins.</param>
 public sealed record AboutInfo(
     string Version,
     string BuildDate,
@@ -238,7 +224,7 @@ public sealed class DialogService : IDialogService
         }
         catch (Exception)
         {
-            // Проводник может быть недоступен политикой — не повод падать.
+            // Explorer may be blocked by policy; not worth crashing over.
         }
     }
 
@@ -251,7 +237,7 @@ public sealed class DialogService : IDialogService
         }
         catch (Exception)
         {
-            // Нет программы для этого типа файла — молча пропускаем.
+            // No application registered for this file type; ignore.
         }
     }
 

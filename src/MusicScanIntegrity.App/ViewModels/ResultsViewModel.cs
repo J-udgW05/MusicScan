@@ -9,7 +9,7 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
-/// <summary>Вкладка «Результаты»: таблица, поиск, фильтры, подробности.</summary>
+/// <summary>Results tab: table, search, filters and details.</summary>
 public sealed partial class ResultsViewModel : ObservableObject
 {
     private readonly ObservableCollection<FileResultViewModel> _all = [];
@@ -48,10 +48,9 @@ public sealed partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private int _playlistMissingCount;
 
-    /// <summary>Значение фильтра «все форматы».</summary>
+    /// <summary>Filter value meaning "all formats".</summary>
     public const string AllFormats = "Формат: все";
 
-    /// <summary>Создаёт модель вкладки результатов.</summary>
     public ResultsViewModel()
     {
         View = CollectionViewSource.GetDefaultView(_all);
@@ -60,17 +59,17 @@ public sealed partial class ResultsViewModel : ObservableObject
         ApplySort();
     }
 
-    /// <summary>Колонка, по которой отсортирована таблица.</summary>
+    /// <summary>Column the table is sorted by.</summary>
     [ObservableProperty]
     private ResultsSortColumn _sortColumn = ResultsSortColumn.Name;
 
-    /// <summary>Сортировка по возрастанию.</summary>
+    /// <summary>Ascending order.</summary>
     [ObservableProperty]
     private bool _sortAscending = true;
 
     /// <summary>
-    /// Переключает сортировку: щелчок по той же колонке разворачивает порядок,
-    /// по другой — сортирует по ней по возрастанию.
+    /// Toggles sorting: clicking the same column reverses the order, another column
+    /// sorts by it ascending.
     /// </summary>
     [RelayCommand]
     private void SortBy(string? column)
@@ -102,9 +101,8 @@ public sealed partial class ResultsViewModel : ObservableObject
 
     private void ApplySort()
     {
-        // Сортировка идёт через CustomSort: размер и статус сравниваются по
-        // числу и по перечислению, а не по подписи, иначе «1,8 ГБ» окажется
-        // меньше «24,1 МБ», а «Повреждён» — раньше «В порядке» по алфавиту.
+        // CustomSort compares size and status by value rather than by caption;
+        // otherwise "1,8 ГБ" would sort below "24,1 МБ" and statuses alphabetically.
         if (View is ListCollectionView list)
         {
             list.CustomSort = new ResultsComparer(SortColumn, SortAscending);
@@ -117,45 +115,44 @@ public sealed partial class ResultsViewModel : ObservableObject
         OnPropertyChanged(nameof(IsSortedByStatus));
     }
 
-    /// <summary>Таблица отсортирована по имени.</summary>
+    /// <summary>Sorted by name.</summary>
     public bool IsSortedByName => SortColumn == ResultsSortColumn.Name;
 
-    /// <summary>Таблица отсортирована по пути.</summary>
+    /// <summary>Sorted by path.</summary>
     public bool IsSortedByPath => SortColumn == ResultsSortColumn.Path;
 
-    /// <summary>Таблица отсортирована по формату.</summary>
+    /// <summary>Sorted by format.</summary>
     public bool IsSortedByFormat => SortColumn == ResultsSortColumn.Format;
 
-    /// <summary>Таблица отсортирована по размеру.</summary>
+    /// <summary>Sorted by size.</summary>
     public bool IsSortedBySize => SortColumn == ResultsSortColumn.Size;
 
-    /// <summary>Таблица отсортирована по статусу.</summary>
+    /// <summary>Sorted by status.</summary>
     public bool IsSortedByStatus => SortColumn == ResultsSortColumn.Status;
 
-    /// <summary>Отфильтрованное представление таблицы.</summary>
+    /// <summary>Filtered view of the table.</summary>
     public ICollectionView View { get; }
 
-    /// <summary>Все результаты без фильтрации.</summary>
+    /// <summary>All results, unfiltered.</summary>
     public IReadOnlyList<FileResultViewModel> All => _all;
 
-    /// <summary>Список форматов для выпадающего фильтра.</summary>
+    /// <summary>Formats offered by the filter drop-down.</summary>
     public ObservableCollection<string> Formats { get; }
 
-    /// <summary>Результаты проверки плейлистов.</summary>
+    /// <summary>Playlist check results.</summary>
     public ObservableCollection<PlaylistCheckResult> Playlists { get; } = [];
 
-    /// <summary>Подпись счётчика «Все» на пилюле-фильтре.</summary>
+    /// <summary>Counter caption on the "All" chip.</summary>
     public string TotalLabel => CoreFormat.Number(TotalCount);
 
-    /// <summary>Добавляет очередную порцию результатов.</summary>
+    /// <summary>Adds the next batch of results.</summary>
     /// <remarks>
-    /// Счётчики наращиваются по мере добавления: пересчитывать их обходом всего
-    /// списка на коллекции в сотни тысяч файлов слишком дорого.
+    /// Counters are incremented as rows arrive; recounting the whole list for
+    /// hundreds of thousands of files would be too slow.
     /// <para>
-    /// Оборачивать добавление в <c>DeferRefresh</c> нельзя: представление
-    /// запрещает менять коллекцию, пока обновление отложено, и бросает
-    /// исключение. Пакетность здесь обеспечивает сам движок — он отдаёт
-    /// результаты порциями, а не по одному.
+    /// <c>DeferRefresh</c> cannot be used here: the view forbids modifying the
+    /// collection while a refresh is deferred and throws. Batching comes from the
+    /// engine, which delivers results in chunks.
     /// </para>
     /// </remarks>
     public void AddRange(IReadOnlyList<FileCheckResult> batch)
@@ -189,7 +186,7 @@ public sealed partial class ResultsViewModel : ObservableObject
         RefreshFormats();
     }
 
-    /// <summary>Заменяет список плейлистов.</summary>
+    /// <summary>Replaces the playlist list.</summary>
     public void SetPlaylists(IReadOnlyList<PlaylistCheckResult> playlists)
     {
         Playlists.Clear();
@@ -202,7 +199,7 @@ public sealed partial class ResultsViewModel : ObservableObject
         PlaylistMissingCount = playlists.Sum(p => p.MissingCount);
     }
 
-    /// <summary>Очищает результаты перед новой проверкой.</summary>
+    /// <summary>Clears results before a new scan.</summary>
     public void Clear()
     {
         _all.Clear();
@@ -225,8 +222,8 @@ public sealed partial class ResultsViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Показывает единственный файл: снимает все фильтры и оставляет поиск
-    /// по его имени. Используется переходом «Показать» с вкладки «Проверка».
+    /// Shows a single file: clears every filter and searches by its name. Used by
+    /// the "Show" link on the scan tab.
     /// </summary>
     public void ShowSingle(string fileName)
     {
@@ -236,7 +233,7 @@ public sealed partial class ResultsViewModel : ObservableObject
         Selected = View.Cast<FileResultViewModel>().FirstOrDefault();
     }
 
-    /// <summary>Переключает фильтр по статусу (повторное нажатие снимает фильтр).</summary>
+    /// <summary>Toggles a status filter; pressing it again clears the filter.</summary>
     [RelayCommand]
     private void FilterByStatus(string? status)
     {
@@ -252,10 +249,10 @@ public sealed partial class ResultsViewModel : ObservableObject
         StatusFilter = StatusFilter == requested ? null : requested;
     }
 
-    /// <summary>В поиске что-то введено — можно показать кнопку очистки.</summary>
+    /// <summary>The search box has text, so the clear button is shown.</summary>
     public bool HasSearchText => SearchText.Length > 0;
 
-    /// <summary>Очищает строку поиска.</summary>
+    /// <summary>Clears the search box.</summary>
     [RelayCommand]
     private void ClearSearch() => SearchText = string.Empty;
 
@@ -277,19 +274,19 @@ public sealed partial class ResultsViewModel : ObservableObject
 
     partial void OnFormatFilterChanged(string value) => View.Refresh();
 
-    /// <summary>Пилюля «Все» активна.</summary>
+    /// <summary>The "All" chip is active.</summary>
     public bool IsAllSelected => StatusFilter is null;
 
-    /// <summary>Пилюля «В порядке» активна.</summary>
+    /// <summary>The "Ok" chip is active.</summary>
     public bool IsOkSelected => StatusFilter == CheckStatus.Ok;
 
-    /// <summary>Пилюля «Повреждено» активна.</summary>
+    /// <summary>The "Corrupted" chip is active.</summary>
     public bool IsCorruptedSelected => StatusFilter == CheckStatus.Corrupted;
 
-    /// <summary>Пилюля «Предупреждения» активна.</summary>
+    /// <summary>The "Warnings" chip is active.</summary>
     public bool IsWarningSelected => StatusFilter == CheckStatus.Warning;
 
-    /// <summary>Пилюля «Пропущено» активна.</summary>
+    /// <summary>The "Skipped" chip is active.</summary>
     public bool IsSkippedSelected => StatusFilter == CheckStatus.Skipped;
 
     private bool PassesFilter(object item)
@@ -331,26 +328,26 @@ public sealed partial class ResultsViewModel : ObservableObject
     }
 }
 
-/// <summary>Колонка сортировки таблицы результатов.</summary>
+/// <summary>Sort column of the results table.</summary>
 public enum ResultsSortColumn
 {
-    /// <summary>Имя файла.</summary>
+    /// <summary>File name.</summary>
     Name,
 
-    /// <summary>Папка.</summary>
+    /// <summary>Folder.</summary>
     Path,
 
-    /// <summary>Формат.</summary>
+    /// <summary>Format.</summary>
     Format,
 
-    /// <summary>Размер.</summary>
+    /// <summary>Size.</summary>
     Size,
 
-    /// <summary>Статус.</summary>
+    /// <summary>Status.</summary>
     Status,
 }
 
-/// <summary>Сравнение строк таблицы по выбранной колонке.</summary>
+/// <summary>Compares table rows by the selected column.</summary>
 internal sealed class ResultsComparer(ResultsSortColumn column, bool ascending) : IComparer
 {
     /// <inheritdoc />
@@ -370,8 +367,8 @@ internal sealed class ResultsComparer(ResultsSortColumn column, bool ascending) 
             _ => string.Compare(left.FileName, right.FileName, StringComparison.CurrentCultureIgnoreCase),
         };
 
-        // При равенстве добавляем имя вторым ключом: иначе строки с одинаковым
-        // форматом или статусом перескакивают с места на место при пересортировке.
+        // Break ties by name, or rows with equal format or status jump around on
+        // every re-sort.
         if (result == 0 && column != ResultsSortColumn.Name)
         {
             result = string.Compare(left.FileName, right.FileName, StringComparison.CurrentCultureIgnoreCase);

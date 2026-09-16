@@ -6,7 +6,7 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
-/// <summary>Вкладка «Отчёт»: KPI, распределение по статусам, папки, выбор формата.</summary>
+/// <summary>Report tab: KPIs, status breakdown, folders and format choice.</summary>
 public sealed partial class ReportViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -33,14 +33,14 @@ public sealed partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private ReportFormat _selectedFormat = ReportFormat.Html;
 
-    /// <summary>Папка, в которую ляжет отчёт по умолчанию.</summary>
+    /// <summary>Folder the report is saved to by default.</summary>
     [ObservableProperty]
     private string _targetFolder = string.Empty;
 
     [ObservableProperty]
     private bool _hasSummary;
 
-    // Доли для полосы распределения; в сумме дают ширину полосы.
+    // Shares for the distribution bar; together they make up its width.
     [ObservableProperty]
     private int _okShare;
 
@@ -65,28 +65,25 @@ public sealed partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string _skippedLabel = "0";
 
-    /// <summary>Проверенные папки: путь, файлов, повреждено.</summary>
+    /// <summary>Checked folders: path, file count, corrupted count.</summary>
     public ObservableCollection<FolderRow> Folders { get; } = [];
 
-    /// <summary>
-    /// Замечания по коллекции: пропуски в нумерации, разнобой форматов, повторы.
-    /// </summary>
+    /// <summary>Collection findings: numbering gaps, mixed formats, duplicates.</summary>
     /// <remarks>
-    /// Живут отдельно от списка результатов, потому что относятся к папке или к
-    /// паре файлов, а не к одному файлу.
+    /// Kept apart from the results list because they concern a folder or a pair of
+    /// files rather than a single file.
     /// </remarks>
     public ObservableCollection<CollectionFinding> Findings { get; } = [];
 
-    /// <summary>Замечания по коллекции есть — показывать карточку.</summary>
+    /// <summary>There are collection findings, so the card is shown.</summary>
     [ObservableProperty]
     private bool _hasFindings;
 
-    /// <summary>Подпись под списком замечаний.</summary>
+    /// <summary>Caption under the findings list.</summary>
     [ObservableProperty]
     private string _findingsNote = string.Empty;
 
-    /// <summary>Заполняет список замечаний по коллекции.</summary>
-    /// <param name="findings">Найденное разбором альбомов и поиском повторов.</param>
+    /// <summary>Fills the collection findings list.</summary>
     public void UpdateFindings(IReadOnlyList<CollectionFinding> findings)
     {
         ArgumentNullException.ThrowIfNull(findings);
@@ -105,11 +102,11 @@ public sealed partial class ReportViewModel : ObservableObject
             : string.Empty;
     }
 
-    /// <summary>Подпись под списком папок, если показаны не все.</summary>
+    /// <summary>Caption under the folder list when not every folder is shown.</summary>
     [ObservableProperty]
     private string _foldersNote = string.Empty;
 
-    /// <summary>Заполняет вкладку по итогам проверки.</summary>
+    /// <summary>Fills the tab from a finished scan.</summary>
     public void Update(ScanSummary summary)
     {
         ArgumentNullException.ThrowIfNull(summary);
@@ -131,7 +128,7 @@ public sealed partial class ReportViewModel : ObservableObject
         ElapsedNote = $"{summary.Parallelism} " +
                       CoreFormat.Plural(summary.Parallelism, "поток", "потока", "потоков");
 
-        // Доли передаются в разметку как звёздочные веса колонок полосы.
+        // Shares go to the markup as star weights of the bar columns.
         OkShare = counters.Ok;
         CorruptedShare = counters.Corrupted;
         WarningShare = counters.Warnings;
@@ -142,10 +139,9 @@ public sealed partial class ReportViewModel : ObservableObject
         WarningLabel = CoreFormat.Number(counters.Warnings);
         SkippedLabel = CoreFormat.Number(counters.Skipped);
 
-        // Список папок намеренно ограничен: на коллекции в сотни тысяч файлов
-        // папок бывают тысячи, и вся таблица в отчёте не нужна. Но обрезать
-        // молча нельзя — иначе цифра «в 1 148 папках» вверху не сходится
-        // с числом строк внизу.
+        // The folder list is capped on purpose: a collection of hundreds of
+        // thousands of files spans thousands of folders. The cut must be announced,
+        // though, or "in 1,148 folders" at the top would contradict the row count.
         const int folderLimit = 200;
 
         FoldersNote = summary.Folders.Count > folderLimit
@@ -166,7 +162,7 @@ public sealed partial class ReportViewModel : ObservableObject
         HasSummary = true;
     }
 
-    /// <summary>Сбрасывает вкладку перед новой проверкой.</summary>
+    /// <summary>Resets the tab before a new scan.</summary>
     public void Clear()
     {
         Folders.Clear();
@@ -179,9 +175,9 @@ public sealed partial class ReportViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Показывает путь относительно проверенной папки: общий префикс у всех строк
-    /// одинаков и только съедает место, а различает папки как раз хвост.
-    /// Полный путь остаётся во всплывающей подсказке.
+    /// Shows the path relative to the scanned folder: the shared prefix only takes
+    /// space, and it is the tail that tells folders apart. The full path stays in
+    /// the tooltip.
     /// </summary>
     private static string Relative(string path, string root)
     {
@@ -194,11 +190,10 @@ public sealed partial class ReportViewModel : ObservableObject
         return tail.Length == 0 ? "· корень выбранной папки" : @"\" + tail;
     }
 
-    /// <summary>Строка списка проверенных папок.</summary>
-    /// <param name="Path">Путь относительно проверенной папки — то, что видно в списке.</param>
-    /// <param name="FullPath">Полный путь для подсказки.</param>
-    /// <param name="Files">Сколько файлов, словами.</param>
-    /// <param name="Bad">Сколько повреждено.</param>
-    /// <param name="HasBad">Есть ли повреждённые — для подсветки.</param>
+    /// <summary>A row in the checked folders list.</summary>
+    /// <param name="Path">Path relative to the scanned folder, as displayed.</param>
+    /// <param name="FullPath">Full path for the tooltip.</param>
+    /// <param name="Files">File count in words.</param>
+    /// <param name="HasBad">Whether any file is corrupted, for highlighting.</param>
     public sealed record FolderRow(string Path, string FullPath, string Files, string Bad, bool HasBad);
 }
