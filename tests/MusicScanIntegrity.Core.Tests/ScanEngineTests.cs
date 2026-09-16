@@ -142,13 +142,22 @@ public sealed class ScanEngineTests
     {
         TaskCompletionSource started = new();
         int completed = 0;
+        int running = 0;
 
         ScriptedChecker checker = new(async (item, token) =>
         {
-            started.TrySetResult();
-            await Task.Delay(20, token);
-            Interlocked.Increment(ref completed);
-            return Ok(item);
+            Interlocked.Increment(ref running);
+            try
+            {
+                started.TrySetResult();
+                await Task.Delay(20, token);
+                Interlocked.Increment(ref completed);
+                return Ok(item);
+            }
+            finally
+            {
+                Interlocked.Decrement(ref running);
+            }
         });
 
         using ScanEngine engine = CreateEngine(checker);
@@ -160,13 +169,37 @@ public sealed class ScanEngineTests
 
         Assert.Equal(ScanState.Paused, engine.State);
 
-        // Files in flight must finish, and no new ones may be taken.
-        await Task.Delay(200);
+        // Files in flight must finish, and no new ones may be taken. Wait for the
+        // in-flight checks themselves rather than a fixed delay: a slow CI runner
+        // can take longer than any fixed guess.
+        // A worker may have taken a file just before the pause without having
+        // registered yet, so idleness has to hold for a while, not just once.
+        DateTime deadline = DateTime.UtcNow.AddSeconds(10);
+        DateTime idleSince = DateTime.MaxValue;
+        while (DateTime.UtcNow < deadline)
+        {
+            if (Volatile.Read(ref running) > 0)
+            {
+                idleSince = DateTime.MaxValue;
+            }
+            else if (idleSince == DateTime.MaxValue)
+            {
+                idleSince = DateTime.UtcNow;
+            }
+            else if (DateTime.UtcNow - idleSince > TimeSpan.FromMilliseconds(150))
+            {
+                break;
+            }
+
+            await Task.Delay(10);
+        }
+
+        Assert.Equal(0, Volatile.Read(ref running));
         int afterPause = Volatile.Read(ref completed);
         await Task.Delay(200);
 
         Assert.Equal(afterPause, Volatile.Read(ref completed));
-        Assert.True(afterPause > 0, "начатые проверки обязаны были завершиться");
+        Assert.True(afterPause > 0, "checks in flight must have completed");
 
         engine.Resume();
         Assert.Equal(ScanState.Running, engine.State);
