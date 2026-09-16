@@ -10,14 +10,14 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
-    <!-- Только Windows x64: зафиксировано в 01_SPECIFICATION.md, раздел 10. -->
+    <!-- Windows x64 only. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
 
-    <!-- Переносимая сборка без установщика: один каталог, который можно скопировать. -->
+    <!-- Self-contained folder: runs as a portable copy and is what the installer ships. -->
     <PublishSingleFile>false</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <!-- Тримминг отключён намеренно: WPF активно использует рефлексию XAML. -->
+    <!-- Trimming off on purpose: WPF relies heavily on XAML reflection. -->
     <PublishTrimmed>false</PublishTrimmed>
 
     <SatelliteResourceLanguages>ru;en</SatelliteResourceLanguages>
@@ -33,16 +33,16 @@
     <ProjectReference Include="..\MusicScanIntegrity.Core\MusicScanIntegrity.Core.csproj" />
   </ItemGroup>
 
-  <!-- Знак программы. Собирается из assets\icon.png скриптом tools\make-icon.ps1.
-       Файл один: Windows берёт из него значок программы, а окна — кадр нужного
-       размера через Controls\AppMark.cs. -->
+  <!-- Application mark, built from assets\icon.png by tools\make-icon.ps1.
+       Windows takes the program icon from it, and windows pick a frame of the
+       right size through Controls\AppMark.cs. -->
   <ItemGroup>
     <Resource Include="Assets\app.ico" />
   </ItemGroup>
 
-  <!-- Native-библиотеки BASS кладутся рядом с exe в подпапку bass\.
-       Их скачивает tools\fetch-bass.ps1 (в репозиторий они не коммитятся:
-       распространяются по лицензии un4seen, см. README). -->
+  <!-- Native BASS libraries go into bass\ next to the executable. They are
+       downloaded by tools\fetch-bass.ps1 and not committed, being distributed
+       under the un4seen licence. -->
   <ItemGroup>
     <None Include="..\..\native\bass\x64\**\*.dll"
           Condition="Exists('..\..\native\bass\x64')"
@@ -50,9 +50,8 @@
           CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!-- Лицензия требует прилагать её текст к двоичным сборкам, а условия BASS
-       нужно донести до того, кто скачал готовый архив: вкладываем оба файла
-       рядом с программой. -->
+  <!-- The licence must accompany binary distributions, and the BASS terms must
+       reach whoever downloads a build, so both files ship with the program. -->
   <ItemGroup>
     <None Include="..\..\LICENSE.txt;..\..\THIRD-PARTY-NOTICES.md"
           CopyToOutputDirectory="PreserveNewest" />

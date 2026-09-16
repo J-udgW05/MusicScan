@@ -10,16 +10,16 @@
 
     <Product>Music Scan Integrity</Product>
     <Company>Music Scan Integrity</Company>
-    <!-- Номер задаётся один раз: FileVersion и AssemblyVersion MSBuild
-         выводит из Version сам. Прописанные отдельно, они отставали от
-         релиза — в свойствах файла 1.5.2 значилось как 1.5.1. -->
+    <!-- Set once: MSBuild derives FileVersion and AssemblyVersion from
+         Version. Declared separately they drifted — release 1.5.2 showed
+         1.5.1 in the file properties. -->
     <Version>1.0.0</Version>
     <Copyright>© 2026 Music Scan Integrity</Copyright>
 
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
-    <!-- Программа только x64 (Windows 10/11 64-бит) — native BASS поставляется под x64. -->
+    <!-- x64 only (64-bit Windows 10/11); the native BASS build is x64. -->
     <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>

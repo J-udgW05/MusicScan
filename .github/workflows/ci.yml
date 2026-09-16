@@ -1,7 +1,7 @@
 name: Сборка и тесты
 
-# Проверяет каждый коммит в main и каждый pull request.
-# Сборка идёт на Windows: программа только под Windows и использует WPF.
+# Checks every commit to main and every pull request. Runs on Windows because
+# the application is Windows-only and uses WPF.
 on:
   push:
     branches: [main]
@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  # Новый коммит в ту же ветку отменяет предыдущую, ещё не доехавшую сборку.
+  # A new commit to the same branch cancels the build still in progress.
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
@@ -45,9 +45,8 @@ jobs:
       - name: Восстановить пакеты
         run: dotnet restore MusicScanIntegrity.sln
 
-      # Библиотеки BASS нужны только интеграционным тестам декодирования.
-      # Если сайт un4seen недоступен, сборку это ронять не должно: такие тесты
-      # сами пометятся пропущенными.
+      # BASS is only needed by the decoding integration tests. If un4seen is
+      # unreachable the build must not fail; those tests mark themselves skipped.
       - name: Скачать библиотеки BASS
         id: bass
         continue-on-error: true
@@ -63,9 +62,9 @@ jobs:
           --logger "trx;LogFileName=tests.trx"
           --results-directory artifacts/test-results
 
-      # Результаты тестов — удобство, а не условие успеха: если выгрузка не
-      # удалась (например, исчерпана квота хранилища), сборка из-за этого
-      # падать не должна. Сам итог тестов уже известен шагом выше.
+      # Test results are a convenience, not a success condition: a failed upload
+      # (e.g. storage quota exceeded) must not fail the build. The test outcome
+      # is already known from the previous step.
       - name: Сохранить результаты тестов
         if: always()
         continue-on-error: true
@@ -80,15 +79,14 @@ jobs:
         run: |
           Write-Host '::warning::Библиотеки BASS не скачались — интеграционные тесты декодирования пропущены.'
 
-      # Переносимая сборка весит ~65 МБ, и раньше она откладывалась на каждый
-      # коммит в main. Бесплатного хранилища Actions — 0,5 ГБ на весь аккаунт,
-      # так что за две недели хранения накапливалось 2,9 ГБ: пятикратный
-      # перебор квоты ради файлов, которые никто не скачивал.
+      # The portable build is ~65 MB and used to be uploaded on every commit to
+      # main. Free Actions storage is 0.5 GB per account, so two weeks of
+      # retention piled up 2.9 GB — five times the quota for files nobody
+      # downloaded.
       #
-      # Та же самая сборка публикуется как файл выпуска в release.yml, а файлы
-      # выпусков в это хранилище не считаются вообще. Поэтому здесь она
-      # собирается только по ручному запуску — когда сборка между выпусками
-      # действительно нужна, — и живёт сутки.
+      # release.yml publishes the same build as a release asset, which does not
+      # count toward that storage. Here it is built only on manual runs, when a
+      # build between releases is actually needed, and kept for one day.
       - name: Собрать переносимую версию
         if: github.event_name == 'workflow_dispatch'
         run: >

@@ -6,8 +6,8 @@
     <AssemblyName>MusicScanIntegrity.Core</AssemblyName>
     <UseWindowsForms>false</UseWindowsForms>
     <UseWPF>false</UseWPF>
-    <!-- Ядро не зависит от WPF: его целиком можно покрыть модульными тестами.
-         TFM windows нужен только для Restart Manager (P/Invoke в RstrtMgr.dll). -->
+    <!-- The core has no WPF dependency so it can be fully unit tested. The
+         Windows TFM is only needed for Restart Manager (P/Invoke into RstrtMgr.dll). -->
   </PropertyGroup>
 
   <ItemGroup>

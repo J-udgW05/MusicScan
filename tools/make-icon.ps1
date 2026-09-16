@@ -1,51 +1,47 @@
 ﻿<#
-    Собирает иконку программы из рисунка assets\icon.png.
+    Builds the application icon from assets\icon.png.
 
-    Что делает:
-      * находит границы рисунка и вписывает его в квадрат с полями —
-        у Windows значок не должен упираться в края;
-      * уменьшает до всех размеров, которые Windows берёт из .ico
-        (16…256), усредняя площадь в линейном свете и возвращая
-        краям резкость нерезкой маской;
-      * складывает многоразмерный .ico: кадры до 128 — как BMP,
-        256 — как PNG (так их читают и Windows, и проводник).
+    Steps:
+      * finds the artwork bounds and fits it into a square with margins;
+      * downscales to every size Windows takes from an .ico (16…256) by area
+        averaging in linear light, restoring edge definition with an unsharp
+        mask;
+      * writes a multi-size .ico: frames up to 128 as BMP, 256 as PNG, which is
+        what both Windows and Explorer read.
 
-    Отдельных PNG для показа внутри программы больше нет: окна берут
-    кадр нужного размера из того же .ico, см. Controls\AppMark.cs.
+    There are no separate PNGs for in-app display: windows take a frame of the
+    right size from the same .ico, see Controls\AppMark.cs.
 
-    Скрипт лежит в репозитории, чтобы иконку можно было пересобрать
-    из исходного рисунка, а не хранить непрозрачный бинарник.
+    Kept in the repository so the icon can be rebuilt from source artwork
+    rather than stored as an opaque binary.
 #>
 [CmdletBinding()]
 param(
     [string]$Source = (Join-Path $PSScriptRoot '..\assets\icon.png'),
     [string]$IcoPath = (Join-Path $PSScriptRoot '..\src\MusicScanIntegrity.App\Assets\app.ico'),
 
-    # Доля поля с каждой стороны.
+    # Margin share on each side.
     #
-    # Windows 11 отводит значкам поля, но это правило про значки-глифы: рисунок
-    # без подложки должен дышать. Наш знак — плашка со скруглёнными углами, она
-    # сама себе рамка и по замыслу занимает всю плитку, как у любой программы
-    # с таким значком. С шестью процентами он выходил заметно мельче соседей по
-    # панели задач, а рисунку доставалось на пару точек меньше — и на 24 точках
-    # это видно. Оставлены два процента: только чтобы тень не упиралась в край.
+    # Windows 11 margins are meant for glyph icons that need room to breathe.
+    # This mark is a rounded plate that frames itself and fills the tile. At six
+    # percent it looked visibly smaller than its taskbar neighbours and lost a
+    # couple of pixels at 24 px. Two percent keeps the shadow off the edge.
     [double]$Margin = 0.02
 )
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
-# Уменьшение вынесено в C#: на 512x512 точек цикл PowerShell считался бы
-# минутами, и всё равно пришлось бы читать байты через LockBits.
+# Downscaling is done in C#: a PowerShell loop over 512x512 pixels would take
+# minutes and still need LockBits.
 Add-Type -ReferencedAssemblies System.Drawing.Common, System.Drawing.Primitives @'
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
 public static class IconMath {
-    // Перевод sRGB <-> линейный свет. Усреднять яркости нужно именно в
-    // линейном: тонкая белая линия, попавшая на четверть точки, иначе
-    // темнеет вдвое сильнее, чем темнеет на самом деле.
+    // sRGB <-> linear light. Averaging must happen in linear light, or a thin
+    // white line covering a quarter pixel darkens twice as much as it should.
     static readonly float[] ToLinear = new float[256];
 
     static IconMath() {
@@ -73,10 +69,10 @@ public static class IconMath {
     }
 
     /// <summary>
-    /// Усредняет площадь исходной области на каждую точку кадра. Цвет
-    /// берётся с весом непрозрачности, иначе прозрачные точки подмешивают
-    /// в кромку свой цвет. Область растягивается до квадрата: рамка
-    /// задумана квадратной, а кадр рисунка чуть шире, чем выше.
+    /// Area-averages the source region for each target pixel. Colour is
+    /// alpha-weighted so transparent pixels do not bleed into the edge. The
+    /// region is stretched to a square: the frame is square while the artwork
+    /// is slightly wider than tall.
     /// </summary>
     public static Bitmap Area(Bitmap src, RectangleF from, int size, int inset) {
         int stride;
@@ -133,8 +129,8 @@ public static class IconMath {
     }
 
     /// <summary>
-    /// Нерезкая маска: возвращает краям определённость, потерянную при
-    /// усреднении. Считается в линейном свете — там же, где усреднение.
+    /// Unsharp mask restoring edge definition lost to averaging; applied in
+    /// linear light, like the averaging.
     /// </summary>
     public static void Sharpen(Bitmap bmp, float amount) {
         if (amount <= 0) return;
@@ -173,8 +169,8 @@ public static class IconMath {
 }
 '@
 
-# Размеры, которые Windows выбирает из .ico: список и мелких (панель задач,
-# заголовок окна), и крупных (крупные значки проводника).
+# Sizes Windows picks from an .ico: small ones (taskbar, title bar) and large
+# ones (Explorer large icons).
 $icoSizes = 16, 20, 24, 32, 40, 48, 64, 96, 128, 256
 
 function Get-ContentBounds {
@@ -191,7 +187,7 @@ function Get-ContentBounds {
         for ($y = 0; $y -lt $Bitmap.Height; $y++) {
             $row = $y * $data.Stride
             for ($x = 0; $x -lt $Bitmap.Width; $x++) {
-                # Полупрозрачную кромку сглаживания в границы не берём.
+                # The semi-transparent anti-aliased fringe does not count toward bounds.
                 if ($bytes[$row + ($x * 4) + 3] -le 8) { continue }
                 if ($x -lt $minX) { $minX = $x }
                 if ($y -lt $minY) { $minY = $y }
@@ -219,10 +215,9 @@ function New-Canvas {
 
 function New-Frame {
     <#
-        Собирает один кадр: усредняет рисунок в квадрат с полями и
-        подсказывает краям, где они. Резкость тем сильнее, чем мельче
-        кадр: на 16 точках линия рисунка тоньше самой точки, и без
-        подсказки от неё остаётся серая размазня.
+        Renders one frame: averages the artwork into a square with margins and
+        sharpens the edges. Smaller frames get more sharpening: at 16 px a stroke
+        is thinner than a pixel and would otherwise become a grey smear.
     #>
     param([System.Drawing.Bitmap]$Bitmap, [System.Drawing.RectangleF]$Bounds, [int]$Size)
 
@@ -261,9 +256,9 @@ function Get-BgraBytes {
 
 function Get-DibFrame {
     <#
-        Кадр .ico в виде BMP: заголовок, точки снизу вверх и маска
-        прозрачности. Маска для 32-битных кадров не используется, но
-        обязана присутствовать — без неё файл читают не все программы.
+        An .ico frame as BMP: header, bottom-up pixels and the transparency
+        mask. The mask is unused for 32-bit frames but must be present, or some
+        programs cannot read the file.
     #>
     param([System.Drawing.Bitmap]$Bitmap)
 
@@ -276,12 +271,12 @@ function Get-DibFrame {
     try {
         $maskStride = [Math]::Floor((($w + 31) / 32)) * 4
 
-        $writer.Write([uint32]40)          # размер заголовка
+        $writer.Write([uint32]40)          # header size
         $writer.Write([int32]$w)
-        $writer.Write([int32]($h * 2))     # высота с маской
-        $writer.Write([uint16]1)           # плоскости
-        $writer.Write([uint16]32)          # бит на точку
-        $writer.Write([uint32]0)           # без сжатия
+        $writer.Write([int32]($h * 2))     # height including mask
+        $writer.Write([uint16]1)           # planes
+        $writer.Write([uint16]32)          # bits per pixel
+        $writer.Write([uint32]0)           # no compression
         $writer.Write([uint32](($w * $h * 4) + ($maskStride * $h)))
         $writer.Write([int32]0); $writer.Write([int32]0)
         $writer.Write([uint32]0); $writer.Write([uint32]0)
@@ -315,7 +310,7 @@ function Get-PngFrame {
     }
 }
 
-# ── Сборка ─────────────────────────────────────────────────────────────
+# ── Build ──────────────────────────────────────────────────────────────
 $Source = (Resolve-Path $Source).Path
 Write-Host "исходный рисунок: $Source"
 
@@ -324,8 +319,8 @@ try {
     $box = Get-ContentBounds -Bitmap $master
     Write-Host ("границы рисунка: {0},{1} {2}x{3}" -f $box.X, $box.Y, $box.Width, $box.Height)
 
-    # Каждый кадр считается прямо из исходного рисунка. Промежуточной
-    # картинки нет намеренно: лишний пересчёт только размывает.
+    # Every frame is computed straight from the source artwork; an intermediate
+    # image would only add blur.
     $bounds = New-Object System.Drawing.RectangleF $box.X, $box.Y, $box.Width, $box.Height
 
     $frames = @()
@@ -345,18 +340,18 @@ try {
     $stream = [System.IO.File]::Create($IcoPath)
     $writer = New-Object System.IO.BinaryWriter($stream)
     try {
-        $writer.Write([uint16]0)                # зарезервировано
-        $writer.Write([uint16]1)                # тип: значок
+        $writer.Write([uint16]0)                # reserved
+        $writer.Write([uint16]1)                # type: icon
         $writer.Write([uint16]$frames.Count)
 
         $offset = 6 + (16 * $frames.Count)
         foreach ($frame in $frames) {
             $writer.Write([byte]($(if ($frame.Size -ge 256) { 0 } else { $frame.Size })))
             $writer.Write([byte]($(if ($frame.Size -ge 256) { 0 } else { $frame.Size })))
-            $writer.Write([byte]0)              # цветов в палитре: нет
-            $writer.Write([byte]0)              # зарезервировано
-            $writer.Write([uint16]1)            # плоскости
-            $writer.Write([uint16]32)           # бит на точку
+            $writer.Write([byte]0)              # palette colours: none
+            $writer.Write([byte]0)              # reserved
+            $writer.Write([uint16]1)            # planes
+            $writer.Write([uint16]32)           # bits per pixel
             $writer.Write([uint32]$frame.Data.Length)
             $writer.Write([uint32]$offset)
             $offset += $frame.Data.Length

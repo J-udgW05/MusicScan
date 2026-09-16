@@ -1,21 +1,21 @@
 <#
 .SYNOPSIS
-    Скачивает 64-битные библиотеки BASS и плагины форматов в native\bass\x64.
+    Downloads the 64-bit BASS library and format plug-ins into native\bass\x64.
 
 .DESCRIPTION
-    BASS распространяется un4seen developments (www.un4seen.com) и в репозиторий
-    программы не коммитится: у неё своя лицензия (бесплатна для некоммерческого
-    использования, для коммерческого нужна лицензия un4seen). Скрипт скачивает
-    официальные архивы, достаёт из них только 64-битные DLL и складывает рядом,
-    откуда сборка копирует их в подпапку bass\ возле исполняемого файла.
+    BASS is distributed by un4seen developments (www.un4seen.com) under its own
+    licence (free for non-commercial use) and is not committed to this
+    repository. The script downloads the official archives, extracts only the
+    64-bit DLLs and places them where the build copies them into bass\ next to
+    the executable.
 
-    Запускать один раз перед первой сборкой. Нужен интернет.
+    Run once before the first build. Requires internet access.
 
 .PARAMETER OutputPath
-    Куда положить библиотеки. По умолчанию native\bass\x64 в корне репозитория.
+    Destination folder. Defaults to native\bass\x64 in the repository root.
 
 .PARAMETER Force
-    Перекачать даже то, что уже скачано.
+    Download again even if already present.
 
 .EXAMPLE
     pwsh tools\fetch-bass.ps1
@@ -28,9 +28,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# Состав: сама библиотека и плагины под форматы из 01_SPECIFICATION.md, раздел 4.
-# WAV, AIFF, MP3, OGG, MOD/XM/IT/S3M и MIDI-контейнер BASS понимает сама;
-# остальным форматам нужны плагины.
+# The library plus plug-ins for the supported formats. BASS itself handles WAV,
+# AIFF, MP3, OGG, MOD/XM/IT/S3M and the MIDI container; the rest need plug-ins.
 $packages = @(
     @{ Name = 'bass';      Url = 'https://www.un4seen.com/files/bass24.zip';       Dll = 'bass.dll';      Inner = 'x64/bass.dll';         Note = 'ядро: WAV, AIFF, MP3, OGG, MP2' }
     @{ Name = 'bassflac';  Url = 'https://www.un4seen.com/files/bassflac24.zip';   Dll = 'bassflac.dll';  Inner = 'x64/bassflac.dll';     Note = 'FLAC' }
@@ -42,8 +41,8 @@ $packages = @(
     @{ Name = 'basswma';   Url = 'https://www.un4seen.com/files/basswma24.zip';    Dll = 'basswma.dll';   Inner = 'x64/basswma.dll';      Note = 'WMA' }
     @{ Name = 'bassdsd';   Url = 'https://www.un4seen.com/files/bassdsd24.zip';    Dll = 'bassdsd.dll';   Inner = 'x64/bassdsd.dll';      Note = 'DSD: DSF, DFF' }
     @{ Name = 'bassmidi';  Url = 'https://www.un4seen.com/files/bassmidi24.zip';   Dll = 'bassmidi.dll';  Inner = 'x64/bassmidi.dll';     Note = 'MIDI' }
-    # Не входят в обязательный список форматов, но делают рабочим пример
-    # «свои расширения» из настроек (.mpc, .tta).
+    # Not in the core format list, but they make the custom extensions example
+    # in settings (.mpc, .tta) actually work.
     @{ Name = 'bass_mpc';  Url = 'https://www.un4seen.com/files/z/2/bass_mpc24.zip'; Dll = 'bass_mpc.dll'; Inner = 'x64/bass_mpc.dll';   Note = 'Musepack (.mpc)' }
     @{ Name = 'bass_tta';  Url = 'https://www.un4seen.com/files/z/2/bass_tta24.zip'; Dll = 'bass_tta.dll'; Inner = 'x64/bass_tta.dll';   Note = 'True Audio (.tta)' }
 )
@@ -76,7 +75,7 @@ try {
 
             Expand-Archive -Path $archive -DestinationPath $extract -Force
 
-            # В архивах un4seen 64-битная версия лежит в подпапке x64.
+            # un4seen archives keep the 64-bit build in an x64 subfolder.
             $source = Get-ChildItem -Path $extract -Filter $package.Dll -Recurse |
                 Where-Object { $_.FullName -match '\\x64\\' } |
                 Select-Object -First 1

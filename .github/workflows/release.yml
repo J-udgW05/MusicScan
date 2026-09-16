@@ -1,6 +1,6 @@
 ﻿name: Релиз
 
-# Релиз выпускается по тегу вида v1.2.3 либо вручную с указанием версии.
+# Releases are published on a v1.2.3-style tag or manually with a version.
 #   git tag v1.0.0 && git push origin v1.0.0
 on:
   push:
@@ -57,8 +57,8 @@ jobs:
       - name: Восстановить пакеты
         run: dotnet restore MusicScanIntegrity.sln
 
-      # Для релиза библиотеки BASS обязательны: без них программа не проверит
-      # ни одного файла, и выкладывать такую сборку нельзя.
+      # BASS is mandatory for a release: without it the application cannot check
+      # a single file.
       - name: Скачать библиотеки BASS
         run: pwsh tools/fetch-bass.ps1
 
@@ -83,7 +83,7 @@ jobs:
             -p:Version=${{ steps.version.outputs.version }} `
             -o artifacts/publish --nologo
 
-          # Отладочные символы в переносимой сборке ни к чему.
+          # Debug symbols have no place in the portable build.
           Get-ChildItem artifacts/publish -Filter *.pdb -Recurse | Remove-Item -Force
 
       - name: Проверить состав сборки
@@ -108,15 +108,14 @@ jobs:
         id: package
         shell: pwsh
         run: |
-          # Имя архива — по имени самой программы, как её видно в системе.
+          # Archive named after the program as it appears in the system.
           $name = "Music_Scan_Integrity-${{ steps.version.outputs.version }}-win-x64"
           $zip = "artifacts/$name.zip"
 
           Compress-Archive -Path 'artifacts/publish/*' -DestinationPath $zip -CompressionLevel Optimal
 
-          # Сумму считаем только для журнала сборки: рядом с каждым файлом
-          # выпуска GitHub показывает свою, и отдельный файл с ней дублировал
-          # бы то, что и так на виду.
+          # Checksum for the build log only: GitHub shows one next to every
+          # release asset, so a separate file would duplicate it.
           $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
 
           "zip=$zip"     >> $env:GITHUB_OUTPUT
@@ -129,8 +128,8 @@ jobs:
         id: setup
         shell: pwsh
         run: |
-          # На образе windows-latest Inno Setup обычно уже стоит; если нет —
-          # ставим. Проверять наличие дешевле, чем ставить каждый раз.
+          # windows-latest usually ships Inno Setup; install it only if missing,
+          # which is cheaper than installing every time.
           $iscc = Get-ChildItem 'C:\Program Files (x86)\Inno Setup*', 'C:\Program Files\Inno Setup*' `
               -Filter 'ISCC.exe' -Recurse -ErrorAction SilentlyContinue |
               Select-Object -First 1 -ExpandProperty FullName
@@ -207,7 +206,7 @@ jobs:
         run: |
           $tag = '${{ steps.version.outputs.tag }}'
 
-          # Ручной запуск может идти без тега — создаём его на текущем коммите.
+          # A manual run may have no tag yet; create it on the current commit.
           if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
               git tag $tag
               git push origin $tag
@@ -218,8 +217,8 @@ jobs:
               '${{ steps.package.outputs.zip }}'
           )
 
-          # Выпуск под этим тегом мог быть создан заранее — например руками.
-          # Тогда файлы докладываются в него, а не создаётся второй.
+          # A release for this tag may already exist, e.g. created by hand. Upload
+          # the assets into it instead of creating a second one.
           gh release view $tag *> $null
           $exists = $LASTEXITCODE -eq 0
 

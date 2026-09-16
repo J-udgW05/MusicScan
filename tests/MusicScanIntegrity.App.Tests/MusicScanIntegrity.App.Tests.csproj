@@ -6,12 +6,12 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
 
-    <!-- WPF нужен по существу: здесь проверяется поведение свойств зависимостей
-         и анимаций, а его без самого WPF не воспроизвести. -->
+    <!-- WPF is essential here: these tests exercise dependency property and
+         animation behaviour that cannot be reproduced without it. -->
     <UseWPF>true</UseWPF>
 
-    <!-- Приложение собирается только под win-x64 и самодостаточным; тесты
-         ссылаются на него, поэтому платформа должна совпадать. -->
+    <!-- The app builds only as self-contained win-x64; the tests reference it,
+         so the platform must match. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
   </PropertyGroup>
@@ -26,10 +26,9 @@
     <ProjectReference Include="..\..\src\MusicScanIntegrity.App\MusicScanIntegrity.App.csproj" />
   </ItemGroup>
 
-  <!-- Словари токенов берутся из исходников как есть: проверять надо тот же
-       файл, который попадает в программу, а не его пересказ. Разобрать его
-       из ресурсов сборки нельзя — адреса pack:// требуют живого Application,
-       которого в тестах нет. -->
+  <!-- Token dictionaries are copied from source as-is, so tests check the exact
+       file the app ships. Loading them from assembly resources is impossible:
+       pack:// URIs need a live Application, which tests do not have. -->
   <ItemGroup>
     <Content Include="..\..\src\MusicScanIntegrity.App\Resources\Tokens.*.xaml"
              Link="Tokens\%(Filename)%(Extension)"

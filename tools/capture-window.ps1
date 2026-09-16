@@ -1,11 +1,10 @@
 ﻿<#
 .SYNOPSIS
-    Снимает окно программы в PNG — для проверки интерфейса при разработке.
+    Captures the application window to PNG for UI checks during development.
 
 .DESCRIPTION
-    Запускает собранное приложение (или подключается к уже запущенному),
-    ждёт появления главного окна и сохраняет его снимок через PrintWindow.
-    Скрипт вспомогательный: в работе программы не участвует.
+    Starts the built application (or attaches to a running one), waits for the
+    main window and saves a snapshot through PrintWindow. Development aid only.
 
 .EXAMPLE
     pwsh tools\capture-window.ps1 -Output shot.png
@@ -70,7 +69,7 @@ if ($width -le 0 -or $height -le 0) { throw 'Не удалось определ�
 $bitmap = New-Object System.Drawing.Bitmap($width, $height)
 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 $hdc = $graphics.GetHdc()
-# Флаг 2 = PW_RENDERFULLCONTENT: без него окна с аппаратным ускорением выходят чёрными.
+# Flag 2 = PW_RENDERFULLCONTENT; without it hardware-accelerated windows come out black.
 [Win]::PrintWindow($handle, $hdc, 2) | Out-Null
 $graphics.ReleaseHdc($hdc)
 $graphics.Dispose()

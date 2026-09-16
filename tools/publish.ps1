@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Собирает переносимую версию программы в artifacts\publish.
+    Builds the portable version of the application into artifacts\publish.
 
 .DESCRIPTION
-    Публикует self-contained сборку под win-x64: .NET на компьютере пользователя
-    не нужен, всё лежит внутри папки. Установщика нет — папку достаточно скопировать.
-    Библиотеки BASS должны быть скачаны заранее (tools\fetch-bass.ps1).
+    Publishes a self-contained win-x64 build: no .NET needed on the target
+    machine, everything is inside the folder. tools\make-setup.ps1 wraps it into
+    an installer. BASS must be downloaded first (tools\fetch-bass.ps1).
 
 .EXAMPLE
     pwsh tools\publish.ps1
@@ -56,7 +56,7 @@ if ($LASTEXITCODE -ne 0) {
     throw 'Публикация не удалась.'
 }
 
-# Отладочные символы в переносимой сборке ни к чему.
+# Debug symbols have no place in the portable build.
 Get-ChildItem $OutputPath -Filter *.pdb -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
 
 $size = (Get-ChildItem $OutputPath -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1MB

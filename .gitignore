@@ -62,17 +62,16 @@ appsettings.*.Local.json
 secrets.json
 
 
-## Native-библиотеки BASS: распространяются по лицензии un4seen,
-## подтягиваются скриптом tools/fetch-bass.ps1
+## Native BASS libraries: distributed under the un4seen licence,
+## downloaded by tools/fetch-bass.ps1
 native/bass/
 
-## Служебное внутри папки с референсами: превью дизайн-редактора и его копии
-## документов ТЗ (сами документы лежат в docs/)
+## Design reference folder internals: editor thumbnails and uploaded copies
 Референсы и дизайн/.thumbnail
 Референсы и дизайн/uploads/
 
-## Снимки экрана и отчёты, сделанные при разработке
+## Screenshots and reports produced during development
 artifacts/
 
-## Настройки инструментов разработки (не относятся к программе)
+## Development tool settings, unrelated to the application
 .claude/

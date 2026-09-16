@@ -17,8 +17,8 @@
     <ProjectReference Include="..\..\src\MusicScanIntegrity.Core\MusicScanIntegrity.Core.csproj" />
   </ItemGroup>
 
-  <!-- Native-библиотеки BASS нужны интеграционным тестам декодирования.
-       Если их не скачали скриптом tools/fetch-bass.ps1, такие тесты пропускаются. -->
+  <!-- Native BASS libraries for the decoding integration tests; those tests are
+       skipped when tools/fetch-bass.ps1 has not been run. -->
   <ItemGroup>
     <None Include="..\..\native\bass\x64\**\*.dll"
           Condition="Exists('..\..\native\bass\x64')"

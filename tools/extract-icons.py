@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-Извлекает иконки из референсов и генерирует XAML-словарь геометрий для WPF
+Extracts icons from the design references and generates the WPF geometry dictionary
 (src/MusicScanIntegrity.App/Resources/Icons.xaml).
 
-Источников два:
+Two sources:
 
-* `Icons.dc.html` — набор иконок целиком. Все они контурные (stroke),
-  viewBox 0 0 20 20. В WPF удобнее хранить одну строку Path.Data на иконку,
-  поэтому <circle> и <rect> переводятся в эквивалентные дуговые сегменты,
-  а <path d="..."> берётся как есть: мини-язык путей WPF совместим с SVG.
-* `MusicScan.dc.html` — макет самой программы. В нём статусы внутри
-  цветного квадрата 20×20 и внутри плашек-фильтров нарисованы БЕЗ кружка:
-  на 13–14 px кружок только замыливает знак. Эти четыре «голых» знака
-  выносятся отдельными иконками `mark-*`, чтобы не рисовать их руками.
+* `Icons.dc.html` — the full icon set. All stroked, viewBox 0 0 20 20. WPF
+  prefers one Path.Data string per icon, so <circle> and <rect> become
+  equivalent arc segments and <path d="..."> is taken as is: WPF path markup
+  is compatible with SVG.
+* `MusicScan.dc.html` — the application mock-up. Statuses inside the 20×20
+  coloured square and the filter chips are drawn WITHOUT the ring, which only
+  blurs the glyph at 13–14 px. These four bare glyphs are emitted as separate
+  `mark-*` icons so they are never hand-drawn.
 
-Источники — рабочие файлы дизайна, в репозиторий не входят (полноразмерный
-макет и служебная разметка, не нужные для сборки программы). Иконки уже
-сгенерированы и лежат в Icons.xaml; скрипт нужен только при обновлении
-дизайна — источники кладутся в `Референсы и дизайн/` рядом с этим файлом.
+The sources are working design files and are not committed. Icons.xaml is
+already generated; this script is only needed when the design changes — put
+the sources into `Референсы и дизайн/` at the repository root.
 
-Запуск:  python tools/extract-icons.py
+Usage:  python tools/extract-icons.py
 """
 from __future__ import annotations
 
@@ -41,7 +40,7 @@ def num(value: float) -> str:
 
 
 def circle_to_path(cx: float, cy: float, r: float) -> str:
-    # Две полудуги — замкнутая окружность одной фигурой.
+    # Two half arcs make a closed circle in a single figure.
     return (f"M{num(cx - r)},{num(cy)}"
             f"A{num(r)},{num(r)} 0 0 1 {num(cx + r)},{num(cy)}"
             f"A{num(r)},{num(r)} 0 0 1 {num(cx - r)},{num(cy)}Z")
@@ -84,21 +83,21 @@ def svg_to_geometry(svg_inner: str) -> str:
 
 
 def reset_origin(d: str) -> str:
-    """Возвращает отсчёт к началу координат перед относительным путём.
+    """Resets the current point to the origin before a relative path.
 
-    В SVG каждый <path> отсчитывается от (0,0), но в Path.Data все пути идут
-    одной строкой, и относительная команда «m» считалась бы от конца предыдущего
-    пути — части иконки уезжали бы в сторону. Явный «M0,0» ставит текущую точку
-    в начало координат; пустая фигура при этом ничего не рисует.
+    In SVG every <path> starts from (0,0), but Path.Data joins all paths into one
+    string, so a relative "m" would continue from the previous path's end and
+    shift parts of the icon. An explicit "M0,0" resets the current point; the
+    empty figure draws nothing.
     """
     return "M0,0 " + d if d[:1].islower() else d
 
 
-# Карточка иконки в референсе: <svg>...</svg>, следом имя и подпись.
-# Имя лежит либо сразу после svg (сетка в 6 колонок), либо внутри соседней
-# <div>-обёртки (блок статусов) — отсюда необязательная группа обёртки.
-# Группа inner намеренно не пускает внутрь себя вложенные <svg>: иначе
-# нежадный поиск склеивает несколько соседних иконок в одну.
+# An icon card in the reference: <svg>...</svg> followed by name and caption.
+# The name follows the svg directly (six-column grid) or sits inside a wrapper
+# <div> (status block), hence the optional wrapper group. The inner group
+# refuses nested <svg> on purpose; otherwise the lazy match merges adjacent
+# icons into one.
 CARD_RE = re.compile(
     r"<svg\b(?P<svgattrs>[^>]*)>(?P<inner>(?:(?!</?svg\b).)*?)</svg>"
     r"(?:\s*<div[^>]*>)?\s*"
@@ -107,7 +106,7 @@ CARD_RE = re.compile(
     re.DOTALL)
 
 
-# Голые знаки статуса из макета программы: `const D = { ok: "...", ... }`.
+# Bare status glyphs from the mock-up: `const D = { ok: "...", ... }`.
 MARKS_RE = re.compile(r"const D = \{(?P<body>.*?)\};", re.DOTALL)
 MARK_RE = re.compile(r'(?P<key>[a-z]+):\s*"(?P<d>[^"]+)"')
 MARK_NAMES = {"ok": "mark-ok", "err": "mark-broken",
@@ -119,7 +118,7 @@ MARK_TITLES = {"ok": "В порядке, знак без кружка",
 
 
 def read_marks() -> dict[str, tuple[str, str, bool]]:
-    """Четыре знака статуса, какими их рисует макет программы."""
+    """The four status glyphs as drawn in the application mock-up."""
     if not LAYOUT.exists():
         print(f"Не найден макет: {LAYOUT}", file=sys.stderr)
         return {}

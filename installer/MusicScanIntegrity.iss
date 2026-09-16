@@ -1,8 +1,8 @@
-; Установщик Music Scan Integrity (Inno Setup 6+).
+; Music Scan Integrity installer (Inno Setup 6+).
 ;
-; Собирается из уже готовой переносимой сборки: сначала tools\publish.ps1
-; кладёт всё в artifacts\publish, потом этот сценарий заворачивает её в setup.
-; Так установленная и переносимая версии — заведомо одни и те же файлы.
+; Built from the finished portable build: tools\publish.ps1 fills
+; artifacts\publish, then this script wraps it. The installed and portable
+; versions are therefore the same files.
 ;
 ;   iscc /DAppVersion=1.2.3 installer\MusicScanIntegrity.iss
 
@@ -19,8 +19,8 @@
 #define LicensePath    SourceRoot + "LICENSE.txt"
 
 [Setup]
-; Один и тот же код на все версии: по нему установщик находит прежнюю
-; установку и обновляет её, а не плодит вторую копию рядом.
+; The same AppId for every version, so setup finds and upgrades an existing
+; installation instead of adding a second copy.
 AppId={{7A3F2C48-9E51-4B6D-8C0A-2F4D6B1E9C73}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -31,20 +31,20 @@ AppSupportURL={#AppUrl}/issues
 AppUpdatesURL={#AppUrl}/releases
 VersionInfoVersion={#AppVersion}
 
-; Программа только 64-битная — на 32-битной Windows её ставить нечем.
+; 64-bit only; there is nothing to install on 32-bit Windows.
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 
-; Ставится в Program Files, а туда пишет только администратор.
+; Installs into Program Files, which only an administrator can write to.
 PrivilegesRequired=admin
 DefaultDirName={autopf}\{#AppName}
 DisableProgramGroupPage=yes
 DefaultGroupName={#AppName}
 
-; Страница соглашения появляется, только если файл лицензии на месте. Отметка
-; в журнале сборки нужна затем, что молча пропущенная страница выглядит ровно
-; так же, как её отсутствие: сборка проходит, а шага в мастере нет.
+; The licence page appears only if the licence file exists. The build log note
+; makes a silently missing page visible: otherwise the build passes and the
+; wizard step is simply gone.
 #if FileExists(LicensePath)
   #pragma message "Лицензия найдена, страница соглашения включена: " + LicensePath
 LicenseFile={#LicensePath}
@@ -63,8 +63,8 @@ SolidCompression=yes
 WizardStyle=modern
 ShowLanguageDialog=yes
 
-; Если программа запущена, установщик предложит её закрыть, а не упрётся
-; в занятые файлы.
+; If the application is running, setup offers to close it rather than failing
+; on locked files.
 CloseApplications=yes
 RestartApplications=no
 
@@ -83,7 +83,7 @@ russian.LaunchAfterInstall=Запустить {#AppName}
 english.LaunchAfterInstall=Launch {#AppName}
 
 [Files]
-; Вся переносимая сборка как есть: exe, библиотеки .NET и BASS, ресурсы.
+; The entire portable build as is: exe, .NET and BASS libraries, resources.
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
@@ -94,8 +94,8 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchAfterInstall}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
-; Настройки и база истории установленной программы лежат в профиле
-; пользователя и удаляются вместе с ней. Папки рядом с программой пусты:
-; в Program Files она писать не может и туда ничего не кладёт.
+; Remove config and data folders next to the program on uninstall. An installed
+; copy normally keeps them in the user profile, since it cannot write to
+; Program Files.
 Type: filesandordirs; Name: "{app}\config"
 Type: filesandordirs; Name: "{app}\data"

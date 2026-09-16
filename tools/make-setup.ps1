@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Собирает установщик из готовой переносимой сборки.
+    Builds the installer from an existing portable build.
 
 .DESCRIPTION
-    Установщик заворачивает то, что уже лежит в artifacts\publish, — значит
-    установленная и переносимая версии это заведомо одни и те же файлы.
-    Сначала выполните tools\publish.ps1.
+    The installer wraps whatever is in artifacts\publish, so the installed and
+    portable versions are guaranteed to be the same files. Run
+    tools\publish.ps1 first.
 
 .EXAMPLE
     pwsh tools\make-setup.ps1
@@ -34,8 +34,8 @@ if (-not $Version) {
     $Version = $Matches[1]
 }
 
-# Компилятор ищется там, где Inno Setup оказывается чаще всего; путь можно
-# задать и вручную — установить его могли куда угодно.
+# Look for the compiler where Inno Setup usually lives; it may be installed
+# anywhere, so the path can also be passed explicitly.
 if (-not $Iscc) {
     $candidates = @(
         "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
@@ -44,7 +44,7 @@ if (-not $Iscc) {
         "${env:ProgramFiles(x86)}\Inno Setup 7\ISCC.exe"
     )
 
-    # Ещё вариант — путь из записи об установке в реестре.
+    # Fall back to the install location recorded in the registry.
     $keys = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
             'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
             'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'

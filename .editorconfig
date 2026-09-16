@@ -18,12 +18,12 @@ end_of_line = lf
 indent_size = 2
 
 [*.cs]
-# ── Порядок using ────────────────────────────────────────────────────
+# ── Using directives ─────────────────────────────────────────────────
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 csharp_using_directive_placement = outside_namespace:warning
 
-# ── Оформление ───────────────────────────────────────────────────────
+# ── Formatting ───────────────────────────────────────────────────────
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
@@ -31,13 +31,13 @@ csharp_new_line_before_finally = true
 csharp_prefer_braces = true:warning
 csharp_style_namespace_declarations = file_scoped:warning
 
-# Тип пишется явно везде, где он не очевиден из правой части. В коде это
-# сделано осознанно: разбор форматов читают по типам, а не по именам.
+# Types are spelled out wherever the right-hand side does not make them
+# obvious: format parsing code is read by its types.
 csharp_style_var_for_built_in_types = false:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = false:suggestion
 
-# ── Современный C# ───────────────────────────────────────────────────
+# ── Modern C# ────────────────────────────────────────────────────────
 csharp_style_expression_bodied_methods = when_on_single_line:suggestion
 csharp_style_expression_bodied_properties = true:suggestion
 csharp_style_pattern_matching_over_is_with_cast_check = true:warning
@@ -54,7 +54,7 @@ dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 dotnet_style_null_propagation = true:warning
 dotnet_style_coalesce_expression = true:warning
 
-# ── Имена ────────────────────────────────────────────────────────────
+# ── Naming ───────────────────────────────────────────────────────────
 dotnet_naming_rule.private_fields_underscore.severity = warning
 dotnet_naming_rule.private_fields_underscore.symbols = private_fields
 dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
@@ -66,24 +66,23 @@ dotnet_naming_symbols.private_fields.required_modifiers =
 dotnet_naming_style.underscore_camel_case.capitalization = camel_case
 dotnet_naming_style.underscore_camel_case.required_prefix = _
 
-# ── Что должно ловиться сборкой ──────────────────────────────────────
-# Ошибки, которые в этом проекте уже случались: незакрытый поток и
-# отброшенный результат асинхронного вызова.
+# ── Caught by the build ──────────────────────────────────────────────
+# Mistakes this project has already made: an undisposed stream and a
+# discarded async result.
 dotnet_diagnostic.CA2000.severity = warning
 dotnet_diagnostic.CA2016.severity = warning
 dotnet_diagnostic.CA1816.severity = warning
 
-# Тексты для пользователя написаны по-русски прямо в коде — это осознанно:
-# программа одноязычная, и вынос строк в ресурсы только усложнил бы правки.
+# User-facing strings are currently written inline.
 dotnet_diagnostic.CA1303.severity = none
 
 [*.{cs,vb}]
-# Проверки культуры: числа и даты форматируются для человека, а не для
-# машинного обмена, поэтому текущая культура здесь уместна.
+# Culture checks: numbers and dates are formatted for people rather than for
+# machine exchange, so the current culture is appropriate.
 dotnet_diagnostic.CA1305.severity = suggestion
 dotnet_diagnostic.CA1310.severity = suggestion
 
 [tests/**/*.cs]
-# Имена тестов — русские предложения с подчёркиваниями: так список
-# проваленных тестов читается как перечень нарушенных обещаний.
+# Test names are sentences joined by underscores, so a list of failures
+# reads as a list of broken guarantees.
 dotnet_diagnostic.CA1707.severity = none
