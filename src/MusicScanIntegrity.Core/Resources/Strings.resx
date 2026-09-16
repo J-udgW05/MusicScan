@@ -33,7 +33,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Duration_LessThanSecond" xml:space="preserve">
+    <value>меньше секунды</value>
+  </data>
+  <data name="Plural_Files_Few" xml:space="preserve">
+    <value>{0} файла</value>
+  </data>
+  <data name="Plural_Files_Many" xml:space="preserve">
+    <value>{0} файлов</value>
+  </data>
+  <data name="Plural_Files_One" xml:space="preserve">
+    <value>{0} файл</value>
+  </data>
+  <data name="Plural_Hours_Few" xml:space="preserve">
+    <value>{0} часа</value>
+  </data>
+  <data name="Plural_Hours_Many" xml:space="preserve">
+    <value>{0} часов</value>
+  </data>
+  <data name="Plural_Hours_One" xml:space="preserve">
+    <value>{0} час</value>
+  </data>
+  <data name="Plural_Minutes_Few" xml:space="preserve">
+    <value>{0} минуты</value>
+  </data>
+  <data name="Plural_Minutes_Many" xml:space="preserve">
+    <value>{0} минут</value>
+  </data>
+  <data name="Plural_Minutes_One" xml:space="preserve">
+    <value>{0} минута</value>
+  </data>
+  <data name="Plural_Seconds_Few" xml:space="preserve">
+    <value>{0} секунды</value>
+  </data>
+  <data name="Plural_Seconds_Many" xml:space="preserve">
+    <value>{0} секунд</value>
+  </data>
+  <data name="Plural_Seconds_One" xml:space="preserve">
+    <value>{0} секунда</value>
+  </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Язык</value>
+  </data>
+  <data name="Unit_B" xml:space="preserve">
+    <value>Б</value>
+  </data>
+  <data name="Unit_GB" xml:space="preserve">
+    <value>ГБ</value>
+  </data>
+  <data name="Unit_KB" xml:space="preserve">
+    <value>КБ</value>
+  </data>
+  <data name="Unit_MB" xml:space="preserve">
+    <value>МБ</value>
+  </data>
+  <data name="Unit_TB" xml:space="preserve">
+    <value>ТБ</value>
   </data>
 </root>
