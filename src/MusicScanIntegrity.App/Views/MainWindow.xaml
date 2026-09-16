@@ -1,11 +1,9 @@
 ﻿<!--
-    Главное окно: заголовок, панель инструментов, вкладки, статусная строка.
+    Main window: title bar, toolbar, tabs and status bar.
 
-    Окно открывается на 880 точках — это же и минимальная ширина. Меньше
-    нельзя: при 880 строка фильтров на вкладке «Результаты» уже занимает две
-    строки, а таблица результатов подходит к пределу читаемости. Больше по
-    умолчанию тоже незачем — вёрстка тянется, и на широком экране окно
-    растягивают сами.
+    Opens at 880 px, which is also the minimum width: at 880 the results filter
+    row already wraps and the table reaches the limit of readability. Nothing
+    larger is needed by default since the layout stretches.
 -->
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.MainWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -32,7 +30,7 @@
                  Closing="OnClosing">
 
     <ui:FluentWindow.InputBindings>
-        <!-- Горячие клавиши из раздела справки. -->
+        <!-- Keyboard shortcuts listed in the help window. -->
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding PickFolderCommand}" />
         <KeyBinding Key="F5" Command="{Binding StartCommand}" />
         <KeyBinding Key="R" Modifiers="Control" Command="{Binding RescanCommand}" />
@@ -49,9 +47,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ── Заголовок окна: 44px, название слева ──────────────────────
-             Знака здесь нет намеренно: он уже стоит в панели задач и на
-             кнопке переключения окон, а в заголовке только дублировался. -->
+        <!-- ── Title bar: 44 px, title on the left ───────────────────────
+             No app mark here on purpose: the taskbar and Alt+Tab already show it. -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Chrome}"
                 BorderBrush="{DynamicResource Brush.ChromeLine}" BorderThickness="0,0,0,1">
             <ui:TitleBar Height="44" ButtonsForeground="{DynamicResource Brush.Fg2}" ShowMaximize="True" ShowMinimize="True" ShowClose="True">
@@ -64,7 +61,7 @@
             </ui:TitleBar>
         </Border>
 
-        <!-- ── Панель инструментов ───────────────────────────────────────── -->
+        <!-- ── Toolbar ───────────────────────────────────────────────────── -->
         <Border Grid.Row="1" Background="{DynamicResource Brush.Chrome}"
                 BorderBrush="{DynamicResource Brush.ChromeLine}" BorderThickness="0,0,0,1"
                 Padding="14,10">
@@ -79,10 +76,10 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Повторная проверка той же папки: содержимое могло
-                     измениться, а заново выбирать путь незачем. -->
-                <!-- Экспорт отсюда убран: он живёт на вкладке «Отчёт», рядом
-                     с тем, что будет сохранено, и вызывается сочетанием Ctrl+S. -->
+                <!-- Rescan the same folder: its contents may have changed, and picking the
+                     path again is pointless. -->
+                <!-- No export button here: export lives on the report tab, next to what gets
+                     saved, and on Ctrl+S. -->
                 <Button DockPanel.Dock="Left" Style="{StaticResource Button.Outline}"
                         Command="{Binding RescanCommand}"
                         AutomationProperties.Name="Проверить заново"
@@ -111,8 +108,7 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Настройки открываются окном, как справка и «О программе»,
-                     поэтому кнопка стоит с ними, а не среди рабочих действий. -->
+                <!-- Settings sit with Help and About rather than among the work actions. -->
                 <Button DockPanel.Dock="Right" Style="{StaticResource Button.Ghost}"
                         Command="{Binding OpenSettingsCommand}"
                         AutomationProperties.Name="Настройки"
@@ -125,10 +121,9 @@
             </DockPanel>
         </Border>
 
-        <!-- ── Вкладки ───────────────────────────────────────────────────── -->
-        <!-- Обрезка по границам: анимация появления сдвигает содержимое
-             преобразованием, а оно само по себе ничем не ограничено —
-             сдвинутый экран нарисовался бы поверх панели инструментов. -->
+        <!-- ── Tabs ──────────────────────────────────────────────────────── -->
+        <!-- Clip to bounds: the entrance animation shifts content with a transform,
+             which is unclipped and would draw over the toolbar. -->
         <TabControl Grid.Row="2" Style="{StaticResource Tabs}"
                     ClipToBounds="True"
                     SelectedIndex="{Binding SelectedTab, Mode=TwoWay}"
@@ -156,9 +151,9 @@
 
         </TabControl>
 
-        <!-- ── Экран настроек: вместо вкладок, со стрелкой назад ─────────────
-             Вкладки на это время прячутся, а не закрываются фоном: с подложкой
-             Mica фон страницы прозрачен, и закрывать им нечего. -->
+        <!-- ── Settings screen: replaces the tabs, with a back arrow ────────
+             The tabs are hidden rather than covered: with Mica the page background
+             is transparent and would cover nothing. -->
         <Border Grid.Row="2" Background="{DynamicResource Brush.Bg}" ClipToBounds="True"
                 Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}">
             <Grid>
@@ -176,8 +171,8 @@
                                 ToolTip="Вернуться к работе (Esc)"
                                 Command="{Binding CloseSettingsCommand}">
                             <StackPanel Orientation="Horizontal">
-                                <!-- Стрелки назад в наборе нет, поэтому берётся
-                                     та же «галочка» списка, повёрнутая влево. -->
+                                <!-- The icon set has no back arrow, so the list chevron is rotated to point
+                                     left. -->
                                 <c:MsIcon Kind="chevron-down" Size="16" VerticalAlignment="Center"
                                           RenderTransformOrigin="0.5,0.5">
                                     <c:MsIcon.RenderTransform>
@@ -198,13 +193,13 @@
             </Grid>
         </Border>
 
-        <!-- ── Статусная строка ──────────────────────────────────────────── -->
+        <!-- ── Status bar ────────────────────────────────────────────────── -->
         <Border Grid.Row="3" Background="{DynamicResource Brush.Mica}"
                 BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="0,1,0,0"
                 Padding="16,9"
                 Visibility="{Binding Settings.ShowStatusBar, Converter={StaticResource BoolToVisibility}}">
-            <!-- Путь идёт последним и заполняет всю оставшуюся ширину:
-                 он длиннее остального и должен обрезаться как можно позже. -->
+            <!-- The path goes last and takes the remaining width: it is the longest item
+                 and should be trimmed last. -->
             <DockPanel LastChildFill="True">
                 <TextBlock DockPanel.Dock="Left" Text="{Binding StatusCounts}" VerticalAlignment="Center"
                            FontSize="12" Foreground="{DynamicResource Brush.Fg2}" />
@@ -220,7 +215,7 @@
             </DockPanel>
         </Border>
 
-        <!-- Подсветка окна при перетаскивании папки. -->
+        <!-- Window highlight while a folder is dragged over it. -->
         <Border x:Name="DropOverlay" Grid.Row="0" Grid.RowSpan="4"
                 Background="{DynamicResource Brush.AccSoft}" Opacity="0.92"
                 Visibility="Collapsed" IsHitTestVisible="False">

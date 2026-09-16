@@ -11,17 +11,14 @@
              c:Motion.Entrance="True">
 
     <UserControl.Resources>
-        <!-- Ширины колонок таблицы: 24 · 2.15* · 3* · 72 · 92 · 148, зазор 14
-             (UI_SPEC.md, раздел 12). Заголовок и строки используют одну и ту же
-             раскладку, поэтому колонки гарантированно совпадают. -->
+        <!-- Table column widths: 24 · 2.15* · 3* · 72 · 92 · 148, 14 px gap. Header
+             and rows share the same layout, so the columns always line up. -->
         <GridLength x:Key="Col.Icon">24</GridLength>
         <GridLength x:Key="Col.Format">72</GridLength>
         <GridLength x:Key="Col.Size">92</GridLength>
         <GridLength x:Key="Col.Status">148</GridLength>
 
-        <!-- Заголовок колонки — кнопка: щелчок сортирует, повторный щелчок
-             разворачивает порядок. Раньше стрелка в шапке была нарисована
-             для вида и ничего не делала. -->
+        <!-- Column header is a button: click sorts, clicking again reverses. -->
         <Style x:Key="Column.Header" TargetType="Button">
             <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -43,7 +40,7 @@
             </Setter>
         </Style>
 
-        <!-- Стрелка направления: вниз — по убыванию. -->
+        <!-- Direction arrow: down means descending. -->
         <Style x:Key="Sort.Arrow" TargetType="c:MsIcon">
             <Setter Property="Kind" Value="sort" />
             <Setter Property="Size" Value="12" />
@@ -62,12 +59,10 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Цвета статуса раздаются триггерами с DynamicResource, а не
-             конвертером. Конвертер отдаёт готовую кисть один раз и при смене
-             темы не пересчитывается: карточка подробностей так и оставалась
-             тёмной после переключения на светлую тему.
-             Значку и тексту цвет не задаётся — он достаётся им по наследству
-             через TextElement.Foreground родителя. -->
+        <!-- Status colours come from triggers with DynamicResource rather than a
+             converter: a converter hands out a brush once and is not re-evaluated on a
+             theme change, which left the details card dark after switching to light.
+             The icon and text inherit their colour through TextElement.Foreground. -->
         <Style x:Key="Status.Square" TargetType="Border">
             <Setter Property="Width" Value="20" />
             <Setter Property="Height" Value="20" />
@@ -103,8 +98,8 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
-        <!-- Карточка подробностей смотрит на выбранную строку: пока ничего
-             не выбрано, статуса нет и карточка остаётся обычной. -->
+        <!-- The details card follows the selected row; with nothing selected there is
+             no status and the card stays neutral. -->
         <Style x:Key="Details.Card" TargetType="Border">
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="Padding" Value="16,14" />
@@ -137,21 +132,19 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ══ Поиск и фильтры ═══════════════════════════════════════════ -->
+        <!-- ══ Search and filters ════════════════════════════════════════ -->
         <Grid Grid.Row="0">
-            <!-- Тянется колонка с пилюлями, а не поиск. Поле поиска шире 240
-                 точек не становится полезнее, а пилюлям место нужно: только
-                 в тянущейся колонке они знают свою ширину и переносятся.
-                 Раньше колонка была Auto — WrapPanel мерился в бесконечной
-                 ширине, никогда не переносил и вылезал за край окна вместе
-                 с выбором формата. -->
+            <!-- The chip column stretches, not the search box. A search box wider than
+                 240 px gains nothing, while the chips need room: only in a stretching column
+                 do they know their width and wrap. With Auto the WrapPanel measured against
+                 infinite width, never wrapped and pushed past the window edge. -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="240" />
                 <ColumnDefinition Width="*" MinWidth="120" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Поиск по имени файла -->
+            <!-- Search by file name -->
             <Border Grid.Column="0" VerticalAlignment="Top"
                     Background="{DynamicResource Brush.Card}"
                     BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1"
@@ -174,8 +167,7 @@
                                  AutomationProperties.Name="Поиск по имени файла"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" />
 
-                        <!-- Крестик появляется только когда есть что стирать:
-                             без него запрос приходилось вычищать вручную. -->
+                        <!-- The clear button appears only when there is something to clear. -->
                         <Button HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Style="{StaticResource Button.Ghost}" Padding="3"
                                 AutomationProperties.Name="Очистить поиск"
@@ -189,8 +181,8 @@
                 </Grid>
             </Border>
 
-            <!-- Пилюли-фильтры со счётчиками по статусам.
-                 На узком окне переносятся, а не уезжают за край. -->
+            <!-- Filter chips with per-status counts; they wrap on a narrow window instead
+                 of running off the edge. -->
             <ItemsControl Grid.Column="1" Margin="10,0,10,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -272,7 +264,7 @@
                       ItemsSource="{Binding Formats}" SelectedItem="{Binding FormatFilter}" />
         </Grid>
 
-        <!-- ══ Таблица ═══════════════════════════════════════════════════ -->
+        <!-- ══ Table ══════════════════════════════════════════════════════ -->
         <Border Grid.Row="2" Style="{StaticResource Card}" ClipToBounds="True">
             <Grid>
                 <Grid.RowDefinitions>
@@ -280,7 +272,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- Шапка -->
+                <!-- Header -->
                 <Border Grid.Row="0" Background="{DynamicResource Brush.Card2}"
                         BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="0,0,0,1"
                         Padding="{StaticResource Grid.RowPadding}">
@@ -356,11 +348,11 @@
                     </Grid>
                 </Border>
 
-                <!-- Строки. Виртуализация обязательна: коллекции бывают
-                     в сотни тысяч файлов (02_ARCHITECTURE.md, раздел 2). -->
-                <!-- Tag держит модель окна. Меню лежит вне визуального дерева
-                     и добирается до данных только через PlacementTarget, а у
-                     самого списка DataContext — модель вкладки, где команд нет. -->
+                <!-- Rows. Virtualisation is mandatory: collections run to hundreds of
+                     thousands of files. -->
+                <!-- Tag holds the window view model. The context menu lives outside the
+                     visual tree and reaches data only through PlacementTarget, while the list's
+                     own DataContext is the tab view model, which has no commands. -->
                 <ListBox x:Name="Rows" Grid.Row="1"
                          ItemsSource="{Binding View}"
                          SelectedItem="{Binding Selected}"
@@ -377,9 +369,8 @@
                          VirtualizingPanel.ScrollUnit="Pixel"
                          VirtualizingPanel.CacheLengthUnit="Page"
                          MouseDoubleClick="OnRowDoubleClick">
-                    <!-- Меню висит на списке, а не на строке: только так до
-                         команд доходит весь набор выделенных строк
-                         (PlacementTarget.SelectedItems). -->
+                    <!-- The menu hangs on the list rather than the row: only then do commands
+                         receive the full selection (PlacementTarget.SelectedItems). -->
                     <ListBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Открыть файл"
@@ -403,9 +394,9 @@
 
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
-                            <!-- Имя строки читает контейнер, а не содержимое
-                                 шаблона: без этого диктор произносит имя класса
-                                 модели вместо имени файла и его статуса. -->
+                            <!-- The container supplies the accessible name, not the template content;
+                                 otherwise a screen reader announces the view model class name instead of
+                                 the file name and status. -->
                             <Setter Property="AutomationProperties.Name" Value="{Binding DetailsTitle}" />
                             <Setter Property="Padding" Value="0" />
                             <Setter Property="Margin" Value="0" />
@@ -447,8 +438,7 @@
                                     <ColumnDefinition Width="{StaticResource Col.Status}" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Значок статуса: контур 14px внутри цветного
-                                     квадрата 20×20 с радиусом 5 (UI_SPEC.md, раздел 10). -->
+                                <!-- Status icon: 14 px outline inside a 20×20 coloured square, radius 5. -->
                                 <Border Grid.Column="0" Style="{StaticResource Status.Square}"
                                         HorizontalAlignment="Left" VerticalAlignment="Center">
                                     <c:MsIcon Size="14" StrokeWeight="1.8"
@@ -483,9 +473,8 @@
                                            Foreground="{DynamicResource Brush.Fg2}"
                                            Text="{Binding Size}" />
 
-                                <!-- Статус: плашка со словом. Значок статуса стоит
-                                     в первой колонке строки, поэтому дублировать его
-                                     внутри плашки не нужно (макет, раздел «Результаты»). -->
+                                <!-- Status badge with a word. The icon is already in the first column, so it
+                                     is not repeated inside the badge. -->
                                 <Border Grid.Column="5" Style="{StaticResource Status.Pill}">
                                     <TextBlock Text="{Binding StatusLabel}"
                                                FontSize="11.5"
@@ -498,7 +487,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Пустое состояние -->
+                <!-- Empty state -->
                 <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
                             Visibility="{Binding TotalCount, Converter={StaticResource NotEmptyToVisibility}, ConverterParameter=invert}">
                     <c:MsIcon Kind="table" Size="32" HorizontalAlignment="Center"
@@ -510,7 +499,7 @@
             </Grid>
         </Border>
 
-        <!-- ══ Подробности и плейлисты ═══════════════════════════════════ -->
+        <!-- ══ Details and playlists ═════════════════════════════════════ -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -518,8 +507,8 @@
                 <ColumnDefinition Width="320" />
             </Grid.ColumnDefinitions>
 
-            <!-- Подробности выбранного файла: человеческая формулировка,
-                 техническая причина — второй строкой (UI_SPEC.md, раздел 9). -->
+            <!-- Details of the selected file: human wording, technical cause on the second
+                 line. -->
             <Border Grid.Column="0" Style="{StaticResource Details.Card}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПОДРОБНОСТИ ВЫБРАННОГО ФАЙЛА" />
@@ -540,7 +529,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- Сводка по плейлистам -->
+            <!-- Playlist summary -->
             <Border Grid.Column="2" Style="{StaticResource Card}" Padding="16,14">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПЛЕЙЛИСТЫ" />

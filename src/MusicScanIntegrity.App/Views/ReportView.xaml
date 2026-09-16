@@ -22,7 +22,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ══ Четыре KPI-карточки ═══════════════════════════════════════ -->
+        <!-- ══ Four KPI cards ═══════════════════════════════════════════ -->
         <UniformGrid Grid.Row="0" Rows="1" Columns="4" DataContext="{Binding Report}">
             <Border Style="{StaticResource Card}" Padding="16,14" Margin="0,0,7,0">
                 <StackPanel>
@@ -63,15 +63,14 @@
             </Border>
         </UniformGrid>
 
-        <!-- ══ Распределение по статусам ═════════════════════════════════ -->
+        <!-- ══ Status breakdown ═════════════════════════════════════════ -->
         <Border Grid.Row="2" Style="{StaticResource Card.Padded}" DataContext="{Binding Report}">
             <StackPanel>
                 <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Распределение по статусам" />
 
-                <!-- Полоса: сегменты пропорциональны счётчикам, зазор 2px,
-                     скруглены только внешние концы. Border в WPF не обрезает
-                     содержимое по скруглению, поэтому форму задаёт маска
-                     прозрачности с таким же радиусом. -->
+                <!-- Bar segments are proportional to the counts with a 2 px gap, and only the
+                     outer ends are rounded. Border does not clip content to its corner
+                     radius, so the shape comes from an opacity mask with the same radius. -->
                 <Border Margin="0,14,0,0" Height="14" CornerRadius="7"
                         Background="{DynamicResource Brush.Bd2}">
                     <Grid x:Name="DistributionBar">
@@ -138,7 +137,7 @@
             </StackPanel>
         </Border>
 
-        <!-- ══ Папки и сохранение отчёта ═════════════════════════════════ -->
+        <!-- ══ Folders and report saving ════════════════════════════════ -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -184,9 +183,8 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:ReportViewModel+FolderRow}">
                                 <DockPanel LastChildFill="False" Margin="18,11">
-                                    <!-- Красным выделяется только настоящая находка:
-                                         прочерк «нет повреждённых» красным был бы
-                                         тревогой на ровном месте. -->
+                                    <!-- Red only for a real finding: a red dash for "no corrupted files" would be
+                                         a false alarm. -->
                                     <TextBlock DockPanel.Dock="Right" Width="40" TextAlignment="Right"
                                                Text="{Binding Bad}">
                                         <TextBlock.Style>
@@ -230,14 +228,13 @@
                 </Grid>
             </Border>
 
-            <!-- Выбор формата и сохранение -->
+            <!-- Format choice and saving -->
             <Border Grid.Column="2" Style="{StaticResource Card.Padded}" VerticalAlignment="Top">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Сохранить отчёт" />
 
-                    <!-- Формат, состав и путь выбираются в окне сохранения.
-                         Раньше три карточки формата стояли и здесь, и там —
-                         один и тот же вопрос задавался дважды подряд. -->
+                    <!-- Format, contents and path are chosen in the save dialog. The format cards
+                         used to appear both here and there, asking the same question twice. -->
                     <TextBlock Style="{StaticResource Text.Eyebrow}" Margin="0,14,0,0" Text="ФОРМАТ ПО УМОЛЧАНИЮ" />
                     <TextBlock Style="{StaticResource Text.Base}" Margin="0,6,0,0"
                                Text="{Binding Report.SelectedFormat, Converter={StaticResource EnumDisplay}}" />
@@ -254,10 +251,9 @@
             </Border>
         </Grid>
 
-        <!-- ══ Замечания по коллекции ════════════════════════════════════
-             Отдельная карточка, а не строки в таблице: пропуск в нумерации —
-             свойство альбома, а повтор — пары файлов; ни то, ни другое не
-             является замечанием к одному файлу. -->
+        <!-- ══ Collection findings ══════════════════════════════════════
+             A separate card rather than table rows: a numbering gap belongs to an
+             album and a duplicate to a pair of files, never to a single file. -->
         <Border Grid.Row="6" Style="{StaticResource Card}" ClipToBounds="True"
                 Visibility="{Binding Report.HasFindings, Converter={StaticResource BoolToVisibility}}">
             <Grid>

@@ -1,17 +1,15 @@
 ﻿<!--
-    Стили элементов управления. Геометрия (радиусы, отступы, размеры) и поведение
-    при наведении перенесены из UI_SPEC.md, разделы 4 и 12, и из макета
-    MusicScan.dc.html. Границы всегда 1px.
+    Control styles. Geometry (radii, padding, sizes) and hover behaviour follow
+    the design mock-up. Borders are always 1 px.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:MusicScanIntegrity.App.Controls"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
-    <!-- ── Кольцо фокуса ────────────────────────────────────────────────
-         Собственные шаблоны кнопок отменяют системную пунктирную рамку, и
-         без замены обход клавиатурой становится слепым: не видно, где ты.
-         WPF рисует это только при работе с клавиатуры, мышь кольца не даёт. -->
+    <!-- ── Focus ring ────────────────────────────────────────────────────
+         Custom button templates drop the system dotted focus rectangle, which
+         leaves keyboard navigation blind. WPF only shows this for keyboard focus. -->
     <Style x:Key="Focus.Ring">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -25,17 +23,16 @@
         </Setter>
     </Style>
 
-    <!-- ── Радиусы ──────────────────────────────────────────────────────── -->
+    <!-- ── Radii ────────────────────────────────────────────────────────── -->
     <CornerRadius x:Key="Radius.Card">10</CornerRadius>
     <CornerRadius x:Key="Radius.Control">6</CornerRadius>
     <CornerRadius x:Key="Radius.Chip">5</CornerRadius>
-    <!-- Радиус капсулы задаётся числом, а не «999»: WPF, в отличие от CSS,
-         не обрезает слишком большой CornerRadius до половины стороны, а
-         пропорционально ужимает все четыре дуги — вместо капсулы с прямыми
-         верхом и низом получается линза. Значение = половина высоты элемента. -->
+    <!-- The pill radius is a number, not "999": unlike CSS, WPF does not clamp an
+         oversized CornerRadius to half the side but shrinks all four arcs
+         proportionally, giving a lens instead of a capsule. Value = half height. -->
     <CornerRadius x:Key="Radius.Pill">15.5</CornerRadius>
 
-    <!-- ── Карточка ─────────────────────────────────────────────────────── -->
+    <!-- ── Card ───────────────────────────────────────────────────────── -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Brush.Card}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd}" />
@@ -47,12 +44,11 @@
         <Setter Property="Padding" Value="18" />
     </Style>
 
-    <!-- ── Кнопки ───────────────────────────────────────────────────────── -->
+    <!-- ── Buttons ────────────────────────────────────────────────────── -->
 
-    <!-- Общий шаблон: скруглённый прямоугольник с содержимым внутри.
-         Выравнивание содержимого берётся у самой кнопки, а не задаётся здесь:
-         почти всем нужен центр, но растянутой кнопке-ссылке — левый край, и
-         жёсткий центр оставлял слева пустую полосу. -->
+    <!-- Shared template: rounded rectangle with content. Content alignment comes
+         from the button itself: almost everything wants centre, but a stretched
+         link button wants the left edge, and a hard-coded centre left a gap. -->
     <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
         <Border x:Name="Root"
                 Background="{TemplateBinding Background}"
@@ -88,13 +84,13 @@
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
     </Style>
 
-    <!-- Акцентная — единственная кнопка с заливкой на панели инструментов. -->
+    <!-- Accent: the only filled button on the toolbar. -->
     <Style x:Key="Button.Accent" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Background" Value="{DynamicResource Brush.Acc}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.AccFg}" />
 
-        <!-- Кромка не совпадает с заливкой: иначе край прыгает с фона сразу
-             на яркий цвет, и на скруглении это видно лесенкой. -->
+        <!-- The edge differs from the fill; otherwise it jumps from background
+             straight to the bright colour and rounded corners look stepped. -->
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.AccBorder}" />
         <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
         <Setter Property="Padding" Value="14,8" />
@@ -107,7 +103,7 @@
         <Setter Property="Padding" Value="13,8" />
     </Style>
 
-    <!-- Кнопки управления проверкой стоят на утопленной поверхности. -->
+    <!-- Scan control buttons sit on a recessed surface. -->
     <Style x:Key="Button.Soft" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Background" Value="{DynamicResource Brush.Card2}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Fg}" />
@@ -116,7 +112,7 @@
         <Setter Property="Padding" Value="16,8" />
     </Style>
 
-    <!-- Деструктивное действие: контур, текст цветом ошибки. -->
+    <!-- Destructive action: outline with error-coloured text. -->
     <Style x:Key="Button.Danger" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Background" Value="{DynamicResource Brush.Card2}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Err}" />
@@ -133,7 +129,7 @@
         <Setter Property="Padding" Value="18,8" />
     </Style>
 
-    <!-- Без рамки: «Справка», «О программе». -->
+    <!-- Borderless: Help, About. -->
     <Style x:Key="Button.Ghost" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Fg2}" />
@@ -147,11 +143,10 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Ссылка-действие внутри карточки. Единственное место, где курсор
-         становится рукой: в Windows рука означает ссылку, а у кнопок,
-         переключателей, вкладок и строк списка курсор остаётся стрелкой.
-         Рука на всём подряд — привычка веба, и из-за неё окно выглядело
-         так, будто нажимается любая его точка. -->
+    <!-- Link action inside a card, and the only place the cursor becomes a hand:
+         on Windows a hand means a link, while buttons, toggles, tabs and list rows
+         keep the arrow. A hand everywhere is a web habit that made every point of
+         the window look clickable. -->
     <Style x:Key="Button.Link" TargetType="Button" BasedOn="{StaticResource Button.Base}">
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Background" Value="Transparent" />
@@ -162,7 +157,7 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!-- ── Поля ввода ───────────────────────────────────────────────────── -->
+    <!-- ── Text inputs ────────────────────────────────────────────────── -->
     <Style x:Key="TextBox.Field" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Ui}" />
         <Setter Property="FontSize" Value="{StaticResource Size.Tab}" />
@@ -181,10 +176,9 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{StaticResource Radius.Control}"
                             SnapsToDevicePixels="True">
-                        <!-- Отступы задаёт сам TextBox: WPF применяет его Padding
-                             к содержимому внутри PART_ContentHost. Продублировать
-                             его ещё и Margin'ом — значит получить двойной отступ
-                             и поле высотой 56 px вместо 38 px по макету. -->
+                        <!-- Padding comes from the TextBox itself: WPF applies it to the content in
+                             PART_ContentHost. Repeating it as a Margin doubles it, making the box
+                             56 px tall instead of 38. -->
                         <ScrollViewer x:Name="PART_ContentHost"
                                       VerticalAlignment="Center"
                                       Focusable="False"
@@ -195,8 +189,7 @@
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Acc}" />
                         </Trigger>
-                        <!-- Недоступное поле должно и выглядеть недоступным,
-                             иначе непонятно, почему в него нельзя писать. -->
+                        <!-- A disabled box must look disabled, or it is unclear why it rejects input. -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.45" />
                         </Trigger>
@@ -206,9 +199,9 @@
         </Setter>
     </Style>
 
-    <!-- Поле без собственного оформления: рамку и фон рисует то, во что оно
-         вложено. Нужен явный стиль — у библиотечного TextBox своя подложка,
-         которая иначе просвечивает поверх подсказки. -->
+    <!-- Box without its own chrome: the container draws border and background. An
+         explicit style is needed because the library TextBox has its own
+         background that would otherwise show over the placeholder. -->
     <Style x:Key="TextBox.Bare" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Ui}" />
         <Setter Property="FontSize" Value="{StaticResource Size.Body}" />
@@ -233,7 +226,7 @@
         </Setter>
     </Style>
 
-    <!-- ── Выпадающий список ────────────────────────────────────────────── -->
+    <!-- ── Combo box ──────────────────────────────────────────────────── -->
     <Style x:Key="ComboBox.Pill" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Ui}" />
         <Setter Property="FontSize" Value="{StaticResource Size.Secondary}" />
@@ -242,9 +235,9 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,5" />
-        <!-- 104 px — ширина «под самое длинное значение»; для «60 с» это поле
-             с текстом посередине пустоты. Ширину задаёт содержимое, а правый
-             край всё равно совпадает: списки прижаты вправо. -->
+        <!-- A fixed 104 px fits the longest value but leaves "60 s" floating in empty
+             space. Width follows content; the right edges still align because the
+             combo boxes are right-aligned. -->
         <Setter Property="MinWidth" Value="72" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
@@ -252,9 +245,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
-                        <!-- Подложка пилюли рисуется отдельным Border, а не кнопкой:
-                             у ToggleButton есть неявный стиль из библиотеки WPF-UI,
-                             который перебивает размеры и схлопывает рамку. -->
+                        <!-- The pill background is a separate Border rather than the button: the
+                             ToggleButton has an implicit WPF-UI style that overrides sizes and
+                             collapses the border. -->
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
@@ -271,13 +264,13 @@
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                               HorizontalAlignment="Center" VerticalAlignment="Center"
                                               TextElement.Foreground="{TemplateBinding Foreground}" />
-                            <!-- Шеврон только у настоящих выпадающих списков (UI_SPEC.md, раздел 12). -->
+                            <!-- Chevron only on genuine drop-downs. -->
                             <controls:MsIcon Grid.Column="1" Kind="chevron-down" Size="12" Opacity="0.6"
                                              Margin="7,0,0,0" VerticalAlignment="Center"
                                              Foreground="{TemplateBinding Foreground}" />
                         </Grid>
 
-                        <!-- Прозрачная кнопка поверх всего — только чтобы ловить клик. -->
+                        <!-- Transparent button on top, only to catch clicks. -->
                         <ToggleButton x:Name="Toggle"
                                       Style="{x:Null}"
                                       Focusable="False"
@@ -355,14 +348,11 @@
         </Setter>
     </Style>
 
-    <!-- ── Тумблер ──────────────────────────────────────────────────────
-         Отклонение от UI_SPEC.md, раздел 4, сделано сознательно: там выключенное
-         состояние описано сплошной серой заливкой, а настоящий тумблер Windows 11
-         в выключенном виде — контур с почти прозрачной заливкой и ползунок
-         поменьше. Программа должна выглядеть как приложение Windows 11, поэтому
-         взята системная геометрия: дорожка 40×20, ползунок 12×12 с отступом 4,
-         плавное перемещение и увеличение ползунка при нажатии.
-    -->
+    <!-- ── Toggle switch ────────────────────────────────────────────────
+         Uses the real Windows 11 geometry: 40×20 track, 12×12 knob inset by 4,
+         smooth travel and a knob that grows while pressed. The off state is an
+         outline with a near-transparent fill, as in the system control, rather
+         than the solid grey of the mock-up. -->
     <Style x:Key="Toggle" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -376,11 +366,10 @@
                                 BorderThickness="1"
                                 SnapsToDevicePixels="True" />
 
-                        <!-- Ход ползунка задаётся из кода (controls:Motion.Knob).
-                             Раскадровкой в шаблоне это делать нельзя: она
-                             заморожена, длительность в ней на ходу не поменять,
-                             а две готовые ветки на одно движение разъезжаются
-                             при смене настройки анимаций. -->
+                        <!-- Knob travel is driven from code (controls:Motion.Knob). A template
+                             storyboard is frozen, its duration cannot change at runtime, and two
+                             prepared branches for one movement drift apart when the animations
+                             setting changes. -->
                         <Border x:Name="Knob" Width="12" Height="12" CornerRadius="6"
                                 HorizontalAlignment="Left" VerticalAlignment="Center"
                                 Margin="4,0,0,0"
@@ -397,14 +386,14 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <!-- Цвета включённого состояния: они не анимируются и от настройки не зависят. -->
+                        <!-- On-state colours: not animated and independent of the setting. -->
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Track" Property="Background" Value="{DynamicResource Brush.Acc}" />
                             <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.AccBorder}" />
                             <Setter TargetName="Knob" Property="Background" Value="{DynamicResource Brush.AccFg}" />
                         </Trigger>
 
-                        <!-- Наведение: выключенная дорожка чуть плотнее, включённая чуть светлее. -->
+                        <!-- Hover: the off track gets slightly denser, the on track slightly lighter. -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
@@ -422,9 +411,8 @@
                             <Setter TargetName="Track" Property="Opacity" Value="0.9" />
                         </MultiTrigger>
 
-                        <!-- Нажатие: ползунок слегка растягивается, как в системе.
-                             Именованное преобразование нельзя задать через Setter,
-                             поэтому используется анимация. -->
+                        <!-- Press: the knob stretches slightly, as in the system control. A named
+                             transform cannot be set through a Setter, hence an animation. -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsPressed" Value="True" />
@@ -485,7 +473,7 @@
         </Setter>
     </Style>
 
-    <!-- ── Флажок 16×16, радиус 4 ───────────────────────────────────────── -->
+    <!-- ── Check box 16×16, radius 4 ──────────────────────────────────── -->
     <Style x:Key="CheckBox.Square" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -521,7 +509,7 @@
         </Setter>
     </Style>
 
-    <!-- ── Радиокнопка в диалоге экспорта: 15×15 с толстым кольцом ──────── -->
+    <!-- ── Export dialog radio button: 15×15 with a thick ring ────────── -->
     <Style x:Key="Radio.Dot" TargetType="RadioButton">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="Template">
@@ -554,7 +542,7 @@
         </Setter>
     </Style>
 
-    <!-- ── Выбор из нескольких равных вариантов (тема оформления) ───────── -->
+    <!-- ── Choice among equal options (theme) ─────────────────────────── -->
     <Style x:Key="ThemeChoice" TargetType="RadioButton">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="FontSize" Value="{StaticResource Size.Secondary}" />
@@ -584,8 +572,8 @@
         </Setter>
     </Style>
 
-    <!-- ── Чип формата: включён — обычная плашка, выключен — приглушённая.
-         Состояние читается не только цветом: у выключенного текст зачёркнут. -->
+    <!-- ── Format chip: on is a plain chip, off is muted. State is not
+         conveyed by colour alone: the text of an off chip is struck through. -->
     <Style x:Key="Chip.Format" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="FontFamily" Value="{StaticResource Font.Mono}" />
@@ -614,10 +602,10 @@
         </Setter>
     </Style>
 
-    <!-- ── Зона перетаскивания ──────────────────────────────────────────
-         Это не картинка, а рабочая область: по ней можно и щёлкнуть, поэтому
-         под курсором она подсвечивается акцентом, а курсор становится рукой.
-         Пунктир рисует Rectangle: Border в WPF пунктирную рамку не умеет. -->
+    <!-- ── Drop zone ───────────────────────────────────────────────────
+         A working area, not a picture: it is clickable, so it highlights with the
+         accent under the cursor and shows a hand. The dashes are a Rectangle
+         because Border cannot draw a dashed outline. -->
     <Style x:Key="Drop.Zone" TargetType="Button">
         <Setter Property="Height" Value="132" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -641,7 +629,7 @@
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Frame" Property="Fill" Value="{DynamicResource Brush.Card2}" />
                         </Trigger>
-                        <!-- Папку тянут к окну: зона подсвечивается вместе с ним. -->
+                        <!-- A folder is dragged over the window: the zone lights up with it. -->
                         <DataTrigger Binding="{Binding IsDragActive}" Value="True">
                             <Setter TargetName="Frame" Property="Stroke" Value="{DynamicResource Brush.Acc}" />
                             <Setter TargetName="Frame" Property="Fill" Value="{DynamicResource Brush.AccSoft}" />
@@ -652,8 +640,8 @@
         </Setter>
     </Style>
 
-    <!-- ── Карточка-действие: заголовок и пояснение, нажатие сразу
-         выполняет действие (в отличие от Choice.Card, где идёт выбор). -->
+    <!-- ── Action card: title and description; clicking acts immediately,
+         unlike Choice.Card, which selects. -->
     <Style x:Key="Choice.Action" TargetType="Button">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -682,10 +670,8 @@
         </Setter>
     </Style>
 
-    <!-- ── Строка-переход: подпись слева, значение справа, шеврон в конце.
-         Нажимается вся строка целиком — так открываются подстраницы в
-         параметрах Windows 11. Раньше нажималось только значение, набранное
-         мелким серым моноширинным шрифтом, и настройка выглядела справкой. -->
+    <!-- ── Navigation row: label left, value right, chevron at the end.
+         The whole row is clickable, as with sub-pages in Windows 11 Settings. -->
     <Style x:Key="Row.Navigate" TargetType="Button">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -713,7 +699,7 @@
 
     
     
-    <!-- ── Вкладки: подчёркивание акцентом, 13,5 / 600 ──────────────────── -->
+    <!-- ── Tabs: accent underline, 13.5 / 600 ─────────────────────────── -->
     <Style x:Key="Tabs" TargetType="TabControl">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -729,10 +715,9 @@
                                 Padding="14,0">
                             <TabPanel IsItemsHost="True" />
                         </Border>
-                        <!-- Имя PART_SelectedContentHost обязательно: по нему WPF
-                             связывает содержимое вкладки с деревом автоматизации.
-                             Без него экранный диктор не видит вообще ничего,
-                             кроме заголовков вкладок. -->
+                        <!-- The PART_SelectedContentHost name is required: WPF uses it to link the tab
+                             content into the automation tree. Without it a screen reader sees nothing
+                             but the tab headers. -->
                         <ContentPresenter x:Name="PART_SelectedContentHost"
                                           ContentSource="SelectedContent" />
                     </DockPanel>
@@ -778,13 +763,11 @@
         </Setter>
     </Style>
 
-    <!-- ── Полоса прогресса: высота 6, радиус — половина высоты ──────────────
-         Оба имени обязательны. Ширину заполненной части ProgressBar считает
-         сам: берёт ActualWidth элемента PART_Track, умножает на долю и
-         присваивает PART_Indicator. Без дорожки умножать не на что — ширина
-         не задаётся вовсе, и полоса остаётся пустой при любом значении.
-         Ошибку не видно ни в разметке, ни в журнале: привязка исправна,
-         значение доходит, а полоса пуста. -->
+    <!-- ── Progress bar: 6 px tall, radius half the height ─────────────
+         Both part names are required. ProgressBar sizes the indicator itself by
+         multiplying PART_Track's ActualWidth by the fraction. Without the track
+         no width is ever set and the bar stays empty for any value — with no error
+         in markup or output, since the binding itself works. -->
     <Style x:Key="Progress" TargetType="ProgressBar">
         <Setter Property="Height" Value="6" />
         <Setter Property="Background" Value="{DynamicResource Brush.Bd2}" />
@@ -795,8 +778,8 @@
                 <ControlTemplate TargetType="ProgressBar">
                     <Border Background="{TemplateBinding Background}" CornerRadius="3" ClipToBounds="True">
                         <Grid>
-                            <!-- Дорожка во всю ширину: по ней и считается заполнение.
-                                 Прозрачная — видимый фон рисует внешняя рамка. -->
+                            <!-- Full-width track the fill is computed from. Transparent; the outer border
+                                 draws the visible background. -->
                             <Rectangle x:Name="PART_Track" Fill="Transparent" />
                             <Border x:Name="PART_Indicator" HorizontalAlignment="Left"
                                     Background="{TemplateBinding Foreground}" CornerRadius="3" />
@@ -807,7 +790,7 @@
         </Setter>
     </Style>
 
-    <!-- ── Полосы прокрутки: тонкие, без стрелок ────────────────────────── -->
+    <!-- ── Scroll bars: thin, no arrows ───────────────────────────────── -->
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Width" Value="10" />
@@ -869,9 +852,9 @@
         </Style.Triggers>
     </Style>
 
-    <!-- ── Контекстное меню ─────────────────────────────────────────────
-         Своё оформление обязательно: системное меню светлое и в тёмной теме
-         выглядит вставкой из другой программы. -->
+    <!-- ── Context menu ────────────────────────────────────────────────
+         Custom styling is required: the system menu is light and looks borrowed
+         from another app in the dark theme. -->
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{DynamicResource Brush.Flyout}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd}" />
@@ -933,19 +916,16 @@
         </Setter>
     </Style>
 
-    <!-- ── Разделитель строки списка ────────────────────────────────────── -->
+    <!-- ── List row separator ─────────────────────────────────────────── -->
     <Style x:Key="RowSeparator" TargetType="Border">
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd2}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
     </Style>
 
-    <!-- ── Пилюля-фильтр: высота 31, радиус 15,5 ──────────────────────────
-         Рамки нет намеренно. Контур в одну точку на скруглении даёт заметные
-         ступеньки: сглаживание работает, но на масштабе 100 % точка полной
-         яркости при движении по дуге перескакивает на соседний ряд. У заливки
-         этой беды нет — дуга закрашена целиком. Отступы 14,7 против прежних
-         13,6: рамка занимала точку с каждой стороны, и без неё пилюля иначе
-         стала бы на две точки меньше. -->
+    <!-- ── Filter chip: 31 px tall, radius 15.5 ────────────────────────
+         No border on purpose. A 1 px outline on a curve shows visible steps at
+         100 % scale; a fill does not. Padding is 14.7 instead of 13.6 so the chip
+         keeps its size without the border. -->
     <Style x:Key="Pill" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Ring}" />
         <Setter Property="FontSize" Value="{StaticResource Size.Secondary}" />
@@ -962,8 +942,8 @@
                         <ContentPresenter VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <!-- Порядок важен: в WPF побеждает последний сработавший
-                             триггер, поэтому наведение объявлено раньше выбора. -->
+                        <!-- Order matters: in WPF the last matching trigger wins, so hover is
+                             declared before selection. -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.ChipHover}" />
                         </Trigger>
@@ -983,8 +963,8 @@
         </Setter>
     </Style>
 
-    <!-- Отступы ячеек таблицы результатов. Ширины колонок заданы в самой
-         таблице: они там читаются вместе с содержимым колонки. -->
+    <!-- Results table cell padding. Column widths live in the table itself, next
+         to the column content. -->
     <Thickness x:Key="Grid.CellGap">0,0,14,0</Thickness>
     <Thickness x:Key="Grid.RowPadding">16,11</Thickness>
 

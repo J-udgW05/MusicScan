@@ -10,7 +10,7 @@
              Background="{DynamicResource Brush.Bg}"
              c:Motion.Entrance="True">
 
-    <!-- Сетка вкладки: контент 22px, правая колонка 300px, зазор 20 (UI_SPEC.md, раздел 4). -->
+    <!-- Tab grid: 22 px content padding, 300 px right column, 20 px gap. -->
     <Grid Margin="22">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -18,12 +18,12 @@
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
-        <!-- ══ Левая колонка ══════════════════════════════════════════════ -->
+        <!-- ══ Left column ════════════════════════════════════════════════ -->
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled" Padding="0,0,4,0">
             <StackPanel>
 
-                <!-- Папка с музыкой -->
+                <!-- Music folder -->
                 <Border Style="{StaticResource Card.Padded}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПАПКА С МУЗЫКОЙ" />
@@ -45,15 +45,15 @@
                                     Command="{Binding PickFolderCommand}" />
                         </Grid>
 
-                        <!-- Зона перетаскивания: пунктир 1,5px (UI_SPEC.md, раздел 6).
-                             Border не умеет пунктирную рамку, поэтому её рисует Rectangle. -->
+                        <!-- Drop zone with a 1.5 px dashed outline. Border cannot draw dashes, so a
+                             Rectangle does. -->
                         <Button Style="{StaticResource Drop.Zone}" Margin="0,12,0,0"
                                 AutomationProperties.Name="Выбрать папку или перетащить её сюда"
                                 ToolTip="Щёлкните, чтобы выбрать папку, или перетащите её сюда"
                                 Command="{Binding PickFolderCommand}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <!-- Папка, а не «стрелка в лоток»: сюда тянут именно
-                                     папку, и знак папки читается однозначно. -->
+                                <!-- A folder icon rather than "arrow into tray": a folder is what gets dragged
+                                     here, and the icon reads unambiguously. -->
                                 <c:MsIcon Kind="folder" Size="32" StrokeWeight="1.5"
                                           HorizontalAlignment="Center"
                                           Foreground="{DynamicResource Brush.Fg3}" />
@@ -67,19 +67,15 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Предложение начать: старт не нужно искать (02_ARCHITECTURE.md, раздел 9) -->
-                <!-- Всё прижато влево, по краю карточек выше: середина колонки
-                     ничем не задана, и выключка по центру ставила плашку в
-                     случайное место относительно всего остального.
+                <!-- Start offer, so Start never has to be searched for. -->
+                <!-- Everything is left-aligned with the cards above; centring placed the
+                     banner at an arbitrary spot relative to the rest.
 
-                     Кнопка вынесена из плашки и стоит рядом. Причина не в
-                     красоте: плашка сообщает («нашлось столько-то»), кнопка
-                     действует — это разные вещи, и кнопка внутри рамки
-                     сообщения читалась как её часть. Снаружи она сама себе
-                     главное действие окна, потому и шире остальных.
-                     По высоте кнопка меньше плашки и стоит по её середине:
-                     растянутая во всю высоту она выглядела глыбой рядом
-                     с двумя строчками текста. -->
+                     The button sits beside the banner, not inside it: the banner informs, the
+                     button acts, and inside the message frame it read as part of the message.
+                     Outside it is the window's primary action, hence wider than the others.
+                     It is shorter than the banner and vertically centred; full height looked
+                     like a slab next to two lines of text. -->
                 <StackPanel Orientation="Horizontal" Margin="0,16,0,0"
                             HorizontalAlignment="Left"
                             Visibility="{Binding IsOfferVisible, Converter={StaticResource BoolToVisibility}}">
@@ -102,7 +98,7 @@
                             Command="{Binding StartCommand}" />
                 </StackPanel>
 
-                <!-- Ход проверки -->
+                <!-- Scan progress -->
                 <Border Style="{StaticResource Card.Padded}" Margin="0,16,0,0"
                         Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
@@ -147,7 +143,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Предупреждения прямо по ходу проверки -->
+                <!-- Live warnings during the scan -->
                 <Border Style="{StaticResource Card}" Margin="0,16,0,0"
                         Visibility="{Binding LiveWarnings.Count, Converter={StaticResource NotEmptyToVisibility}}">
                     <StackPanel>
@@ -200,8 +196,8 @@
                                                            TextTrimming="CharacterEllipsis" Text="{Binding Path}" />
                                             </StackPanel>
 
-                                            <!-- Действие по строке: «Понятно» убирает её,
-                                                 «Показать» открывает файл в «Результатах». -->
+                                            <!-- Row action: "Got it" dismisses the row, "Show" opens the file on the
+                                                 results tab. -->
                                             <Button Grid.Column="2" Style="{StaticResource Button.Link}"
                                                     Margin="12,0,0,0" VerticalAlignment="Top"
                                                     Content="{Binding ActionLabel}"
@@ -219,16 +215,15 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- ══ Правая колонка ═════════════════════════════════════════════ -->
+        <!-- ══ Right column ═══════════════════════════════════════════════ -->
         <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
 
-                <!-- Вопрос о занятом файле: по одному, не блокируя очередь.
-                     Стоит первым в колонке: проверка на нём стоит и ждёт ответа,
-                     а внизу, под сводкой и параметрами, карточка при стандартном
-                     размере окна уходила за нижний край — проверка замирала
-                     на вопросе, которого не видно. -->
+                <!-- Locked-file question: one at a time, without blocking the queue. It comes
+                     first in the column because the scan waits on it; placed below the summary
+                     and options it fell off the bottom at the default window size, and the scan
+                     stalled on a question nobody could see. -->
                 <Border Margin="0,0,0,16" CornerRadius="10" Padding="16"
                         Background="{DynamicResource Brush.WarnBg}"
                         BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1"
@@ -245,9 +240,8 @@
                         <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,8,0,0"
                                    TextWrapping="Wrap" Text="{Binding LockedOwnerText}" />
 
-                        <!-- Каждый вариант с пояснением, как в макете: выбор
-                             «пропустить или скопировать» без объяснения
-                             последствий — гадание. -->
+                        <!-- Every choice carries an explanation: choosing between skip and copy
+                             without knowing the consequences is guesswork. -->
                         <Button Style="{StaticResource Choice.Action}" Margin="0,12,0,0"
                                 AutomationProperties.Name="Пропустить файл"
                                 Command="{Binding AnswerLockedCommand}" CommandParameter="skip">
@@ -297,8 +291,7 @@
                                   HorizontalAlignment="Stretch"
                                   Visibility="{Binding CanApplyToAll, Converter={StaticResource BoolToVisibility}}"
                                   IsChecked="{Binding LockedApplyToAll}">
-                            <!-- MaxWidth, иначе подпись не переносится и уезжает
-                                 за правый край карточки. -->
+                            <!-- MaxWidth, or the caption does not wrap and runs past the card edge. -->
                             <TextBlock Style="{StaticResource Text.Secondary}" TextWrapping="Wrap"
                                        MaxWidth="232"
                                        Text="Поступать так же со всеми занятыми файлами" />
@@ -315,7 +308,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Сводка -->
+                <!-- Summary -->
                 <Border Style="{StaticResource Card}" Padding="16">
                     <StackPanel>
                         <TextBlock Style="{StaticResource Text.Eyebrow}" Text="СВОДКА" Margin="0,0,0,6" />
@@ -401,7 +394,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Быстрые параметры проверки -->
+                <!-- Quick scan options -->
                 <Border Style="{StaticResource Card}" Padding="16" Margin="0,16,0,0">
                     <StackPanel>
                         <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ПАРАМЕТРЫ ПРОВЕРКИ" Margin="0,0,0,12" />

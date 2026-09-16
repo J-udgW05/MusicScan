@@ -13,8 +13,8 @@
              c:Motion.Entrance="True">
 
     <UserControl.Resources>
-        <!-- Строка настройки: подпись слева, значение справа с min-width 104
-             (UI_SPEC.md, раздел 12) — правый край выровнен по всему разделу. -->
+        <!-- Setting row: label on the left, value on the right with a 104 px minimum
+             width so the right edge lines up across the section. -->
         <Style x:Key="SettingRow" TargetType="Border">
             <Setter Property="Padding" Value="18,13" />
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd2}" />
@@ -34,8 +34,8 @@
         </ObjectDataProvider>
     </UserControl.Resources>
 
-    <!-- Горизонтальная прокрутка отключена: колонки тянутся по ширине,
-         а «Auto» по умолчанию выдавала внизу полосу на ровном месте. -->
+    <!-- Horizontal scrolling off: columns stretch to fit, and the default Auto
+         showed a pointless scroll bar at the bottom. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                   Padding="22">
         <Grid DataContext="{Binding Settings}">
@@ -49,10 +49,10 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ══ Левая колонка ═════════════════════════════════════════ -->
+            <!-- ══ Left column ════════════════════════════════════════════ -->
             <StackPanel Grid.Row="0" Grid.Column="0">
 
-                <!-- Внешний вид -->
+                <!-- Appearance -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -80,8 +80,8 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:StatusColorRow}">
                                         <Border BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
-                                            <!-- Нажимается вся строка: образец цвета и есть то место,
-                                                 куда тянется рука, а раньше он был просто картинкой. -->
+                                            <!-- The whole row is clickable: the swatch is where the hand goes, and it used
+                                                 to be a plain image. -->
                                             <Button Style="{StaticResource Row.Navigate}"
                                                     AutomationProperties.Name="{Binding Label, StringFormat=Цвет статуса {0}}"
                                                     ToolTip="Выбрать цвет"
@@ -98,7 +98,7 @@
                                                                Foreground="{DynamicResource Brush.Fg2}"
                                                                Text="{Binding Label}" />
 
-                                                    <!-- Шеврон как в параметрах Windows: строка открывает окно выбора. -->
+                                                    <!-- Chevron as in Windows Settings: the row opens a picker. -->
                                                     <c:MsIcon DockPanel.Dock="Right" Kind="chevron-down" Size="14"
                                                               Margin="8,0,0,0" VerticalAlignment="Center"
                                                               Foreground="{DynamicResource Brush.Fg3}"
@@ -200,7 +200,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Форматы -->
+                <!-- Formats -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -262,7 +262,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Занятые файлы -->
+                <!-- Locked files -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -377,10 +377,9 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Что ещё искать: проверки, которые смотрят не на целость
-                     файла, а на то, как он звучит, и на коллекцию целиком.
-                     Отдельной карточкой ещё и потому, что без неё правая
-                     колонка вырастала вдвое выше левой. -->
+                <!-- Additional checks: these look at how a file sounds and at the collection
+                     as a whole rather than file integrity. A separate card also keeps the
+                     right column from growing twice as tall as the left. -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -465,7 +464,7 @@
 
             <StackPanel Grid.Row="0" Grid.Column="2">
 
-                <!-- Проверка -->
+                <!-- Scanning -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -720,7 +719,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Общие и отчёты -->
+                <!-- General and reports -->
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
@@ -861,12 +860,9 @@
 
             </StackPanel>
 
-            <!-- ══ Файл настроек и сброс: общий для обеих колонок ══════════
-                 Раньше здесь лежали четыре разнородные вещи подряд: фраза
-                 про мгновенное применение, красная кнопка у правого края,
-                 ссылка «Открыть папку» и голый путь под ней. Теперь слева
-                 один блок — подпись и сам путь, который и есть ссылка,
-                 справа кнопка сброса по центру всей строки. -->
+            <!-- ══ Settings file and reset, spanning both columns ═══════════
+                 Left: a caption and the path, which is itself the link. Right: the reset
+                 button, centred on the row. -->
             <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource Card}"
                     Padding="18,15" Margin="0,18,0,0">
                 <DockPanel LastChildFill="True">
@@ -885,13 +881,11 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ФАЙЛ НАСТРОЕК" />
 
-                        <!-- Путь и есть ссылка: отдельная строка «Открыть папку»
-                             рядом с тем же путём была бы повтором. -->
-                        <!-- Кнопка тянется во всю ширину, а путь лежит в колонке
-                             со звёздочкой: только так TextTrimming знает, где
-                             обрезать. Прижатая влево кнопка мерилась без границ,
-                             многоточие не появлялось, и длинный путь просто
-                             уходил под край карточки. -->
+                        <!-- The path is the link; a separate "Open folder" line next to the same path
+                             would repeat it. -->
+                        <!-- The button stretches and the path sits in a star-sized column: only then
+                             does TextTrimming know where to cut. A left-aligned button was measured
+                             unbounded, no ellipsis appeared, and a long path ran under the card edge. -->
                         <Button Style="{StaticResource Button.Link}" Margin="0,7,0,0"
                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                 ToolTip="Открыть папку с файлом настроек"
