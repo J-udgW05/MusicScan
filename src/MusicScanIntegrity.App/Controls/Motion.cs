@@ -6,63 +6,55 @@ using System.Windows.Media.Animation;
 namespace MusicScanIntegrity.App.Controls;
 
 /// <summary>
-/// Анимации появления — те же по характеру, что в окне параметров Windows 11:
-/// содержимое всплывает снизу и одновременно проявляется.
+/// Entrance animations in the style of Windows 11 Settings: content rises from
+/// below while fading in.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Почему анимации запускаются из кода, а не раскадровками в разметке. Триггер
-/// в шаблоне держит раскадровку замороженной — иначе её нельзя было бы делить
-/// между всеми одинаковыми элементами. Замороженное дерево не принимает ни
-/// <c>DynamicResource</c>, ни привязок, поэтому длительность в нём нельзя
-/// поменять на ходу: разбор такой разметки просто падает. Проверено — не
-/// предположение. Значит, выключатель анимаций в шаблонах не сделать, и
-/// анимации, которыми он управляет, должны заводиться из кода, где условие
-/// проверяется в момент запуска.
+/// Animations are started from code rather than storyboards in markup. A
+/// template trigger keeps its storyboard frozen so it can be shared, and a
+/// frozen tree accepts neither <c>DynamicResource</c> nor bindings — parsing
+/// such markup throws. An animations on/off switch therefore cannot be
+/// expressed in templates; the condition has to be checked in code at start.
 /// </para>
 /// <para>
-/// По той же причине отсюда двигается и ползунок переключателя
-/// (<see cref="KnobProperty" />). Попытка развести это двумя ветками триггеров
-/// — «включён и анимации есть» против «включён и анимаций нет» — обошлась
-/// дорого: оба условия завязаны на состояние, истинное в покое, и смена
-/// настройки анимаций заставляла одну ветку выйти, уводя ползунок в положение
-/// «выключено», а другую войти. Тумблеры разъезжались и переставали показывать
-/// своё настоящее состояние. Положение ползунка не должно зависеть от того,
-/// включены анимации: они решают только, двигаться плавно или встать сразу.
+/// The toggle knob (<see cref="KnobProperty" />) moves from here for the same
+/// reason. Splitting it into two trigger branches — "on with animations" and
+/// "on without" — made toggles drift: both conditions are true at rest, so
+/// changing the animations setting made one branch exit, sliding the knob to
+/// "off", while the other entered. Knob position must not depend on the
+/// setting; animations only decide whether it slides or snaps.
 /// </para>
 /// </remarks>
 public static class Motion
 {
-    /// <summary>Насколько содержимое всплывает, в точках.</summary>
+    /// <summary>How far content rises, in layout units.</summary>
     private const double Rise = 24;
 
-    /// <summary>Ход ползунка переключателя: 40 − 4 − 12 − 4 = 20.</summary>
+    /// <summary>Toggle knob travel: 40 − 4 − 12 − 4 = 20.</summary>
     private const double KnobTravel = 20;
 
-    /// <summary>
-    /// Значение, которое получают вновь открытые окна.
-    /// </summary>
+    /// <summary>Value given to newly opened windows.</summary>
     /// <remarks>
-    /// Диалог — отдельное окно, и его <see cref="Window.Owner" /> логическим
-    /// родителем не является: наследование присоединённого свойства до него не
-    /// доходит. Поэтому значение ставится каждому окну при загрузке, а здесь
-    /// лежит то, которое ставить.
+    /// A dialog's <see cref="Window.Owner" /> is not its logical parent, so the
+    /// inherited attached property never reaches it. Each window gets the value
+    /// on load instead, and this is the value it gets.
     /// </remarks>
     public static bool DefaultEnabled { get; set; } = true;
 
-    /// <summary>Длительность появления.</summary>
+    /// <summary>Entrance duration.</summary>
     /// <remarks>
-    /// 300 мс — столько же занимает переход между разделами в параметрах
-    /// Windows 11. Короче выглядит дёрганьем, длиннее — задержкой.
+    /// 300 ms matches page transitions in Windows 11 Settings; shorter looks
+    /// jerky, longer looks laggy.
     /// </remarks>
     private static readonly Duration Entrance = new(TimeSpan.FromMilliseconds(300));
 
-    /// <summary>Длительность хода ползунка — как у системного переключателя.</summary>
+    /// <summary>Knob travel duration, matching the system toggle.</summary>
     private static readonly Duration KnobSlide = new(TimeSpan.FromMilliseconds(150));
 
     /// <summary>
-    /// Анимации включены. Наследуется вниз по дереву, поэтому достаточно
-    /// поставить его на окно.
+    /// Animations are enabled. Inherited down the tree, so setting it on the window
+    /// is enough.
     /// </summary>
     public static readonly DependencyProperty EnabledProperty =
         DependencyProperty.RegisterAttached(
@@ -71,12 +63,10 @@ public static class Motion
             typeof(Motion),
             new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.Inherits));
 
-    /// <summary>
-    /// Элемент проигрывает появление всякий раз, когда становится видимым.
-    /// </summary>
+    /// <summary>The element plays its entrance whenever it becomes visible.</summary>
     /// <remarks>
-    /// Ставится на корень каждого экрана. Переключение вкладок и вход в
-    /// настройки — это и есть смена видимости, отдельного события искать не надо.
+    /// Set on the root of each screen; switching tabs and opening settings are
+    /// visibility changes, so no other event is needed.
     /// </remarks>
     public static readonly DependencyProperty EntranceProperty =
         DependencyProperty.RegisterAttached(
@@ -85,13 +75,10 @@ public static class Motion
             typeof(Motion),
             new PropertyMetadata(false, OnEntranceChanged));
 
-    /// <summary>
-    /// Ползунок переключателя: его положение задаётся отсюда.
-    /// </summary>
+    /// <summary>Marks a toggle knob whose position is driven from here.</summary>
     /// <remarks>
-    /// Ставится на сам ползунок в шаблоне. Состояние берётся у переключателя,
-    /// внутри которого он живёт, а настройка анимаций решает только, ехать
-    /// плавно или встать сразу.
+    /// Set on the knob inside the template. State comes from the enclosing
+    /// toggle; the animations setting only decides whether it slides or snaps.
     /// </remarks>
     public static readonly DependencyProperty KnobProperty =
         DependencyProperty.RegisterAttached(
@@ -100,7 +87,7 @@ public static class Motion
             typeof(Motion),
             new PropertyMetadata(false, OnKnobChanged));
 
-    /// <summary>Обработчик переключения, сохранённый ради отписки.</summary>
+    /// <summary>Toggle handler kept so it can be unsubscribed.</summary>
     private static readonly DependencyProperty KnobHandlerProperty =
         DependencyProperty.RegisterAttached(
             "KnobHandler",
@@ -110,74 +97,57 @@ public static class Motion
 
     static Motion()
     {
-        // Одна подписка на весь класс окон: и главное, и любой диалог,
-        // открытый когда угодно позже.
+        // One class handler covers every window: the main one and any dialog opened later.
         EventManager.RegisterClassHandler(
             typeof(Window),
             FrameworkElement.LoadedEvent,
             new RoutedEventHandler(OnWindowLoaded));
     }
 
-    /// <summary>Читает <see cref="EnabledProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <returns>Включены ли анимации на этом элементе.</returns>
+    /// <summary>Gets <see cref="EnabledProperty" />.</summary>
     public static bool GetEnabled(DependencyObject element)
     {
         ArgumentNullException.ThrowIfNull(element);
         return (bool)element.GetValue(EnabledProperty);
     }
 
-    /// <summary>Пишет <see cref="EnabledProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <param name="value">Включены ли анимации.</param>
+    /// <summary>Sets <see cref="EnabledProperty" />.</summary>
     public static void SetEnabled(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
         element.SetValue(EnabledProperty, value);
     }
 
-    /// <summary>Читает <see cref="EntranceProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <returns>Проигрывает ли элемент появление.</returns>
+    /// <summary>Gets <see cref="EntranceProperty" />.</summary>
     public static bool GetEntrance(DependencyObject element)
     {
         ArgumentNullException.ThrowIfNull(element);
         return (bool)element.GetValue(EntranceProperty);
     }
 
-    /// <summary>Пишет <see cref="EntranceProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <param name="value">Проигрывать ли появление.</param>
+    /// <summary>Sets <see cref="EntranceProperty" />.</summary>
     public static void SetEntrance(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
         element.SetValue(EntranceProperty, value);
     }
 
-    /// <summary>Читает <see cref="KnobProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <returns>Двигается ли этот элемент как ползунок переключателя.</returns>
+    /// <summary>Gets <see cref="KnobProperty" />.</summary>
     public static bool GetKnob(DependencyObject element)
     {
         ArgumentNullException.ThrowIfNull(element);
         return (bool)element.GetValue(KnobProperty);
     }
 
-    /// <summary>Пишет <see cref="KnobProperty" />.</summary>
-    /// <param name="element">Элемент.</param>
-    /// <param name="value">Двигать ли элемент как ползунок.</param>
+    /// <summary>Sets <see cref="KnobProperty" />.</summary>
     public static void SetKnob(DependencyObject element, bool value)
     {
         ArgumentNullException.ThrowIfNull(element);
         element.SetValue(KnobProperty, value);
     }
 
-    /// <summary>
-    /// Ставит ползунок в положение, отвечающее состоянию переключателя.
-    /// </summary>
-    /// <param name="knob">Ползунок.</param>
-    /// <param name="on">Переключатель включён.</param>
-    /// <param name="animate">Ехать плавно, а не вставать сразу.</param>
+    /// <summary>Moves the knob to the position matching the toggle state.</summary>
+    /// <param name="animate">Slide rather than snap.</param>
     public static void PlaceKnob(FrameworkElement knob, bool on, bool animate)
     {
         ArgumentNullException.ThrowIfNull(knob);
@@ -189,10 +159,10 @@ public static class Motion
 
         TranslateTransform? shift = FindShift(group);
 
-        // Смотреть надо на сам сдвиг, а не на группу: группа бывает
-        // разморожена, а лежащий в ней сдвиг — нет. Всё, что объявлено в
-        // шаблоне, WPF замораживает: шаблон общий на все переключатели, и
-        // менять его содержимое поодиночке нельзя. Своя копия — можно.
+        // Check the translate transform itself, not the group: the group may be
+        // thawed while the transform inside it is frozen. WPF freezes everything
+        // declared in a template, since the template is shared by every toggle; a
+        // private copy can be modified.
         if (shift is null || shift.IsFrozen || group.IsFrozen)
         {
             group = group.CloneCurrentValue();
@@ -209,8 +179,8 @@ public static class Motion
 
         if (!animate)
         {
-            // Снимаем прежнюю анимацию: иначе она держала бы своё значение
-            // и присвоение не подействовало бы.
+            // Remove the running animation first, or it keeps holding its value and
+            // the assignment has no effect.
             shift.BeginAnimation(TranslateTransform.XProperty, null);
             shift.X = target;
             return;
@@ -225,14 +195,13 @@ public static class Motion
     }
 
     /// <summary>
-    /// Проигрывает появление, если анимации включены; иначе просто ставит
-    /// элемент в конечное положение.
+    /// Plays the entrance when animations are on; otherwise puts the element in
+    /// its final position.
     /// </summary>
-    /// <param name="element">Элемент.</param>
     /// <remarks>
-    /// Ветка «выключено» нужна не для симметрии: без неё элемент, однажды
-    /// анимированный, остался бы с прозрачностью и сдвигом от прерванной
-    /// анимации, и после выключения анимаций часть экрана оказалась бы съехавшей.
+    /// The "off" branch matters: without it an element interrupted mid-animation
+    /// would keep its opacity and offset, leaving part of the screen shifted after
+    /// animations are turned off.
     /// </remarks>
     public static void Play(FrameworkElement element)
     {
@@ -263,8 +232,7 @@ public static class Motion
         });
     }
 
-    /// <summary>Снимает следы анимации: элемент виден и стоит на месте.</summary>
-    /// <param name="element">Элемент.</param>
+    /// <summary>Clears animation leftovers: fully visible and in place.</summary>
     public static void Reset(FrameworkElement element)
     {
         ArgumentNullException.ThrowIfNull(element);
@@ -272,8 +240,8 @@ public static class Motion
         element.BeginAnimation(UIElement.OpacityProperty, null);
         element.Opacity = 1;
 
-        // Замороженное преобразование трогать нельзя — но и следов анимации
-        // на нём быть не может: заморозить его могли только в шаблоне.
+        // A frozen transform cannot be touched, but it cannot carry animation state
+        // either — only a template could have frozen it.
         if (element.RenderTransform is TranslateTransform shift && !shift.IsFrozen)
         {
             shift.BeginAnimation(TranslateTransform.YProperty, null);
@@ -314,8 +282,8 @@ public static class Motion
 
         Detach(knob, toggle);
 
-        // Обработчик замыкает сам ползунок: искать его в шаблоне по имени
-        // значило бы привязать поведение к разметке.
+        // The handler closes over the knob itself; looking it up in the template by
+        // name would tie behaviour to markup.
         RoutedEventHandler handler = (_, _) =>
             PlaceKnob(knob, toggle.IsChecked == true, GetEnabled(knob));
 
@@ -323,7 +291,7 @@ public static class Motion
         toggle.Checked += handler;
         toggle.Unchecked += handler;
 
-        // Начальное положение — без движения: переключатель ещё не трогали.
+        // Initial placement without motion: the toggle has not been touched yet.
         PlaceKnob(knob, toggle.IsChecked == true, animate: false);
     }
 
@@ -347,7 +315,7 @@ public static class Motion
 
     private static void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
-        // Значение, выставленное явно, не трогаем: оно сильнее умолчания.
+        // Leave explicitly set values alone; they win over the default.
         if (sender is Window window &&
             window.ReadLocalValue(EnabledProperty) == DependencyProperty.UnsetValue)
         {
@@ -378,7 +346,7 @@ public static class Motion
         }
     }
 
-    /// <summary>Находит сдвиг внутри группы преобразований.</summary>
+    /// <summary>Finds the translate transform inside a transform group.</summary>
     private static TranslateTransform? FindShift(TransformGroup group)
     {
         foreach (Transform transform in group.Children)
@@ -392,11 +360,10 @@ public static class Motion
         return null;
     }
 
-    /// <summary>Даёт элементу сдвиг, по которому его можно поднимать.</summary>
+    /// <summary>Gives the element a translate transform to animate.</summary>
     /// <remarks>
-    /// Чужое преобразование не трогаем: если у элемента уже свой
-    /// <see cref="RenderTransform" />, поднимать его нельзя — сломается то,
-    /// ради чего преобразование ставили.
+    /// An existing <see cref="RenderTransform" /> belongs to someone else and is
+    /// left alone; moving it would break whatever it was set for.
     /// </remarks>
     private static TranslateTransform EnsureShift(FrameworkElement element)
     {

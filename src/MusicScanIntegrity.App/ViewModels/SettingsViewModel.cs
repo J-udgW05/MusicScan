@@ -12,12 +12,11 @@ using MusicScanIntegrity.Core.Settings;
 namespace MusicScanIntegrity.App.ViewModels;
 
 /// <summary>
-/// Настройки. Модель правит копию настроек и применяет её целиком —
-/// так «Отмена» действительно отменяет, а не откатывает по одному полю.
+/// Settings screen. Edits a copy of the settings and applies it as a whole.
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
-    /// <summary>Готовые значения порога «большого файла» (UI_SPEC.md, раздел 7).</summary>
+    /// <summary>Preset large-file thresholds.</summary>
     public static readonly IReadOnlyList<ThresholdOption> ThresholdOptions =
     [
         new(100, "100 МБ"),
@@ -28,7 +27,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         new(0, "Без ограничений"),
     ];
 
-    /// <summary>Готовые значения таймаута проверки одного файла.</summary>
+    /// <summary>Preset per-file timeouts.</summary>
     public static readonly IReadOnlyList<TimeoutOption> TimeoutOptions =
     [
         new(15, "15 с"),
@@ -46,12 +45,11 @@ public sealed partial class SettingsViewModel : ObservableObject
     private AppSettings _draft;
 
     /// <summary>
-    /// Идёт заполнение полей из настроек, а не правка пользователем.
-    /// Без этого флага загрузка сама себя тут же и сохраняла бы.
+    /// Fields are being filled from settings rather than edited by the user;
+    /// without this flag loading would immediately save itself.
     /// </summary>
     private bool _loading;
 
-    /// <summary>Создаёт модель настроек.</summary>
     public SettingsViewModel(
         ISettingsService settingsService,
         IThemeService themeService,
@@ -64,8 +62,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         _history = history;
         _draft = settingsService.Current.Clone();
 
-        // Плейлисты включаются отдельным переключателем, поэтому в чипы идут
-        // только звуковые расширения — их и можно отключать поштучно.
+        // Playlists have their own toggle, so only audio extensions become chips
+        // that can be switched off individually.
         Formats = [.. AudioFormats.AllAudio
             .Select(e => e.TrimStart('.').ToUpperInvariant())
             .Distinct()
@@ -82,27 +80,25 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         Reload();
 
-        // Те же параметры — «Заходить в подпапки», «Проверять теги», порог
-        // большого файла и таймаут — правятся ещё и быстрой панелью на экране
-        // проверки. Без подписки этот экран показывал бы снимок, снятый при
-        // запуске, а его применение затирало бы сделанное в панели: ApplyAsync
-        // выкладывает в настройки все свои поля разом, включая устаревшие.
+        // Subfolders, tag checking, the large-file threshold and the timeout are also
+        // edited from the quick panel on the scan tab. Without this subscription the
+        // screen would show a snapshot taken at startup, and ApplyAsync — which writes
+        // every field at once — would overwrite what was changed in the panel.
         _settingsService.Changed += OnSettingsChanged;
     }
 
     private void OnSettingsChanged(object? sender, AppSettings settings)
     {
-        // Собственное сохранение возвращается сюда же этим событием. Перечитывать
-        // нечего: значения уже наши, а Reload посреди применения сбил бы правку,
-        // которую пользователь делает прямо сейчас.
+        // Our own save comes back through this event. There is nothing to reload,
+        // and reloading mid-apply would clobber the edit in progress.
         if (_applying)
         {
             return;
         }
 
-        // Настройки могут прийти из фонового потока, а привязки живут в потоке
-        // интерфейса. Если мы уже в нём — перечитываем сразу, без лишнего круга
-        // через очередь: иначе значение успевает мелькнуть старым.
+        // Settings can arrive from a background thread while bindings live on the UI
+        // thread. When already on it, reload immediately rather than round-tripping
+        // through the queue, or the old value flickers.
         Dispatcher dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
 
         if (dispatcher.CheckAccess())
@@ -117,15 +113,14 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     private bool _applying;
 
-    /// <summary>Список поддерживаемых форматов — чипы в разделе «Форматы».</summary>
+    /// <summary>Supported formats, shown as chips in the formats section.</summary>
     /// <remarks>
-    /// Чип переключается: выключенное расширение попадает в
-    /// <see cref="AppSettings.DisabledExtensions"/> и в обход не идёт.
-    /// Раньше это был просто список подписей, и настройка была недостижима.
+    /// A chip toggles: a disabled extension goes into
+    /// <see cref="AppSettings.DisabledExtensions"/> and is skipped by the walk.
     /// </remarks>
     public ObservableCollection<FormatChip> Formats { get; }
 
-    /// <summary>Сводка по чипам: «12 из 14».</summary>
+    /// <summary>Chip summary, e.g. "12 of 14".</summary>
     public string FormatsSummary =>
         $"{Formats.Count(f => f.Enabled)} из {Formats.Count}";
 
@@ -140,27 +135,24 @@ public sealed partial class SettingsViewModel : ObservableObject
         _ = ApplyAsync();
     }
 
-    /// <summary>Цвета статусов, показанные в разделе «Внешний вид».</summary>
+    /// <summary>Status colours shown in the appearance section.</summary>
     public ObservableCollection<StatusColorRow> StatusColors { get; }
 
-    /// <summary>Настройки изменены и применены.</summary>
+    /// <summary>Raised after settings are changed and applied.</summary>
     public event EventHandler? Applied;
 
-    // ── Внешний вид ──────────────────────────────────────────────────────
+    // ── Appearance ───────────────────────────────────────────────────────
 
-    /// <summary>Тема оформления.</summary>
     [ObservableProperty]
     private AppTheme _theme;
 
-    /// <summary>Плотность строк таблицы.</summary>
     [ObservableProperty]
     private ListDensity _listDensity;
 
-    /// <summary>Высота строки таблицы результатов для выбранной плотности.</summary>
+    /// <summary>Results row height for the selected density.</summary>
     /// <remarks>
-    /// Настройка обязана что-то менять: значение, которое сохраняется и ни на
-    /// что не влияет, хуже отсутствующей настройки. Отступ строки берётся
-    /// прямо отсюда — «Результаты» привязаны к этому свойству.
+    /// The results view binds its row padding to this, so the density setting has
+    /// a visible effect.
     /// </remarks>
     public Thickness RowPadding => ListDensity == ListDensity.Compact
         ? new Thickness(16, 7, 16, 7)
@@ -168,192 +160,155 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     partial void OnListDensityChanged(ListDensity value) => OnPropertyChanged(nameof(RowPadding));
 
-    /// <summary>Показывать полные пути.</summary>
     [ObservableProperty]
     private bool _showFullPaths;
 
-    /// <summary>Моноширинный шрифт для путей.</summary>
     [ObservableProperty]
     private bool _monospacePaths;
 
-    /// <summary>Показывать строку состояния внизу окна.</summary>
     [ObservableProperty]
     private bool _showStatusBar;
 
-    /// <summary>Подложка Mica под окном.</summary>
     [ObservableProperty]
     private bool _micaEffect;
 
-    /// <summary>Анимации.</summary>
     [ObservableProperty]
     private bool _animations;
 
-    /// <summary>Система умеет рисовать подложку Mica.</summary>
+    /// <summary>The OS can draw a Mica backdrop.</summary>
     /// <remarks>
-    /// Переключатель без этого был бы обманом: на Windows 10 его можно было бы
-    /// включить, и ничего бы не произошло.
+    /// Without this the toggle would lie: on Windows 10 it could be switched on
+    /// with no effect.
     /// </remarks>
     public bool IsMicaSupported => _themeService.IsMicaSupported;
 
     /// <summary>
-    /// Пояснение под переключателем: показывается, только когда эффект
-    /// недоступен и надо объяснить погасший тумблер.
+    /// Caption under the Mica toggle; only shown when the effect is unavailable,
+    /// to explain why the toggle is disabled.
     /// </summary>
     public string MicaNote => IsMicaSupported
         ? string.Empty
         : "недоступно: подложку умеет рисовать только Windows 11";
 
-    // ── Проверка ─────────────────────────────────────────────────────────
+    // ── Scanning ─────────────────────────────────────────────────────────
 
-    /// <summary>Рекурсивный обход подпапок.</summary>
     [ObservableProperty]
     private bool _recursive;
 
-    /// <summary>Проверка метаданных.</summary>
     [ObservableProperty]
     private bool _checkMetadata;
 
-    /// <summary>Проверка плейлистов.</summary>
     [ObservableProperty]
     private bool _checkPlaylists;
 
-    /// <summary>Насколько глубоко читать файл декодером.</summary>
     [ObservableProperty]
     private CheckDepth _checkDepth;
 
-    /// <summary>Учитывать тип диска при выборе числа потоков.</summary>
     [ObservableProperty]
     private bool _respectDriveType;
 
-    /// <summary>Следить за порчей: хранить отпечатки файлов.</summary>
     [ObservableProperty]
     private bool _trackChanges;
 
-    /// <summary>Сколько файлов помнит история.</summary>
+    /// <summary>How many files the history remembers.</summary>
     [ObservableProperty]
     private string _historyNote = string.Empty;
 
-    /// <summary>Разбирать альбомы и искать повторы.</summary>
     [ObservableProperty]
     private bool _inspectCollection;
 
-    /// <summary>Замечать тишину и провалы внутри трека.</summary>
     [ObservableProperty]
     private bool _detectSilence;
 
-    /// <summary>Замечать перегрузку и смещение нуля.</summary>
     [ObservableProperty]
     private bool _detectClipping;
 
-    /// <summary>Искать признаки перекодирования по срезанному спектру.</summary>
     [ObservableProperty]
     private bool _detectTranscode;
 
-    /// <summary>Сверять расширение с содержимым.</summary>
     [ObservableProperty]
     private bool _verifyExtension;
 
-    /// <summary>Проверять контрольные суммы формата и целостность контейнера.</summary>
     [ObservableProperty]
     private bool _verifyContainerIntegrity;
 
-    /// <summary>Порог «большого файла».</summary>
     [ObservableProperty]
     private ThresholdOption _threshold = ThresholdOptions[1];
 
-    /// <summary>Таймаут проверки файла.</summary>
     [ObservableProperty]
     private TimeoutOption _timeout = TimeoutOptions[2];
 
-    /// <summary>Параллельность выбирается автоматически.</summary>
     [ObservableProperty]
     private bool _autoParallelism;
 
-    /// <summary>Параллельность, заданная вручную.</summary>
     [ObservableProperty]
     private int _manualParallelism;
 
-    /// <summary>Предупреждать о больших файлах.</summary>
     [ObservableProperty]
     private bool _warnAboutLargeFiles;
 
-    // ── Занятые файлы ────────────────────────────────────────────────────
+    // ── Locked files ─────────────────────────────────────────────────────
 
-    /// <summary>Что делать с занятым файлом.</summary>
     [ObservableProperty]
     private LockedFileAction _lockedFileAction;
 
-    /// <summary>Сколько ждать освобождения.</summary>
     [ObservableProperty]
     private int _lockedWaitSeconds;
 
-    /// <summary>Сколько раз повторять попытку.</summary>
     [ObservableProperty]
     private int _lockedRetryCount;
 
-    /// <summary>Определять программу-владельца.</summary>
     [ObservableProperty]
     private bool _detectOwnerProcess;
 
-    /// <summary>Показывать в вопросе флажок «поступать так же со всеми».</summary>
     [ObservableProperty]
     private bool _allowApplyToAllLocked;
 
-    /// <summary>Предлагать закрыть владельца.</summary>
     [ObservableProperty]
     private bool _offerCloseOwner;
 
-    // ── Форматы ──────────────────────────────────────────────────────────
+    // ── Formats ──────────────────────────────────────────────────────────
 
-    /// <summary>Экспериментальная поддержка ISO (SACD).</summary>
     [ObservableProperty]
     private bool _enableIsoSacd;
 
-    /// <summary>Пользовательские расширения через запятую.</summary>
+    /// <summary>User extensions, comma separated.</summary>
     [ObservableProperty]
     private string _customExtensions = string.Empty;
 
-    // ── Общие ────────────────────────────────────────────────────────────
+    // ── General ──────────────────────────────────────────────────────────
 
-    /// <summary>Запоминать последнюю папку.</summary>
     [ObservableProperty]
     private bool _rememberLastFolder;
 
-    /// <summary>Предлагать старт после выбора папки.</summary>
     [ObservableProperty]
     private bool _offerStartAfterFolderSelected;
 
-    /// <summary>Показывать приветствие при первом запуске.</summary>
     [ObservableProperty]
     private bool _showFirstRunTip;
 
-    /// <summary>Звук по завершении проверки.</summary>
     [ObservableProperty]
     private bool _soundOnFinish;
 
-    // ── Отчёты ───────────────────────────────────────────────────────────
+    // ── Reports ──────────────────────────────────────────────────────────
 
-    /// <summary>Формат отчёта по умолчанию.</summary>
     [ObservableProperty]
     private ReportFormat _defaultReportFormat;
 
-    /// <summary>Папка для отчётов.</summary>
     [ObservableProperty]
     private string _reportsFolder = string.Empty;
 
-    /// <summary>Включать в отчёт файлы «в порядке».</summary>
     [ObservableProperty]
     private bool _includeOkFilesInReport;
 
-    /// <summary>Открывать отчёт после сохранения.</summary>
     [ObservableProperty]
     private bool _openReportAfterSave;
 
 
-    /// <summary>Путь к файлу настроек — показывается пользователю.</summary>
+    /// <summary>Path to the settings file, shown to the user.</summary>
     public string SettingsFilePath => _settingsService.SettingsFilePath;
 
-    /// <summary>Читает значения из текущих настроек.</summary>
+    /// <summary>Loads values from the current settings.</summary>
     public void Reload()
     {
         _loading = true;
@@ -367,14 +322,11 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Любая правка применяется сразу, без кнопки «Применить».
-    /// </summary>
+    /// <summary>Every change is applied immediately, with no Apply button.</summary>
     /// <remarks>
-    /// Так устроены настройки самой Windows 11, и так уже вели себя быстрые
-    /// параметры на вкладке «Проверка» — держать рядом два разных поведения
-    /// значило бы путать пользователя. Отдельная кнопка ещё и требовала бы
-    /// помнить о ней: закрыл вкладку, не нажав, — правки потеряны.
+    /// That is how Windows 11 Settings behaves, and how the quick panel on the
+    /// scan tab already worked; a separate button would also lose edits whenever
+    /// the user forgot to press it.
     /// </remarks>
     protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -396,9 +348,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         MonospacePaths = _draft.MonospacePaths;
         ShowStatusBar = _draft.ShowStatusBar;
 
-        // К этому месту пустых значений уже нет: их разрешили при запуске.
-        // Но подстраховка ничего не стоит, а окно настроек не должно зависеть
-        // от того, кто и в каком порядке вызывался до него.
+        // Nulls were already resolved at startup, but the fallback costs nothing and
+        // keeps this screen independent of call order.
         MicaEffect = _draft.MicaEffect ?? false;
         Animations = _draft.Animations ?? true;
 
@@ -453,7 +404,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         RefreshStatusColors();
     }
 
-    /// <summary>Собирает изменённые настройки и сохраняет их.</summary>
+    /// <summary>Collects the edited values and saves them.</summary>
     public async Task ApplyAsync()
     {
         _applying = true;
@@ -508,7 +459,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         settings.IncludeOkFilesInReport = IncludeOkFilesInReport;
         settings.OpenReportAfterSave = OpenReportAfterSave;
 
-        // Цвета статусов правятся отдельно и уже лежат в StatusColors.
+        // Status colours are edited separately and already live in StatusColors.
         settings.StatusColors = new StatusColorOverrides
         {
             Ok = StatusColors[0].Override,
@@ -531,8 +482,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         _loading = true;
         try
         {
-            // Цвета статусов по умолчанию зависят от темы: после её смены
-            // подписи в списке обновляются, но правкой это не считается.
+            // Default status colours depend on the theme; refreshing the captions after a
+            // theme change is not a user edit.
             RefreshStatusColors();
         }
         finally
@@ -543,7 +494,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Applied?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>Сбрасывает все настройки к значениям по умолчанию.</summary>
+    /// <summary>Resets every setting to its default.</summary>
     [RelayCommand]
     private async Task ResetAllAsync()
     {
@@ -566,7 +517,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Applied?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>Выбирает папку для отчётов.</summary>
+    /// <summary>Picks the reports folder.</summary>
     [RelayCommand]
     private void PickReportsFolder()
     {
@@ -594,11 +545,11 @@ public sealed partial class SettingsViewModel : ObservableObject
         RefreshHistoryNote();
     }
 
-    /// <summary>Стирает историю проверок.</summary>
+    /// <summary>Wipes the scan history.</summary>
     /// <remarks>
-    /// Спрашивает подтверждение: после очистки первая же проверка снова прочитает
-    /// каждый файл целиком, а тихая порча, случившаяся до этого, останется
-    /// незамеченной — сравнивать будет не с чем.
+    /// Asks first: afterwards the next scan reads every file whole again, and any
+    /// silent corruption that happened before goes unnoticed — there is nothing
+    /// left to compare against.
     /// </remarks>
     [RelayCommand]
     private async Task ClearHistoryAsync()
@@ -621,7 +572,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         RefreshHistoryNote();
     }
 
-    /// <summary>Открывает базу истории, если она ещё не открыта.</summary>
+    /// <summary>Opens the history database if it is not open yet.</summary>
     private void EnsureHistoryOpen()
     {
         if (!_history.IsOpen)
@@ -630,7 +581,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Обновляет подпись со сведениями о базе.</summary>
+    /// <summary>Refreshes the database information caption.</summary>
     private void RefreshHistoryNote()
     {
         if (!TrackChanges)
@@ -648,11 +599,11 @@ public sealed partial class SettingsViewModel : ObservableObject
               $"{Core.Common.Format.Plural(count, "файл", "файла", "файлов")}; база лежит в {_history.DatabasePath}";
     }
 
-    /// <summary>Открывает папку с файлом настроек в проводнике.</summary>
+    /// <summary>Reveals the settings file in Explorer.</summary>
     [RelayCommand]
     private void OpenSettingsFolder() => _dialogService.RevealInExplorer(SettingsFilePath);
 
-    /// <summary>Меняет цвет одного статуса.</summary>
+    /// <summary>Changes the colour of one status.</summary>
     [RelayCommand]
     private void PickStatusColor(StatusColorRow? row)
     {
@@ -670,14 +621,13 @@ public sealed partial class SettingsViewModel : ObservableObject
         row.Override = picked;
         row.EffectiveHex = picked;
 
-        // Сохранение вызывается вручную: строки цвета — отдельные объекты, и
-        // их правка не поднимает PropertyChanged у самих настроек, на котором
-        // держится автосохранение. Без этой строки выбранный цвет оставался
-        // только в списке и пропадал при перезапуске.
+        // Saved explicitly: colour rows are separate objects, and editing them does
+        // not raise PropertyChanged on the settings that autosave relies on. Without
+        // this the picked colour was lost on restart.
         _ = ApplyAsync();
     }
 
-    /// <summary>Возвращает цвету статуса значение из темы.</summary>
+    /// <summary>Restores a status colour to the theme default.</summary>
     [RelayCommand]
     private void ResetStatusColor(StatusColorRow? row)
     {
@@ -708,27 +658,22 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
-    /// <summary>Вариант порога «большого файла».</summary>
-    /// <param name="Megabytes">Размер в мегабайтах; 0 — без ограничений.</param>
-    /// <param name="Label">Подпись для списка.</param>
+    /// <summary>A large-file threshold option.</summary>
+    /// <param name="Megabytes">Size in megabytes; 0 means no limit.</param>
     public sealed record ThresholdOption(int Megabytes, string Label)
     {
         /// <inheritdoc />
         public override string ToString() => Label;
     }
 
-    /// <summary>Вариант «число + подпись»: сколько файлов журнала, сколько мегабайт.</summary>
-    /// <param name="Value">Само число.</param>
-    /// <param name="Label">Подпись для списка.</param>
+    /// <summary>A number with its display caption.</summary>
     public sealed record CountOption(int Value, string Label)
     {
         /// <inheritdoc />
         public override string ToString() => Label;
     }
 
-    /// <summary>Вариант таймаута проверки файла.</summary>
-    /// <param name="Seconds">Секунды.</param>
-    /// <param name="Label">Подпись для списка.</param>
+    /// <summary>A per-file timeout option.</summary>
     public sealed record TimeoutOption(int Seconds, string Label)
     {
         /// <inheritdoc />
@@ -736,20 +681,20 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 }
 
-/// <summary>Чип формата в настройках: расширение и признак «обходить».</summary>
+/// <summary>Format chip: extension and whether it is scanned.</summary>
 public sealed partial class FormatChip(string extension, Action onToggled) : ObservableObject
 {
     private readonly Action _onToggled = onToggled;
     private bool _quiet;
 
-    /// <summary>Расширение без точки, прописными: «FLAC».</summary>
+    /// <summary>Upper-case extension without the dot, e.g. "FLAC".</summary>
     public string Extension { get; } = extension;
 
-    /// <summary>Обходить файлы с этим расширением.</summary>
+    /// <summary>Files with this extension are scanned.</summary>
     [ObservableProperty]
     private bool _enabled = true;
 
-    /// <summary>Ставит состояние, не поднимая пересчёт настроек (при загрузке).</summary>
+    /// <summary>Sets the state without triggering a settings update; used while loading.</summary>
     public void SetEnabledQuietly(bool value)
     {
         _quiet = true;
@@ -766,24 +711,22 @@ public sealed partial class FormatChip(string extension, Action onToggled) : Obs
     }
 }
 
-/// <summary>Строка настройки цвета статуса.</summary>
+/// <summary>Status colour row.</summary>
 public sealed partial class StatusColorRow(CheckStatus status, string label) : ObservableObject
 {
-    /// <summary>Статус, к которому относится цвет.</summary>
     public CheckStatus Status { get; } = status;
 
-    /// <summary>Подпись строки.</summary>
     public string Label { get; } = label;
 
-    /// <summary>Цвет, выбранный пользователем; <see langword="null"/> — цвет темы.</summary>
+    /// <summary>User colour; <see langword="null"/> means the theme colour.</summary>
     [ObservableProperty]
     private string? _override;
 
-    /// <summary>Цвет, который сейчас показан.</summary>
+    /// <summary>Colour currently displayed.</summary>
     [ObservableProperty]
     private string _effectiveHex = "#808080";
 
-    /// <summary>Цвет задан пользователем, а не взят из темы.</summary>
+    /// <summary>The colour was set by the user rather than taken from the theme.</summary>
     public bool IsCustom => Override is not null;
 
     partial void OnOverrideChanged(string? value) => OnPropertyChanged(nameof(IsCustom));
