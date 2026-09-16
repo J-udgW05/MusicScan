@@ -34,7 +34,7 @@ public sealed class AudioStatsTests
     private static float[] Silence(double seconds) => new float[(int)(Rate * seconds)];
 
     [Fact]
-    public void Пустой_набор_даёт_нули()
+    public void Empty_input_yields_zeros()
     {
         AudioStats stats = Measure();
 
@@ -43,7 +43,7 @@ public sealed class AudioStatsTests
     }
 
     [Fact]
-    public void Сплошная_тишина_видна_по_уровню()
+    public void Digital_silence_shows_in_level()
     {
         AudioStats stats = Measure(Silence(3));
 
@@ -52,19 +52,19 @@ public sealed class AudioStatsTests
     }
 
     [Fact]
-    public void Обычный_звук_тишиной_не_считается()
+    public void Ordinary_audio_is_not_silence()
     {
         AudioStats stats = Measure(Tone(1));
 
         Assert.False(stats.IsSilent);
         Assert.InRange(stats.Peak, 0.49, 0.51);
 
-        // Среднеквадратичное синуса — амплитуда, делённая на корень из двух.
+        // RMS of a sine is its amplitude divided by the square root of two.
         Assert.InRange(stats.Rms, 0.34, 0.36);
     }
 
     [Fact]
-    public void Провал_внутри_трека_измеряется()
+    public void Dropout_inside_track_is_measured()
     {
         AudioStats stats = Measure(Tone(1), Silence(2), Tone(1));
 
@@ -72,21 +72,21 @@ public sealed class AudioStatsTests
     }
 
     [Fact]
-    public void Тишина_в_начале_и_в_конце_провалом_не_считается()
+    public void Silence_at_start_and_end_is_not_a_dropout()
     {
-        // Подводка и затухание есть почти у каждого трека: если считать их
-        // провалом, предупреждение получит половина коллекции.
+        // Nearly every track has an intro and a fade; counting them as dropouts would
+        // warn about half the collection.
         AudioStats stats = Measure(Silence(3), Tone(1), Silence(3));
 
-        // Одиночные нули на переходах синуса через ноль в счёт идут, но провалом
-        // считается только заметная пауза — доли миллисекунды ею не являются.
+        // Single zeros at sine zero crossings are counted, but only a noticeable pause
+        // is a dropout — fractions of a millisecond are not.
         Assert.True(
             stats.LongestSilentSeconds < 0.01,
             $"насчитано {stats.LongestSilentSeconds:0.####} с тишины внутри звучания");
     }
 
     [Fact]
-    public void Перегрузка_считается_долей_отсчётов()
+    public void Clipping_is_a_share_of_samples()
     {
         float[] loud = new float[1000];
         Array.Fill(loud, 1f);
@@ -98,7 +98,7 @@ public sealed class AudioStatsTests
     }
 
     [Fact]
-    public void Смещение_нуля_видно_в_постоянной_составляющей()
+    public void Dc_offset_shows_in_mean()
     {
         float[] shifted = Tone(1);
         for (int i = 0; i < shifted.Length; i++)
@@ -112,7 +112,7 @@ public sealed class AudioStatsTests
     }
 
     [Fact]
-    public void У_ровной_записи_ноль_на_месте()
+    public void Centred_recording_has_no_offset()
     {
         AudioStats stats = Measure(Tone(1));
 

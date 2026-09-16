@@ -7,11 +7,10 @@ namespace MusicScanIntegrity.Core.Tests;
 public sealed class AppSettingsDefaultsTests
 {
     [Fact]
-    public void Значения_по_умолчанию_совпадают_со_спецификацией()
+    public void Defaults_match_documented_values()
     {
         AppSettings settings = new();
 
-        // UI_SPEC.md, раздел 7.
         Assert.True(settings.Recursive);
         Assert.False(settings.CheckMetadata);
         Assert.Equal(500, settings.LargeFileThresholdMb);
@@ -25,7 +24,7 @@ public sealed class AppSettingsDefaultsTests
     }
 
     [Fact]
-    public void Авто_параллельность_не_превышает_восьми_потоков()
+    public void Auto_parallelism_is_capped_at_eight()
     {
         AppSettings settings = new() { AutoParallelism = true };
 
@@ -34,7 +33,7 @@ public sealed class AppSettingsDefaultsTests
     }
 
     [Fact]
-    public void Ручная_параллельность_берётся_из_настройки()
+    public void Manual_parallelism_comes_from_setting()
     {
         AppSettings settings = new() { AutoParallelism = false, ManualParallelism = 16 };
 
@@ -42,14 +41,14 @@ public sealed class AppSettingsDefaultsTests
     }
 
     [Fact]
-    public void Нулевой_порог_означает_без_ограничений()
+    public void Zero_threshold_means_no_limit()
     {
         Assert.Null(new AppSettings { LargeFileThresholdMb = 0 }.LargeFileThresholdBytes);
         Assert.Equal(500L * 1024 * 1024, new AppSettings { LargeFileThresholdMb = 500 }.LargeFileThresholdBytes);
     }
 
     [Fact]
-    public void Клон_не_разделяет_списки_с_оригиналом()
+    public void Clone_does_not_share_lists()
     {
         AppSettings original = new();
         original.CustomExtensions.Add(".mpc");
@@ -66,7 +65,7 @@ public sealed class AppSettingsDefaultsTests
 public sealed class JsonSettingsServiceTests
 {
     [Fact]
-    public async Task Первый_запуск_создаёт_файл_и_возвращает_значения_по_умолчанию()
+    public async Task First_run_creates_file_with_defaults()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "settings.json");
@@ -80,7 +79,7 @@ public sealed class JsonSettingsServiceTests
     }
 
     [Fact]
-    public async Task Сохранённые_настройки_переживают_перезапуск()
+    public async Task Saved_settings_survive_restart()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "settings.json");
@@ -106,7 +105,7 @@ public sealed class JsonSettingsServiceTests
     }
 
     [Fact]
-    public async Task Повреждённый_файл_не_мешает_запуску()
+    public async Task Damaged_file_does_not_block_startup()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "settings.json");
@@ -119,13 +118,13 @@ public sealed class JsonSettingsServiceTests
         Assert.Equal(500, service.Current.LargeFileThresholdMb);
         Assert.True(File.Exists(path + ".corrupted"));
 
-        // Файл перезаписан корректным JSON.
+        // The file was rewritten with valid JSON.
         using JsonDocument document = JsonDocument.Parse(await File.ReadAllTextAsync(path));
         Assert.Equal(500, document.RootElement.GetProperty("LargeFileThresholdMb").GetInt32());
     }
 
     [Fact]
-    public async Task Сброс_возвращает_значения_по_умолчанию()
+    public async Task Reset_restores_defaults()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "settings.json");
@@ -148,7 +147,7 @@ public sealed class JsonSettingsServiceTests
     [InlineData(-100, 0)]
     [InlineData(0, 0)]
     [InlineData(500, 500)]
-    public void Отрицательный_порог_приводится_к_нулю(int input, int expected)
+    public void Negative_threshold_is_clamped_to_zero(int input, int expected)
     {
         AppSettings settings = JsonSettingsService.Sanitize(new AppSettings { LargeFileThresholdMb = input });
 
@@ -156,7 +155,7 @@ public sealed class JsonSettingsServiceTests
     }
 
     [Fact]
-    public void Значения_из_правленного_вручную_файла_загоняются_в_разумные_пределы()
+    public void Hand_edited_values_are_clamped_to_sane_ranges()
     {
         AppSettings settings = JsonSettingsService.Sanitize(new AppSettings
         {
@@ -175,7 +174,7 @@ public sealed class JsonSettingsServiceTests
     [InlineData(".FLAC", ".flac")]
     [InlineData("*.mpc", ".mpc")]
     [InlineData("  .tta  ", ".tta")]
-    public void Расширения_приводятся_к_единому_виду(string input, string expected)
+    public void Extensions_are_normalised(string input, string expected)
     {
         Assert.Equal(expected, JsonSettingsService.NormalizeExtension(input));
     }

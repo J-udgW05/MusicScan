@@ -15,7 +15,7 @@ public sealed class ScanHistoryTests
         new(path, size, new DateTime(2026, 9, 5, 12, 0, 0, DateTimeKind.Utc), hash, CheckStatus.Ok, DateTimeOffset.Now);
 
     [Fact]
-    public void Запись_читается_обратно()
+    public void Entry_reads_back()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -32,7 +32,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Повторная_запись_обновляет_прежнюю()
+    public void Second_write_updates_entry()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -46,7 +46,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void База_переживает_закрытие_и_открытие()
+    public void Database_survives_close_and_reopen()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "history.db");
@@ -64,7 +64,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Очистка_убирает_все_записи()
+    public void Clear_removes_all_entries()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -78,7 +78,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Закрытая_история_ничего_не_знает()
+    public void Closed_history_knows_nothing()
     {
         using ScanHistory history = new();
 
@@ -88,7 +88,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Отпечаток_меняется_вместе_с_содержимым()
+    public void Fingerprint_changes_with_contents()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("файл.bin", [1, 2, 3, 4, 5]);
@@ -103,7 +103,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Отпечаток_одинакового_содержимого_совпадает()
+    public void Identical_contents_share_fingerprint()
     {
         using TempDirectory temp = new();
         string one = temp.WriteBytes("один.bin", [7, 7, 7, 7]);
@@ -115,7 +115,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public async Task Тихая_порча_находится_по_отпечатку()
+    public async Task Silent_corruption_is_found_by_fingerprint()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -124,7 +124,7 @@ public sealed class ScanHistoryTests
         string path = temp.WriteBytes("трек.flac", [.. Enumerable.Repeat((byte)42, 4096)]);
         FileInfo info = new(path);
 
-        // Прошлая проверка: тот же размер и та же дата, но другое содержимое.
+        // Previous scan: same size and date, different contents.
         history.Save(new FileHistoryEntry(
             path,
             info.Length,
@@ -151,7 +151,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public async Task Неизменившийся_файл_повторно_не_проверяется()
+    public async Task Unchanged_file_is_not_rechecked()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -189,7 +189,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public async Task Изменённый_файл_проверяется_заново()
+    public async Task Changed_file_is_rechecked()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -198,7 +198,7 @@ public sealed class ScanHistoryTests
         string path = temp.WriteBytes("трек.flac", [.. Enumerable.Repeat((byte)7, 4096)]);
         FileInfo info = new(path);
 
-        // Содержимое и дата изменились — это обычная правка, а не порча.
+        // Contents and date both changed: an ordinary edit, not corruption.
         history.Save(new FileHistoryEntry(
             path,
             info.Length,
@@ -227,7 +227,7 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public async Task Без_настройки_история_не_трогается()
+    public async Task History_is_untouched_when_setting_is_off()
     {
         using TempDirectory temp = new();
         using ScanHistory history = new();
@@ -252,12 +252,11 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public void Дата_вне_файлового_времени_не_ломает_запись()
+    public void Date_outside_file_time_does_not_break_write()
     {
-        // Дата до 1601 года не переводится в файловое время Windows: раньше
-        // ToFileTimeUtc бросал исключение, и исправный файл получал в отчёте
-        // «непредвиденную ошибку». Такие даты в коллекциях встречаются —
-        // испорченная запись файловой системы, распаковка архива без дат.
+        // Dates before 1601 cannot be converted to Windows file time. ToFileTimeUtc
+        // used to throw, and a healthy file got an "unexpected error" in the report.
+        // Such dates do occur: damaged filesystem records, archives without dates.
         using TempDirectory temp = new();
         using ScanHistory history = new();
         history.Open(Path.Combine(temp.Path, "history.db"));
@@ -277,18 +276,18 @@ public sealed class ScanHistoryTests
         Assert.NotNull(found);
         Assert.Equal("aabbccdd", found!.Hash);
 
-        // Дату мы не выдумываем: она заведомо не совпадёт с настоящей датой
-        // файла, поэтому «тихой порчей» такой файл объявлен не будет.
+        // The date is not invented: it cannot match the file's real date, so the file
+        // will not be reported as silently corrupted.
         Assert.NotEqual(entry.ModifiedUtc, found.ModifiedUtc);
     }
 
     [Fact]
-    public void Очистка_и_счёт_на_закрытой_базе_не_бросают()
+    public void Clear_and_count_on_closed_database_do_not_throw()
     {
         using ScanHistory history = new();
 
-        // Кнопка «Очистить историю» вызывает это из потока окна: исключение
-        // отсюда осталось бы непойманным и уронило бы программу.
+        // The "Clear history" button calls this on the UI thread, where an escaping
+        // exception would crash the app.
         history.Clear();
 
         Assert.Equal(0, history.Count());
@@ -296,10 +295,10 @@ public sealed class ScanHistoryTests
     }
 
     [Fact]
-    public async Task Закрытие_во_время_записи_не_ломает_соединение()
+    public async Task Closing_during_write_does_not_break_connection()
     {
-        // Настоящий случай: проверка пишет в базу из рабочих потоков, а
-        // выключатель «Следить за порчей» закрывает базу из потока окна.
+        // Real case: the scan writes from worker threads while the corruption-
+        // tracking toggle closes the database from the UI thread.
         using TempDirectory temp = new();
         using ScanHistory history = new();
         history.Open(Path.Combine(temp.Path, "history.db"));

@@ -8,11 +8,11 @@ namespace MusicScanIntegrity.Core.Tests;
 public sealed class StorageTypeTests(ITestOutputHelper output)
 {
     [Fact]
-    public void Про_системный_диск_отвечает_без_ошибок()
+    public void System_drive_answers_without_error()
     {
-        // Требовать определённый ответ нельзя: на живой машине драйвер его
-        // даёт, а на виртуальной сборочной — нет, и это законный «не знаю».
-        // Важно, что вызов отвечает, а не падает.
+        // No specific answer can be required: a real machine's driver gives one, a
+        // virtual build agent may not, and "unknown" is legitimate. What matters is
+        // that the call returns instead of throwing.
         StorageType type = StorageTypeDetector.Detect(Environment.SystemDirectory);
 
         output.WriteLine($"системный диск: {type}");
@@ -24,17 +24,17 @@ public sealed class StorageTypeTests(ITestOutputHelper output)
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(@"\\сервер\общая\музыка")]
-    public void Про_несуществующий_или_сетевой_путь_программа_не_гадает(string? path)
+    public void Missing_or_network_path_is_not_guessed(string? path)
     {
         Assert.Equal(StorageType.Unknown, StorageTypeDetector.Detect(path));
     }
 
     [Fact]
-    public void Мусор_вместо_пути_не_роняет_проверку()
+    public void Garbage_path_does_not_throw()
     {
-        // Строка со странными знаками разбирается как относительный путь — от
-        // текущего диска, и ответ будет о нём. Важно другое: наружу не летят
-        // исключения, потому что от этой подсказки зависит только число потоков.
+        // A string of odd characters parses as a relative path on the current drive,
+        // so the answer is about that drive. What matters is that no exception escapes:
+        // only the thread count depends on this hint.
         StorageType type = StorageTypeDetector.Detect("не путь вовсе |<>");
 
         output.WriteLine($"ответ на мусор: {type}");
@@ -52,32 +52,32 @@ public sealed class ParallelismPlannerTests
     };
 
     [Fact]
-    public void На_жёстком_диске_потоков_остаётся_два()
+    public void Hard_disk_gets_two_threads()
     {
         Assert.Equal(2, ParallelismPlanner.Resolve(Settings(), StorageType.HardDisk));
     }
 
     [Fact]
-    public void На_твердотельном_ограничения_нет()
+    public void Solid_state_drive_is_not_capped()
     {
         Assert.Equal(8, ParallelismPlanner.Resolve(Settings(), StorageType.SolidState));
     }
 
     [Fact]
-    public void Неизвестный_носитель_поведение_не_меняет()
+    public void Unknown_drive_does_not_change_behaviour()
     {
-        // «Не знаю» — не повод замедлять проверку: гадать вредно.
+        // "Unknown" is no reason to slow the scan down; guessing would be worse.
         Assert.Equal(8, ParallelismPlanner.Resolve(Settings(), StorageType.Unknown));
     }
 
     [Fact]
-    public void Выключенная_настройка_отменяет_ограничение()
+    public void Disabled_setting_removes_cap()
     {
         Assert.Equal(8, ParallelismPlanner.Resolve(Settings(respect: false), StorageType.HardDisk));
     }
 
     [Fact]
-    public void Один_поток_меньше_не_становится()
+    public void Single_thread_is_not_reduced()
     {
         Assert.Equal(1, ParallelismPlanner.Resolve(Settings(manual: 1), StorageType.HardDisk));
     }

@@ -26,13 +26,13 @@ public sealed class AudioFormatsTests
     [InlineData(".s3m")]
     [InlineData(".dsf")]
     [InlineData(".dff")]
-    public void Все_форматы_из_спецификации_поддерживаются(string extension)
+    public void All_documented_formats_are_supported(string extension)
     {
         Assert.Contains(extension, AudioFormats.AllAudio);
     }
 
     [Fact]
-    public void Iso_по_умолчанию_не_считается_аудио()
+    public void Iso_is_not_audio_by_default()
     {
         FormatSelection formats = AudioFormats.ForSettings(new AppSettings());
 
@@ -41,7 +41,7 @@ public sealed class AudioFormatsTests
     }
 
     [Fact]
-    public void Iso_включается_только_экспериментальной_настройкой()
+    public void Iso_is_enabled_only_by_experimental_setting()
     {
         FormatSelection formats = AudioFormats.ForSettings(new AppSettings { EnableIsoSacd = true });
 
@@ -49,7 +49,7 @@ public sealed class AudioFormatsTests
     }
 
     [Fact]
-    public void Выключенное_расширение_перестаёт_попадать_в_обход()
+    public void Disabled_extension_is_excluded_from_walk()
     {
         AppSettings settings = new();
         settings.DisabledExtensions.Add(".wma");
@@ -61,7 +61,7 @@ public sealed class AudioFormatsTests
     }
 
     [Fact]
-    public void Пользовательское_расширение_добавляется_к_обходу()
+    public void Custom_extension_is_added_to_walk()
     {
         AppSettings settings = new();
         settings.CustomExtensions.Add(".mpc");
@@ -72,7 +72,7 @@ public sealed class AudioFormatsTests
     }
 
     [Fact]
-    public void Плейлисты_не_попадают_в_аудио()
+    public void Playlists_are_not_audio()
     {
         FormatSelection formats = AudioFormats.ForSettings(new AppSettings());
 
@@ -86,7 +86,7 @@ public sealed class AudioFormatsTests
     [InlineData(".midi", "MIDI")]
     [InlineData(".aif", "AIFF")]
     [InlineData(".oga", "OGG")]
-    public void Название_формата_читается_по_человечески(string extension, string expected)
+    public void Format_display_name_is_readable(string extension, string expected)
     {
         Assert.Equal(expected, AudioFormats.DisplayName(extension));
     }
@@ -97,7 +97,7 @@ public sealed class FileDiscoveryServiceTests
     private static FileDiscoveryService CreateService() => new();
 
     [Fact]
-    public async Task Находит_аудио_и_плейлисты_и_игнорирует_прочее()
+    public async Task Finds_audio_and_playlists_and_ignores_the_rest()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("a.flac", 1);
@@ -114,7 +114,7 @@ public sealed class FileDiscoveryServiceTests
     }
 
     [Fact]
-    public async Task Рекурсия_включена_по_умолчанию()
+    public async Task Recursion_is_on_by_default()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("root.flac", 1);
@@ -126,7 +126,7 @@ public sealed class FileDiscoveryServiceTests
     }
 
     [Fact]
-    public async Task Без_рекурсии_подпапки_не_обходятся()
+    public async Task Without_recursion_subfolders_are_skipped()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("root.flac", 1);
@@ -140,7 +140,7 @@ public sealed class FileDiscoveryServiceTests
     }
 
     [Fact]
-    public async Task Несуществующая_папка_отмечается_честно_а_не_падает()
+    public async Task Missing_folder_is_reported_not_thrown()
     {
         string missing = Path.Combine(Path.GetTempPath(), "нет-такой-папки-" + Guid.NewGuid().ToString("N"));
 
@@ -151,7 +151,7 @@ public sealed class FileDiscoveryServiceTests
     }
 
     [Fact]
-    public async Task Плейлисты_не_обходятся_если_их_проверка_выключена()
+    public async Task Playlists_are_skipped_when_checking_is_off()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("a.flac", 1);
@@ -165,7 +165,7 @@ public sealed class FileDiscoveryServiceTests
     }
 
     [Fact]
-    public async Task Размер_файла_попадает_в_результат_обхода()
+    public async Task File_size_is_reported_by_walk()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("a.flac", 1, 2, 3, 4, 5);

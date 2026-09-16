@@ -6,7 +6,7 @@ namespace MusicScanIntegrity.Core.Tests;
 public sealed class FftTests
 {
     [Fact]
-    public void Синус_даёт_пик_в_своей_полосе()
+    public void Sine_peaks_in_its_own_bin()
     {
         const int size = 1024;
         const int bin = 64;
@@ -38,7 +38,7 @@ public sealed class FftTests
     }
 
     [Fact]
-    public void Постоянный_сигнал_собирается_в_нулевой_полосе()
+    public void Constant_signal_lands_in_bin_zero()
     {
         double[] real = new double[256];
         double[] imaginary = new double[256];
@@ -50,18 +50,14 @@ public sealed class FftTests
         Assert.InRange(Math.Abs(real[1]), 0, 1e-9);
     }
 
-    /// <summary>
-    /// Окно из одного отсчёта не должно давать «не число».
-    /// </summary>
     /// <remarks>
-    /// В формуле окна стоит деление на длину минус один, и при длине единица
-    /// оно даёт ноль. Полученное NaN не выбрасывает исключения, а тихо
-    /// расползается по всему спектру: любое сравнение с ним ложно, и верхняя
-    /// граница молча оказывается нулевой. Такую ошибку не видно ни по журналу,
-    /// ни по вердикту — только по неправильному ответу.
+    /// The window formula divides by length minus one, which is zero for a single
+    /// sample. The resulting NaN throws nothing and silently spreads through the
+    /// spectrum: every comparison with it is false and the upper edge quietly
+    /// becomes zero. Visible only as a wrong answer.
     /// </remarks>
     [Fact]
-    public void Окно_из_одного_отсчёта_остаётся_числом()
+    public void Single_sample_window_is_a_number()
     {
         double[] window = Fft.HannWindow(1);
 
@@ -71,20 +67,20 @@ public sealed class FftTests
     }
 
     [Fact]
-    public void Окно_нулевой_длины_пустое()
+    public void Zero_length_window_is_empty()
     {
         Assert.Empty(Fft.HannWindow(0));
     }
 
     [Fact]
-    public void Окно_отрицательной_длины_не_принимается()
+    public void Negative_length_window_is_rejected()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => Fft.HannWindow(-1));
     }
 
-    /// <summary>Обычное окно: края прижаты к нулю, середина — к единице.</summary>
+    /// <summary>Regular window: edges pulled to zero, middle to one.</summary>
     [Fact]
-    public void Окно_прижимает_края_к_нулю()
+    public void Window_pulls_edges_to_zero()
     {
         double[] window = Fft.HannWindow(64);
 
@@ -95,7 +91,7 @@ public sealed class FftTests
     }
 
     [Fact]
-    public void Длина_не_степень_двойки_не_принимается()
+    public void Non_power_of_two_length_is_rejected()
     {
         double[] real = new double[100];
         double[] imaginary = new double[100];
@@ -128,9 +124,9 @@ public sealed class SpectrumAnalyzerTests
     }
 
     [Fact]
-    public void Полоса_обрезанного_сверху_сигнала_видна()
+    public void Band_of_low_passed_signal_is_detected()
     {
-        // Сумма тонов до 10 кГц: выше в сигнале ничего нет.
+        // Sum of tones up to 10 kHz; nothing above that in the signal.
         SpectrumProfile profile = Analyze(i =>
         {
             double t = i / (double)Rate;
@@ -144,7 +140,7 @@ public sealed class SpectrumAnalyzerTests
     }
 
     [Fact]
-    public void Широкополосный_шум_доходит_до_предела_формата()
+    public void Wideband_noise_reaches_format_limit()
     {
         Random random = new(20260905);
 
@@ -157,7 +153,7 @@ public sealed class SpectrumAnalyzerTests
     }
 
     [Fact]
-    public void Тишина_не_даёт_ложной_границы()
+    public void Silence_gives_no_false_edge()
     {
         SpectrumProfile profile = Analyze(_ => 0);
 
@@ -165,7 +161,7 @@ public sealed class SpectrumAnalyzerTests
     }
 
     [Fact]
-    public void Короткого_куска_недостаточно_для_вывода()
+    public void Short_block_is_not_enough_to_conclude()
     {
         SpectrumProfile profile = Analyze(i => Math.Sin(2 * Math.PI * 1000 * i / Rate), seconds: 0.2);
 

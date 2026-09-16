@@ -5,7 +5,7 @@ using MusicScanIntegrity.Core.Models;
 
 namespace MusicScanIntegrity.Core.Tests;
 
-/// <summary>Временная папка, которая сама за собой убирает.</summary>
+/// <summary>Temporary folder that cleans up after itself.</summary>
 internal sealed class TempDirectory : IDisposable
 {
     public TempDirectory()
@@ -16,7 +16,7 @@ internal sealed class TempDirectory : IDisposable
 
     public string Path { get; }
 
-    /// <summary>Создаёт файл с текстовым содержимым и возвращает полный путь.</summary>
+    /// <summary>Creates a text file and returns its full path.</summary>
     public string WriteText(string relativePath, string content, System.Text.Encoding? encoding = null)
     {
         string full = System.IO.Path.Combine(Path, relativePath);
@@ -25,7 +25,7 @@ internal sealed class TempDirectory : IDisposable
         return full;
     }
 
-    /// <summary>Создаёт файл заданного размера, набитый нулями.</summary>
+    /// <summary>Creates a zero-filled file of the given size.</summary>
     public string WriteBytes(string relativePath, params byte[] content)
     {
         string full = System.IO.Path.Combine(Path, relativePath);
@@ -45,27 +45,27 @@ internal sealed class TempDirectory : IDisposable
         }
         catch (IOException)
         {
-            // Папку кто-то держит — на результат теста это не влияет.
+            // Something holds the folder; it does not affect the test result.
         }
     }
 }
 
-/// <summary>Подставной декодер: отвечает по правилу, заданному тестом.</summary>
+/// <summary>Fake decoder that answers by a rule set in the test.</summary>
 internal sealed class FakeAudioProbe(Func<string, AudioProbeResult>? behaviour = null) : IAudioProbe
 {
     private int _calls;
 
     public bool IsAvailable { get; set; } = true;
 
-    /// <summary>Сколько раз вызвали проверку — удобно считать параллельность.</summary>
+    /// <summary>How many times Probe was called; handy for counting parallelism.</summary>
     public int Calls => Volatile.Read(ref _calls);
 
-    /// <summary>Задержка перед ответом — имитирует долгий файл.</summary>
+    /// <summary>Delay before answering, to simulate a slow file.</summary>
     public TimeSpan Delay { get; set; } = TimeSpan.Zero;
 
     public string? Initialize() => null;
 
-    /// <summary>С какой глубиной звали проверку в последний раз.</summary>
+    /// <summary>Depth requested by the most recent call.</summary>
     public DecodeScope LastScope { get; private set; } = DecodeScope.Quick;
 
     public AudioProbeResult Probe(string filePath, DecodeScope scope, CancellationToken cancellationToken)
@@ -75,7 +75,7 @@ internal sealed class FakeAudioProbe(Func<string, AudioProbeResult>? behaviour =
 
         if (Delay > TimeSpan.Zero)
         {
-            // Ждём с учётом отмены: так тест может проверить срабатывание таймаута.
+            // Honour cancellation so tests can exercise the timeout.
             cancellationToken.WaitHandle.WaitOne(Delay);
             cancellationToken.ThrowIfCancellationRequested();
         }
@@ -84,7 +84,7 @@ internal sealed class FakeAudioProbe(Func<string, AudioProbeResult>? behaviour =
     }
 }
 
-/// <summary>Подставной читатель тегов.</summary>
+/// <summary>Fake tag reader.</summary>
 internal sealed class FakeMetadataReader(TrackMetadata? metadata = null, string? error = null) : IMetadataReader
 {
     public TrackMetadata? Read(string filePath, out string? readError)
@@ -94,22 +94,21 @@ internal sealed class FakeMetadataReader(TrackMetadata? metadata = null, string?
     }
 }
 
-/// <summary>Определитель владельца, который всегда честно говорит «не знаю».</summary>
+/// <summary>Lock detector that always honestly answers "unknown".</summary>
 internal sealed class UnknownOwnerDetector : ILockOwnerDetector
 {
     public LockOwnerResult Detect(string filePath) => LockOwnerResult.Unknown("тест");
 }
 
-/// <summary>История, которой нет.</summary>
+/// <summary>A history that does not exist.</summary>
 /// <remarks>
-/// Проверке файла история нужна как зависимость, но большинству тестов она
-/// не интересна. Раньше в таких местах создавался настоящий ScanHistory —
-/// незакрытый и никогда не открытый. Заглушка честнее: видно, что история
-/// в этом тесте не участвует.
+/// The file checker takes a history dependency most tests do not care about.
+/// This used to be a real ScanHistory, never opened and never disposed; the
+/// stub makes it explicit that history plays no part.
 /// </remarks>
 internal sealed class NoHistory : IScanHistory
 {
-    /// <summary>Общий экземпляр: состояния у заглушки нет, закрывать нечего.</summary>
+    /// <summary>Shared instance: the stub has no state and nothing to dispose.</summary>
     public static readonly NoHistory Instance = new();
 
     private NoHistory()

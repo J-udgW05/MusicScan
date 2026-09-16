@@ -6,45 +6,41 @@ using Xunit;
 namespace MusicScanIntegrity.Core.Tests;
 
 /// <summary>
-/// Правило «при первом запуске берём из системы, дальше — то, что выбрал
-/// человек».
+/// First run takes the system setting; afterwards the user's choice stands.
 /// </summary>
 /// <remarks>
-/// Правило простое на словах и ровно поэтому его легко сломать: достаточно
-/// перепутать «ещё не выбирали» с «выключено». Здесь перебраны все сочетания.
+/// Simple to state and easy to break by confusing "never chosen" with "off",
+/// so every combination is covered.
 /// </remarks>
 public sealed class VisualEffectsTests
 {
-    /// <summary>Всё включено и всё умеет — так выглядит обычная Windows 11.</summary>
+    /// <summary>Everything on and supported: a typical Windows 11.</summary>
     private static readonly SystemEffects Rich = new(true, true, true);
 
-    /// <summary>Эффекты в системе выключены, но нарисовать их есть чем.</summary>
+    /// <summary>Effects off in the system, but Mica is supported.</summary>
     private static readonly SystemEffects Plain = new(false, false, true);
 
-    /// <summary>Подложку рисовать нечем — так выглядит Windows 10.</summary>
+    /// <summary>Mica unsupported: Windows 10.</summary>
     private static readonly SystemEffects NoMica = new(true, true, false);
 
     [Fact]
-    public void При_первом_запуске_подложка_берётся_из_системных_эффектов()
+    public void First_run_takes_backdrop_from_system_effects()
     {
         Assert.True(VisualEffects.ResolveMicaPreference(null, Rich));
         Assert.False(VisualEffects.ResolveMicaPreference(null, Plain));
     }
 
     [Fact]
-    public void При_первом_запуске_анимации_берутся_из_системных()
+    public void First_run_takes_animations_from_system()
     {
         Assert.True(VisualEffects.ResolveAnimations(null, Rich));
         Assert.False(VisualEffects.ResolveAnimations(null, Plain));
     }
 
-    /// <summary>
-    /// Выбор человека сильнее системного: он на то и выбор.
-    /// </summary>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void Выбранное_вручную_не_перебивается_системой(bool chosen)
+    public void User_choice_is_not_overridden_by_system(bool chosen)
     {
         Assert.Equal(chosen, VisualEffects.ResolveMicaPreference(chosen, Rich));
         Assert.Equal(chosen, VisualEffects.ResolveMicaPreference(chosen, Plain));
@@ -52,16 +48,12 @@ public sealed class VisualEffectsTests
         Assert.Equal(chosen, VisualEffects.ResolveAnimations(chosen, Plain));
     }
 
-    /// <summary>
-    /// «Выключено» — это выбор, а не отсутствие выбора.
-    /// </summary>
     /// <remarks>
-    /// Самая вероятная ошибка в таком коде: проверить значение на ложь вместо
-    /// проверки на «не задано». Тогда человек, выключивший подложку, получал бы
-    /// её обратно при каждом запуске.
+    /// The likeliest bug here is testing for false instead of for unset, which
+    /// would give the backdrop back on every launch to a user who turned it off.
     /// </remarks>
     [Fact]
-    public void Выключено_вручную_не_путается_с_невыбранным()
+    public void Explicit_off_is_not_confused_with_unset()
     {
         Assert.False(VisualEffects.ResolveMicaPreference(false, Rich));
         Assert.True(VisualEffects.ResolveMicaPreference(null, Rich));
@@ -70,15 +62,13 @@ public sealed class VisualEffectsTests
         Assert.True(VisualEffects.ResolveAnimations(null, Rich));
     }
 
-    /// <summary>
-    /// Хранится намерение, рисуется возможное.
-    /// </summary>
+    /// <summary>The intent is stored; only what is possible is drawn.</summary>
     /// <remarks>
-    /// На Windows 10 подложки нет, но настройку это выключать не должно: иначе
-    /// после перехода на одиннадцатую она осталась бы выключенной без причины.
+    /// Windows 10 cannot draw Mica, but that must not turn the setting off, or it
+    /// would stay off after upgrading to Windows 11.
     /// </remarks>
     [Fact]
-    public void Без_поддержки_системы_подложка_хранится_но_не_рисуется()
+    public void Unsupported_backdrop_is_stored_but_not_drawn()
     {
         bool preference = VisualEffects.ResolveMicaPreference(null, NoMica);
 
@@ -88,27 +78,23 @@ public sealed class VisualEffectsTests
     }
 
     [Fact]
-    public void Выключенная_подложка_не_рисуется_и_там_где_её_умеют()
+    public void Disabled_backdrop_is_not_drawn_even_when_supported()
     {
         Assert.False(VisualEffects.IsMicaEffective(false, Rich));
     }
 
-    /// <summary>
-    /// Анимации от поддержки подложки не зависят.
-    /// </summary>
     /// <remarks>
-    /// Их рисует сама программа, а не система, — на Windows 10 они работают
-    /// точно так же.
+    /// The application draws animations itself, so they work the same on Windows 10.
     /// </remarks>
     [Fact]
-    public void Анимации_не_зависят_от_поддержки_подложки()
+    public void Animations_do_not_depend_on_backdrop_support()
     {
         Assert.True(VisualEffects.ResolveAnimations(null, NoMica));
         Assert.True(VisualEffects.ResolveAnimations(true, NoMica));
     }
 }
 
-/// <summary>Хранение трёхзначных настроек в файле.</summary>
+/// <summary>Persisting three-state settings.</summary>
 public sealed class VisualEffectsStorageTests
 {
     private static readonly JsonSerializerOptions Options = new()
@@ -116,16 +102,12 @@ public sealed class VisualEffectsStorageTests
         Converters = { new JsonStringEnumConverter() },
     };
 
-    /// <summary>
-    /// «Ещё не выбирали» должно доживать до следующего запуска.
-    /// </summary>
     /// <remarks>
-    /// Если пустое значение при записи превратится в <c>false</c>, первый
-    /// запуск на деле никогда не состоится: программа решит, что человек уже
-    /// всё выключил, и системные настройки не посмотрит ни разу.
+    /// If null were written as false, first run would never happen: the app would
+    /// assume the user turned everything off and never consult the system.
     /// </remarks>
     [Fact]
-    public void Невыбранное_значение_переживает_запись_и_чтение()
+    public void Unset_value_survives_round_trip()
     {
         AppSettings loaded = RoundTrip(new AppSettings());
 
@@ -138,7 +120,7 @@ public sealed class VisualEffectsStorageTests
     [InlineData(false, true)]
     [InlineData(true, true)]
     [InlineData(false, false)]
-    public void Выбранные_значения_переживают_запись_и_чтение(bool mica, bool animations)
+    public void Chosen_values_survive_round_trip(bool mica, bool animations)
     {
         AppSettings loaded = RoundTrip(new AppSettings { MicaEffect = mica, Animations = animations });
 
@@ -147,7 +129,7 @@ public sealed class VisualEffectsStorageTests
     }
 
     [Fact]
-    public void Приведение_в_допустимые_пределы_не_трогает_эффекты()
+    public void Sanitising_does_not_touch_effects()
     {
         AppSettings settings = JsonSettingsService.Sanitize(
             new AppSettings { MicaEffect = false, Animations = null });
@@ -157,7 +139,7 @@ public sealed class VisualEffectsStorageTests
     }
 
     [Fact]
-    public void Копия_настроек_несёт_эффекты_с_собой()
+    public void Settings_clone_carries_effects()
     {
         AppSettings copy = new AppSettings { MicaEffect = true, Animations = false }.Clone();
 
@@ -165,15 +147,12 @@ public sealed class VisualEffectsStorageTests
         Assert.False(copy.Animations);
     }
 
-    /// <summary>
-    /// Старый файл настроек, где этих полей ещё нет, читается как «не выбирали».
-    /// </summary>
     /// <remarks>
-    /// Программа обновляется поверх старой, и её файл настроек остаётся прежним.
-    /// Человек должен получить оформление по системным настройкам, а не пустое.
+    /// An update installs over the old version and keeps its settings file; the
+    /// user should get styling based on system settings, not none.
     /// </remarks>
     [Fact]
-    public void Файл_настроек_прежней_версии_читается_как_невыбранное()
+    public void Old_settings_file_reads_as_unset()
     {
         AppSettings? loaded = JsonSerializer.Deserialize<AppSettings>(
             """{ "SchemaVersion": 1, "Theme": "Dark", "ShowStatusBar": true }""",

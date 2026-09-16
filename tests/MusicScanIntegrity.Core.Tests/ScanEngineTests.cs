@@ -10,7 +10,7 @@ namespace MusicScanIntegrity.Core.Tests;
 
 public sealed class ScanEngineTests
 {
-    /// <summary>Проверка файла, поведение которой полностью задаёт тест.</summary>
+    /// <summary>File check whose behaviour the test fully controls.</summary>
     private sealed class ScriptedChecker(Func<ScanItem, CancellationToken, Task<FileCheckResult>> body) : IFileChecker
     {
         public int Started;
@@ -46,7 +46,7 @@ public sealed class ScanEngineTests
         new AlwaysSkipDecisionProvider());
 
     [Fact]
-    public async Task Все_файлы_проверяются_и_счётчики_сходятся()
+    public async Task All_files_are_checked_and_counters_match()
     {
         ScriptedChecker checker = new((item, _) => Task.FromResult(Ok(item)));
         using ScanEngine engine = CreateEngine(checker);
@@ -68,7 +68,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Результаты_приходят_порциями_а_не_по_одному()
+    public async Task Results_arrive_in_batches()
     {
         ScriptedChecker checker = new((item, _) => Task.FromResult(Ok(item)));
         using ScanEngine engine = CreateEngine(checker);
@@ -80,12 +80,12 @@ public sealed class ScanEngineTests
         await engine.RunAsync(Discovery(400), new AppSettings());
 
         Assert.Equal(400, total);
-        // 400 результатов не должны прийти четырьмястами событиями.
+        // 400 results must not arrive as 400 events.
         Assert.True(batches < 400, $"порций {batches} — ожидалась пакетная отдача");
     }
 
     [Fact]
-    public async Task Ошибка_на_одном_файле_не_останавливает_остальные()
+    public async Task Error_on_one_file_does_not_stop_others()
     {
         ScriptedChecker checker = new((item, _) => Task.FromResult(
             item.FullPath.EndsWith("track0005.flac", StringComparison.Ordinal)
@@ -106,7 +106,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Стоп_прерывает_проверку_и_сохраняет_уже_полученные_результаты()
+    public async Task Stop_aborts_scan_and_keeps_results()
     {
         TaskCompletionSource gate = new();
 
@@ -138,7 +138,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Пауза_не_обрывает_начатые_проверки_но_не_берёт_новые()
+    public async Task Pause_finishes_running_checks_and_takes_no_new_ones()
     {
         TaskCompletionSource started = new();
         int completed = 0;
@@ -160,7 +160,7 @@ public sealed class ScanEngineTests
 
         Assert.Equal(ScanState.Paused, engine.State);
 
-        // Уже начатые файлы должны докрутиться, а новые — не браться.
+        // Files in flight must finish, and no new ones may be taken.
         await Task.Delay(200);
         int afterPause = Volatile.Read(ref completed);
         await Task.Delay(200);
@@ -176,7 +176,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Стоп_работает_даже_когда_проверка_стоит_на_паузе()
+    public async Task Stop_works_while_paused()
     {
         TaskCompletionSource started = new();
 
@@ -196,13 +196,13 @@ public sealed class ScanEngineTests
 
         engine.Stop();
 
-        // Без снятия паузы потоки зависли бы навсегда — проверка не должна таймаутиться.
+        // Without lifting the pause the threads would hang forever; the scan must not time out.
         await run.WaitAsync(TimeSpan.FromSeconds(10));
         Assert.Equal(ScanState.Stopped, engine.State);
     }
 
     [Fact]
-    public async Task Критический_сбой_останавливает_проверку_но_сохраняет_накопленное()
+    public async Task Critical_failure_stops_scan_and_keeps_results()
     {
         int checkedCount = 0;
 
@@ -230,7 +230,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Параллельность_не_превышает_заданную()
+    public async Task Parallelism_does_not_exceed_limit()
     {
         int current = 0;
         int peak = 0;
@@ -251,7 +251,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Предупреждения_приходят_по_ходу_проверки_а_не_только_в_конце()
+    public async Task Warnings_arrive_during_scan()
     {
         ScriptedChecker checker = new((item, _) => Task.FromResult(
             WithIssue(item, new CheckIssue(IssueCode.MetadataProblem, "нет тегов"))));
@@ -268,7 +268,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Плейлисты_проверяются_после_файлов_и_видят_их_статусы()
+    public async Task Playlists_are_checked_after_files_and_see_their_statuses()
     {
         using TempDirectory temp = new();
         string track = temp.WriteBytes("track.flac", 1, 2, 3);
@@ -305,7 +305,7 @@ public sealed class ScanEngineTests
     }
 
     [Fact]
-    public async Task Повторный_запуск_во_время_проверки_запрещён()
+    public async Task Starting_during_scan_is_rejected()
     {
         TaskCompletionSource started = new();
 
@@ -365,7 +365,7 @@ public sealed class LockedFileQuestionQueueTests
     }
 
     [Fact]
-    public async Task Вопросы_задаются_по_одному_а_не_пачкой()
+    public async Task Questions_are_asked_one_at_a_time()
     {
         RecordingProvider provider = new(LockedFileDecision.Skip);
         using LockedFileQuestionQueue queue = new(provider);
@@ -378,7 +378,7 @@ public sealed class LockedFileQuestionQueueTests
     }
 
     [Fact]
-    public async Task Ответ_ко_всем_избавляет_от_остальных_вопросов()
+    public async Task Apply_to_all_answers_remaining_questions()
     {
         RecordingProvider provider = new(new LockedFileDecision(LockedFileAction.Skip, ApplyToAll: true));
         using LockedFileQuestionQueue queue = new(provider);
@@ -395,7 +395,7 @@ public sealed class LockedFileQuestionQueueTests
     }
 
     [Fact]
-    public async Task Остановка_из_вопроса_прекращает_дальнейшие_вопросы()
+    public async Task Stop_from_question_ends_further_questions()
     {
         RecordingProvider provider = new(new LockedFileDecision(LockedFileAction.Skip, StopScan: true));
         using LockedFileQuestionQueue queue = new(provider);
@@ -412,7 +412,7 @@ public sealed class LockedFileQuestionQueueTests
 public sealed class TempCopyManagerTests
 {
     [Fact]
-    public async Task Копия_удаляется_даже_если_проверка_упала()
+    public async Task Copy_is_deleted_even_when_check_fails()
     {
         using TempDirectory source = new();
         using TempDirectory copies = new();
@@ -432,7 +432,7 @@ public sealed class TempCopyManagerTests
     }
 
     [Fact]
-    public void Осиротевшие_копии_от_прошлого_запуска_подчищаются()
+    public void Orphaned_copies_from_previous_run_are_cleaned()
     {
         using TempDirectory copies = new();
         File.WriteAllBytes(Path.Combine(copies.Path, "abcdef123456.tmp"), [1, 2, 3]);

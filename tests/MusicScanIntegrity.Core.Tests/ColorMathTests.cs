@@ -10,7 +10,7 @@ public sealed class ColorMathTests
     [InlineData("#FFFFFF", 255, 255, 255)]
     [InlineData("#0F7B3F", 15, 123, 63)]
     [InlineData("  #ff7075  ", 255, 112, 117)]
-    public void Код_цвета_разбирается(string hex, byte r, byte g, byte b)
+    public void Hex_code_is_parsed(string hex, byte r, byte g, byte b)
     {
         Assert.True(ColorMath.TryParse(hex, out ColorMath.Rgb color));
         Assert.Equal(new ColorMath.Rgb(r, g, b), color);
@@ -23,13 +23,13 @@ public sealed class ColorMathTests
     [InlineData("#0F7B3")]
     [InlineData("#0F7B3FF")]
     [InlineData("#ZZZZZZ")]
-    public void Мусор_вместо_кода_цвета_не_принимается(string? hex)
+    public void Garbage_hex_code_is_rejected(string? hex)
     {
         Assert.False(ColorMath.TryParse(hex, out _));
     }
 
     [Fact]
-    public void Цвет_записывается_решёткой_и_шестью_знаками()
+    public void Colour_formats_as_hash_and_six_digits()
     {
         Assert.Equal("#0F7B3F", new ColorMath.Rgb(15, 123, 63).ToString());
     }
@@ -41,7 +41,7 @@ public sealed class ColorMathTests
     [InlineData(0, 0, 1, 255, 255, 255)]
     [InlineData(0, 0, 0, 0, 0, 0)]
     [InlineData(0, 1, 0.5, 128, 0, 0)]
-    public void Оттенок_переводится_в_составляющие(
+    public void Hsv_converts_to_rgb(
         double hue, double saturation, double value, byte r, byte g, byte b)
     {
         ColorMath.Rgb color = ColorMath.ToRgb(new ColorMath.Hsv(hue, saturation, value));
@@ -55,7 +55,7 @@ public sealed class ColorMathTests
     [InlineData("#0000FF", 240, 1, 1)]
     [InlineData("#FFFFFF", 0, 0, 1)]
     [InlineData("#808080", 0, 0, 0.502)]
-    public void Составляющие_переводятся_в_оттенок(
+    public void Rgb_converts_to_hsv(
         string hex, double hue, double saturation, double value)
     {
         Assert.True(ColorMath.TryParse(hex, out ColorMath.Rgb color));
@@ -73,7 +73,7 @@ public sealed class ColorMathTests
     [InlineData("#7C4DBE")]
     [InlineData("#9A9AA2")]
     [InlineData("#010203")]
-    public void Перевод_туда_и_обратно_даёт_исходный_цвет(string hex)
+    public void Round_trip_returns_original_colour(string hex)
     {
         Assert.True(ColorMath.TryParse(hex, out ColorMath.Rgb color));
 
@@ -83,7 +83,7 @@ public sealed class ColorMathTests
     }
 
     [Fact]
-    public void Подложка_метки_близка_к_готовым_токенам()
+    public void Badge_tint_is_close_to_design_tokens()
     {
         ColorMath.Rgb white = new(0xFF, 0xFF, 0xFF);
         ColorMath.Rgb dark = new(0x1C, 0x1C, 0x1E);
@@ -91,7 +91,7 @@ public sealed class ColorMathTests
         Assert.True(ColorMath.TryParse("#0F7B3F", out ColorMath.Rgb light));
         ColorMath.Rgb lightTint = ColorMath.Tint(light, white, 0.10);
 
-        // Токен темы — #E8F6ED; допускается расхождение в несколько единиц.
+        // Theme token is #E8F6ED; a few units of difference are allowed.
         Assert.InRange(lightTint.R, 0xE0, 0xF0);
         Assert.InRange(lightTint.G, 0xEE, 0xFA);
         Assert.InRange(lightTint.B, 0xE5, 0xF3);
@@ -99,14 +99,14 @@ public sealed class ColorMathTests
         Assert.True(ColorMath.TryParse("#5EC27F", out ColorMath.Rgb night));
         ColorMath.Rgb darkTint = ColorMath.Tint(night, dark, 0.13);
 
-        // Токен темы — #1C3227.
+        // Theme token is #1C3227.
         Assert.InRange(darkTint.R, 0x18, 0x2A);
         Assert.InRange(darkTint.G, 0x2C, 0x3A);
         Assert.InRange(darkTint.B, 0x20, 0x30);
     }
 
     [Fact]
-    public void Подложка_остаётся_поверхностью_при_нулевой_доле()
+    public void Zero_share_tint_keeps_surface()
     {
         ColorMath.Rgb surface = new(0x1C, 0x1C, 0x1E);
 
@@ -120,7 +120,7 @@ public sealed class ColorMathTests
     [InlineData(-40, 200, 0)]
     [InlineData(400, 200, 1)]
     [InlineData(50, 0, 0)]
-    public void Положение_курсора_приводится_к_доле(double position, double length, double expected)
+    public void Cursor_position_maps_to_share(double position, double length, double expected)
     {
         Assert.Equal(expected, ColorMath.Share(position, length), 4);
     }

@@ -20,7 +20,7 @@ public sealed class CueMarksTests
         """;
 
     [Fact]
-    public void Метки_разбираются_вместе_с_номерами_дорожек()
+    public void Marks_are_parsed_with_track_numbers()
     {
         IReadOnlyList<CueMark> marks = CuePlaylistParser.ParseMarks(Cue);
 
@@ -29,12 +29,12 @@ public sealed class CueMarksTests
         Assert.Equal(0, marks[0].Seconds);
         Assert.Equal(200, marks[1].Seconds);
 
-        // Третья метка: 7 минут 45 секунд и 37 кадров по одной семьдесятпятой.
+        // Third mark: 7 minutes 45 seconds and 37 frames of 1/75 s.
         Assert.Equal(465 + (37 / 75.0), marks[2].Seconds, 3);
     }
 
     [Fact]
-    public void Мусор_вместо_времени_пропускается()
+    public void Garbage_timestamps_are_skipped()
     {
         IReadOnlyList<CueMark> marks = CuePlaylistParser.ParseMarks("""
             TRACK 01 AUDIO
@@ -47,7 +47,7 @@ public sealed class CueMarksTests
     }
 
     [Fact]
-    public async Task Метка_за_пределом_файла_замечается()
+    public async Task Mark_past_end_of_file_is_reported()
     {
         using TempDirectory temp = new();
         string audio = temp.WriteBytes("альбом.flac", new byte[1024]);
@@ -55,7 +55,7 @@ public sealed class CueMarksTests
 
         PlaylistService service = new();
 
-        // Файл длиной пять минут, а последняя дорожка начинается на восьмой.
+        // The file is five minutes long, but the last track starts at eight.
         PlaylistCheckResult result = await service.CheckAsync(
             cue,
             knownStatuses: null,
@@ -67,7 +67,7 @@ public sealed class CueMarksTests
     }
 
     [Fact]
-    public async Task Разметка_по_размеру_файла_замечаний_не_вызывает()
+    public async Task Marks_within_file_raise_no_finding()
     {
         using TempDirectory temp = new();
         string audio = temp.WriteBytes("альбом.flac", new byte[1024]);
@@ -85,7 +85,7 @@ public sealed class CueMarksTests
     }
 
     [Fact]
-    public async Task Без_известной_длительности_разметка_не_проверяется()
+    public async Task Marks_are_not_checked_without_known_duration()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("альбом.flac", new byte[1024]);

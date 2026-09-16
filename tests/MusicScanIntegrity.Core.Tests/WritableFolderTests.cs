@@ -5,14 +5,12 @@ using Xunit;
 
 namespace MusicScanIntegrity.Core.Tests;
 
-/// <summary>
-/// Куда программа кладёт свои файлы.
-/// </summary>
+/// <summary>Where the application stores its files.</summary>
 /// <remarks>
-/// Пока программа была только переносимой, ответ был один — рядом с собой.
-/// С установщиком она попадает в «Program Files», где обычному пользователю
-/// писать не дают, и всё, что она хранит, должно уходить в профиль. Молчаливый
-/// отказ здесь хуже ошибки: слежение за порчей просто не работало бы.
+/// A portable build writes next to itself, but an installed one lands in
+/// Program Files, where users cannot write, so everything has to move to the
+/// profile. Failing silently would be worse than an error: corruption tracking
+/// would simply not work.
 /// </remarks>
 public sealed class WritableFolderTests : IDisposable
 {
@@ -21,14 +19,13 @@ public sealed class WritableFolderTests : IDisposable
     public void Dispose() => Directory.Delete(_folder, recursive: true);
 
     [Fact]
-    public void В_доступную_папку_писать_можно()
+    public void Writable_folder_accepts_writes()
     {
         Assert.True(WritableFolder.CanWriteTo(_folder));
     }
 
-    /// <summary>Проба не оставляет за собой мусора.</summary>
     [Fact]
-    public void Проба_записи_ничего_не_оставляет()
+    public void Write_probe_leaves_nothing_behind()
     {
         WritableFolder.CanWriteTo(_folder);
 
@@ -36,7 +33,7 @@ public sealed class WritableFolderTests : IDisposable
     }
 
     [Fact]
-    public void Несуществующая_папка_создаётся()
+    public void Missing_folder_is_created()
     {
         string nested = Path.Combine(_folder, "новая", "глубже");
 
@@ -44,38 +41,32 @@ public sealed class WritableFolderTests : IDisposable
         Assert.True(Directory.Exists(nested));
     }
 
-    /// <summary>
-    /// Негодный путь — это «нельзя», а не исключение.
-    /// </summary>
     /// <remarks>
-    /// Путь приходит из файла настроек, который правят руками. Падать на
-    /// строке с недопустимыми знаками программа не должна.
+    /// The path comes from a hand-edited settings file; invalid characters must not
+    /// crash the application.
     /// </remarks>
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData("|<>*?")]
-    public void Негодный_путь_считается_недоступным(string path)
+    public void Invalid_path_is_not_writable(string path)
     {
         Assert.False(WritableFolder.CanWriteTo(path));
     }
 
-    /// <summary>
-    /// Настройки и база расходятся по разным частям профиля.
-    /// </summary>
     /// <remarks>
-    /// Настройки лежали в перемещаемой части с самого начала: переезд потерял
-    /// бы их у всех, кто уже пользуется программой. База истории вырастает до
-    /// десятков мегабайт, и таскать её за профилем между машинами незачем.
+    /// Settings have always lived in the roaming profile and moving them would lose
+    /// them for existing users. The history database grows to tens of megabytes and
+    /// has no business roaming between machines.
     /// </remarks>
     [Fact]
-    public void Перемещаемая_и_локальная_части_профиля_различаются()
+    public void Roaming_and_local_profile_differ()
     {
         string roaming = WritableFolder.Resolve("проба-перемещаемая", roaming: true);
         string local = WritableFolder.Resolve("проба-локальная");
 
-        // Рядом с тестами писать можно, поэтому оба пути ведут туда же —
-        // сравнивать имеет смысл только сами корни профиля.
+        // The test folder is writable, so both paths resolve there; only the profile
+        // roots themselves are worth comparing.
         Assert.NotEqual(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
@@ -85,13 +76,13 @@ public sealed class WritableFolderTests : IDisposable
     }
 
     [Fact]
-    public void Путь_к_базе_истории_заканчивается_именем_файла()
+    public void History_path_ends_with_file_name()
     {
         Assert.EndsWith("history.db", ScanHistory.ResolveDefaultPath(), StringComparison.Ordinal);
     }
 
     [Fact]
-    public void Путь_к_настройкам_заканчивается_именем_файла()
+    public void Settings_path_ends_with_file_name()
     {
         Assert.EndsWith("settings.json", JsonSettingsService.ResolveDefaultPath(), StringComparison.Ordinal);
     }

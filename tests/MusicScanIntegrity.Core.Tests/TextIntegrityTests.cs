@@ -15,23 +15,23 @@ public sealed class TextIntegrityTests
     [InlineData("")]
     [InlineData(null)]
     [InlineData("AC/DC")]
-    public void Нормальный_текст_кракозябрами_не_считается(string? value)
+    public void Normal_text_is_not_mojibake(string? value)
     {
         Assert.False(TextIntegrity.LooksBroken(value), $"текст «{value}» назван сломанным");
     }
 
     [Fact]
-    public void Кириллица_прочитанная_западной_таблицей_ловится()
+    public void Cyrillic_read_as_western_table_is_detected()
     {
-        // «Привет» в CP1251, прочитанное как западноевропейская таблица.
+        // "Привет" in CP1251 read through the Western European table.
         Assert.True(TextIntegrity.LooksBroken("Ïðèâåò"));
         Assert.Contains("западноевропейской", TextIntegrity.Describe("Ïðèâåò")!, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void Побайтно_прочитанный_UTF8_ловится()
+    public void Utf8_read_byte_by_byte_is_detected()
     {
-        // «Привет» в UTF-8, прочитанное побайтно.
+        // "Привет" in UTF-8 read byte by byte.
         string broken = "ÐŸÑ€Ð¸Ð²ÐµÑ‚";
 
         Assert.True(TextIntegrity.LooksBroken(broken));
@@ -39,20 +39,20 @@ public sealed class TextIntegrityTests
     }
 
     [Fact]
-    public void Знаки_замены_считаются_поломкой()
+    public void Replacement_characters_count_as_broken()
     {
         Assert.True(TextIntegrity.LooksBroken("Пес�ня"));
     }
 
     [Fact]
-    public void Слишком_короткий_текст_не_разбирается()
+    public void Too_short_text_is_not_judged()
     {
-        // На двух буквах ошибиться проще, чем угадать.
+        // Two letters are easier to misjudge than to get right.
         Assert.False(TextIntegrity.LooksBroken("Ïð"));
     }
 
     [Fact]
-    public void Сломанные_поля_перечисляются()
+    public void Broken_fields_are_listed()
     {
         IReadOnlyList<string> broken = TextIntegrity.BrokenFields(
             ("Название", "Ïåñíÿ"),
