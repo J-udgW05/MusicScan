@@ -11,15 +11,14 @@ using Xunit;
 namespace MusicScanIntegrity.App.Tests;
 
 /// <summary>
-/// Быстрая панель на экране проверки и экран настроек правят одни и те же
-/// параметры. Раньше экран настроек снимал их копию один раз при запуске:
-/// переключение в панели он не замечал, а собственное применение возвращало
-/// устаревшее значение обратно.
+/// The quick panel on the scan tab and the settings screen edit the same
+/// values. The settings screen used to snapshot them once at startup: it missed
+/// changes made in the panel, and applying it wrote the stale values back.
 /// </summary>
 public sealed class SettingsSyncTests
 {
     [Fact]
-    public void Экран_настроек_подхватывает_изменение_извне()
+    public void Settings_screen_picks_up_external_change()
     {
         Sta.Run(() =>
         {
@@ -29,7 +28,7 @@ public sealed class SettingsSyncTests
 
             Assert.True(viewModel.CheckMetadata);
 
-            // Так это делает быстрая панель: правит текущие настройки и сообщает.
+            // This is what the quick panel does: edit the current settings and notify.
             AppSettings changed = settings.Current.Clone();
             changed.CheckMetadata = false;
             settings.ApplyAsync(changed).GetAwaiter().GetResult();
@@ -40,7 +39,7 @@ public sealed class SettingsSyncTests
     }
 
     [Fact]
-    public void Применение_настроек_не_возвращает_изменение_извне()
+    public void Applying_settings_does_not_revert_external_change()
     {
         Sta.Run(() =>
         {
@@ -53,7 +52,7 @@ public sealed class SettingsSyncTests
             settings.ApplyAsync(changed).GetAwaiter().GetResult();
             Pump();
 
-            // Пользователь меняет в настройках что-то другое и применяет.
+            // The user changes something else in settings and applies it.
             viewModel.ShowStatusBar = !viewModel.ShowStatusBar;
             viewModel.ApplyAsync().GetAwaiter().GetResult();
             Pump();
@@ -65,7 +64,7 @@ public sealed class SettingsSyncTests
     private static SettingsViewModel Create(ISettingsService settings, FakeHistory history) =>
         new(settings, new FakeTheme(), new FakeDialogs(), history);
 
-    /// <summary>Прокручивает очередь диспетчера: перечитывание идёт через неё.</summary>
+    /// <summary>Pumps the dispatcher queue, which the reload goes through.</summary>
     private static void Pump()
     {
         DispatcherFrame frame = new();

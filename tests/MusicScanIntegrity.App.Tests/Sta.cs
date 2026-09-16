@@ -2,18 +2,14 @@ using System.Runtime.ExceptionServices;
 
 namespace MusicScanIntegrity.App.Tests;
 
-/// <summary>
-/// Выполняет проверку в потоке с однопоточной моделью.
-/// </summary>
+/// <summary>Runs test code on an STA thread.</summary>
 /// <remarks>
-/// Элементы WPF живут только в таком потоке, а xunit запускает тесты в
-/// многопоточном. Отдельного пакета ради одного атрибута сюда не тащим:
-/// весь нужный механизм — три строки.
+/// WPF elements live only on STA threads while xUnit runs tests on MTA ones.
+/// The mechanism is a few lines, not worth an extra package.
 /// </remarks>
 internal static class Sta
 {
-    /// <summary>Запускает действие в STA-потоке и ждёт его.</summary>
-    /// <param name="action">Что выполнить.</param>
+    /// <summary>Runs the action on an STA thread and waits for it.</summary>
     public static void Run(Action action)
     {
         ExceptionDispatchInfo? failure = null;
@@ -26,8 +22,8 @@ internal static class Sta
             }
             catch (Exception ex)
             {
-                // Исключение из чужого потока иначе потерялось бы, и тест
-                // прошёл бы при сломанном коде.
+                // Otherwise an exception from the other thread would be lost and the test
+                // would pass on broken code.
                 failure = ExceptionDispatchInfo.Capture(ex);
             }
         });

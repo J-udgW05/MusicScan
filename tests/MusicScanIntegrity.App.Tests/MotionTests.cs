@@ -6,18 +6,16 @@ using Xunit;
 
 namespace MusicScanIntegrity.App.Tests;
 
-/// <summary>
-/// Выключатель анимаций.
-/// </summary>
+/// <summary>Animations switch.</summary>
 /// <remarks>
-/// Проверяется здесь не красота движения, а то, из-за чего выключатель мог бы
-/// не сработать: наследование значения по дереву, отдельные окна, к которым
-/// наследование не доходит, и состояние элемента после выключения.
+/// These tests cover what could make the switch fail, not how motion looks:
+/// inheritance down the tree, separate windows inheritance does not reach, and
+/// element state after animations are turned off.
 /// </remarks>
 public sealed class MotionTests
 {
     [Fact]
-    public void Значение_наследуется_вниз_по_дереву()
+    public void Value_is_inherited_down_the_tree()
     {
         Sta.Run(() =>
         {
@@ -37,11 +35,8 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Своё значение сильнее унаследованного.
-    /// </summary>
     [Fact]
-    public void Своё_значение_перебивает_унаследованное()
+    public void Local_value_overrides_inherited()
     {
         Sta.Run(() =>
         {
@@ -56,16 +51,12 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// При выключенных анимациях элемент сразу оказывается на месте.
-    /// </summary>
     /// <remarks>
-    /// Это не мелочь: без такой ветки элемент, застигнутый выключением на
-    /// середине анимации, остался бы полупрозрачным и сдвинутым — и часть
-    /// экрана выглядела бы съехавшей до перезапуска.
+    /// Without this an element caught mid-animation would stay translucent and
+    /// shifted until restart.
     /// </remarks>
     [Fact]
-    public void С_выключенными_анимациями_элемент_сразу_на_месте()
+    public void With_animations_off_element_is_in_place_immediately()
     {
         Sta.Run(() =>
         {
@@ -80,17 +71,13 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// С включёнными анимациями движение действительно заводится.
-    /// </summary>
     /// <remarks>
-    /// Проверяется факт анимации, а не её кадр. Кадр без запущенного цикла
-    /// диспетчера смотреть бесполезно: анимация уже назначена свойству, но
-    /// значение ещё не пересчитано, и проверка кадра ловила бы не поведение,
-    /// а отсутствие цикла сообщений.
+    /// Asserts that an animation is attached, not a frame: without a running
+    /// dispatcher loop the value is not yet recomputed, so a frame check would
+    /// test the missing message loop rather than the behaviour.
     /// </remarks>
     [Fact]
-    public void С_включёнными_анимациями_движение_заводится()
+    public void With_animations_on_motion_starts()
     {
         Sta.Run(() =>
         {
@@ -107,7 +94,7 @@ public sealed class MotionTests
     }
 
     [Fact]
-    public void Сброс_снимает_следы_прерванной_анимации()
+    public void Reset_clears_interrupted_animation()
     {
         Sta.Run(() =>
         {
@@ -122,15 +109,12 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Чужое преобразование не отбирается.
-    /// </summary>
     /// <remarks>
-    /// Элемент мог быть повёрнут или отмасштабирован не нами. Заменить его
-    /// преобразование своим — сломать то, ради чего его ставили.
+    /// The element may have been rotated or scaled by someone else; replacing its
+    /// transform would break that.
     /// </remarks>
     [Fact]
-    public void Чужое_преобразование_не_подменяется()
+    public void Foreign_transform_is_not_replaced()
     {
         Sta.Run(() =>
         {
@@ -144,13 +128,10 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Ползунок стоит там, где велит состояние переключателя.
-    /// </summary>
     [Theory]
     [InlineData(true, 20.0)]
     [InlineData(false, 0.0)]
-    public void Ползунок_встаёт_по_состоянию(bool on, double expected)
+    public void Knob_follows_toggle_state(bool on, double expected)
     {
         Sta.Run(() =>
         {
@@ -162,19 +143,14 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Смена настройки анимаций не двигает ползунок.
-    /// </summary>
     /// <remarks>
-    /// Ровно эта ошибка и была: ход ползунка разводился двумя ветками триггеров
-    /// по условиям «включён и анимации есть» и «включён и анимаций нет». Оба
-    /// условия завязаны на состояние, истинное в покое, поэтому переключение
-    /// настройки анимаций заставляло одну ветку выйти — уводя ползунок в
-    /// положение «выключено», — а другую войти. Тумблеры разъезжались и
-    /// переставали показывать своё настоящее состояние.
+    /// Regression: knob travel was split into trigger branches "on with
+    /// animations" and "on without". Both conditions hold at rest, so toggling the
+    /// setting made one branch exit — sliding the knob to "off" — and the other
+    /// enter, leaving toggles out of step with their state.
     /// </remarks>
     [Fact]
-    public void Переключение_настройки_анимаций_не_двигает_ползунок()
+    public void Toggling_animations_setting_does_not_move_knob()
     {
         Sta.Run(() =>
         {
@@ -194,11 +170,8 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// С анимациями ползунок едет, без них встаёт сразу.
-    /// </summary>
     [Fact]
-    public void Ползунок_едет_только_когда_анимации_включены()
+    public void Knob_slides_only_when_animations_are_on()
     {
         Sta.Run(() =>
         {
@@ -213,11 +186,9 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Возврат без анимации снимает предыдущую — иначе она держала бы значение.
-    /// </summary>
+    /// <summary>Snapping cancels a running slide, which would otherwise hold its value.</summary>
     [Fact]
-    public void Мгновенная_установка_отменяет_начатое_движение()
+    public void Snap_cancels_running_slide()
     {
         Sta.Run(() =>
         {
@@ -231,17 +202,13 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Замороженное преобразование не мешает: оно заменяется своей копией.
-    /// </summary>
     /// <remarks>
-    /// Всё, что объявлено в шаблоне, WPF замораживает — шаблон общий на все
-    /// переключатели. Прямой вызов анимации по замороженному объекту падает
-    /// с «объект запечатан или заморожен», и программа показывает окно ошибки.
-    /// Раскадровка это обходила сама, поэтому в разметке проблема не всплывала.
+    /// WPF freezes everything declared in a template. Animating a frozen object
+    /// directly throws "cannot modify a frozen object"; storyboards clone it
+    /// implicitly, which is why markup never hit this.
     /// </remarks>
     [Fact]
-    public void Замороженное_преобразование_заменяется_копией()
+    public void Frozen_transform_is_replaced_with_copy()
     {
         Sta.Run(() =>
         {
@@ -256,18 +223,13 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Замороженным бывает не вся группа, а только сдвиг внутри неё.
-    /// </summary>
     /// <remarks>
-    /// Первая попытка чинить это смотрела на TransformGroup.IsFrozen и мимо:
-    /// группа бывает разморожена, а лежащий в ней сдвиг — нет. Ошибка «объект
-    /// запечатан или заморожен» вылезала окном поверх программы. Проверка на
-    /// Freeze() всей группы этот случай не воспроизводит — Freeze морозит всё
-    /// дерево разом.
+    /// The first fix checked TransformGroup.IsFrozen and missed: the group can be
+    /// thawed while the translate transform inside it is frozen. Freezing the whole
+    /// group does not reproduce this, since Freeze() freezes the entire tree.
     /// </remarks>
     [Fact]
-    public void Замороженным_может_быть_только_сдвиг_внутри_группы()
+    public void Only_translate_inside_group_may_be_frozen()
     {
         Sta.Run(() =>
         {
@@ -292,9 +254,9 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>То же без анимации: присвоение тоже требует размороженного.</summary>
+    /// <summary>Same without animation: plain assignment also needs a thawed transform.</summary>
     [Fact]
-    public void Замороженное_преобразование_не_мешает_встать_сразу()
+    public void Frozen_transform_does_not_block_snap()
     {
         Sta.Run(() =>
         {
@@ -307,7 +269,7 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>Ползунок такой же, как в шаблоне переключателя.</summary>
+    /// <summary>A knob built like the one in the toggle template.</summary>
     private static Border Knob() => new()
     {
         Width = 12,
@@ -321,17 +283,13 @@ public sealed class MotionTests
     private static TranslateTransform Shift(Border knob) =>
         (TranslateTransform)((TransformGroup)knob.RenderTransform).Children[1];
 
-    /// <summary>
-    /// Новое окно получает текущую настройку.
-    /// </summary>
     /// <remarks>
-    /// Диалог — отдельное окно, и его владелец логическим родителем не
-    /// является: наследование до диалога не доходит. Значение ставится ему
-    /// при загрузке — иначе переключатели в диалоге продолжали бы ездить
-    /// при выключенных анимациях.
+    /// A dialog's owner is not its logical parent, so inheritance does not reach
+    /// it; without the load-time value, toggles in dialogs would keep sliding with
+    /// animations off.
     /// </remarks>
     [Fact]
-    public void Новое_окно_получает_текущую_настройку()
+    public void New_window_gets_current_setting()
     {
         Sta.Run(() =>
         {
@@ -358,11 +316,8 @@ public sealed class MotionTests
         });
     }
 
-    /// <summary>
-    /// Значение, выставленное явно, умолчанием не перебивается.
-    /// </summary>
     [Fact]
-    public void Явно_заданное_значение_окна_сохраняется()
+    public void Explicit_window_value_is_kept()
     {
         Sta.Run(() =>
         {

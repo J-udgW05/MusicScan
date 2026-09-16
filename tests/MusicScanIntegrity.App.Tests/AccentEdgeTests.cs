@@ -5,21 +5,17 @@ using Xunit;
 
 namespace MusicScanIntegrity.App.Tests;
 
-/// <summary>
-/// Кромка акцентной заливки должна лежать между заливкой и фоном.
-/// </summary>
+/// <summary>The accent edge tone must lie between the fill and the background.</summary>
 /// <remarks>
+/// Stepped corners are not a lack of anti-aliasing but the size of the jump:
+/// on a 6 px corner the arc covers a handful of pixels, and going straight
+/// from background to bright fill reads as a staircase. An intermediate tone
+/// halves the jump.
 /// <para>
-/// Ступеньки на скруглениях видны не от нехватки сглаживания — оно работает.
-/// Дело в величине перепада: на шестипиксельном скруглении дуга занимает
-/// считанные точки, и прыжок с фона сразу на яркую заливку глаз читает как
-/// лесенку. Промежуточный тон делит этот прыжок надвое.
-/// </para>
-/// <para>
-/// Направление смешивания важнее величины, и оно разное у тем. В тёмной кромка
-/// темнее заливки, в светлой — светлее; перепутать их значит сделать хуже, чем
-/// было: измерено, затемнение кромки в светлой теме поднимает наибольший
-/// перепад со 140 до 171. Проверка ниже ловит именно это.
+/// The mixing direction matters more than the amount and differs per theme:
+/// darker than the fill in dark, lighter in light. Getting it backwards is worse
+/// than nothing — darkening the edge in the light theme raised the largest
+/// jump from 140 to 171.
 /// </para>
 /// </remarks>
 public sealed class AccentEdgeTests
@@ -27,7 +23,7 @@ public sealed class AccentEdgeTests
     [Theory]
     [InlineData("Tokens.Dark.xaml")]
     [InlineData("Tokens.Light.xaml")]
-    public void Кромка_лежит_между_заливкой_и_фоном(string theme)
+    public void Edge_lies_between_fill_and_background(string theme)
     {
         Sta.Run(() =>
         {
@@ -46,18 +42,14 @@ public sealed class AccentEdgeTests
         });
     }
 
-    /// <summary>
-    /// Кромка отличается от заливки настолько, чтобы это имело смысл.
-    /// </summary>
     /// <remarks>
-    /// Совпадение с заливкой — это и есть то состояние, из-за которого край
-    /// прыгал одним шагом. Слишком большая разница тоже плоха: кромка начинает
-    /// читаться отдельным кольцом вокруг кнопки, а не её краем.
+    /// Equal to the fill is exactly the single-step edge being fixed; too different
+    /// and the edge reads as a separate ring around the button.
     /// </remarks>
     [Theory]
     [InlineData("Tokens.Dark.xaml")]
     [InlineData("Tokens.Light.xaml")]
-    public void Кромка_заметно_отличается_от_заливки_но_не_чрезмерно(string theme)
+    public void Edge_differs_from_fill_noticeably_but_not_excessively(string theme)
     {
         Sta.Run(() =>
         {
@@ -77,7 +69,7 @@ public sealed class AccentEdgeTests
     [Theory]
     [InlineData("Tokens.Dark.xaml")]
     [InlineData("Tokens.Light.xaml")]
-    public void Кисть_кромки_объявлена(string theme)
+    public void Edge_brush_is_declared(string theme)
     {
         Sta.Run(() =>
         {
@@ -90,8 +82,8 @@ public sealed class AccentEdgeTests
 
     private static ResourceDictionary Load(string theme)
     {
-        // Читается файл из исходников, скопированный рядом с тестами: адреса
-        // pack:// разбираются только при живом Application, а его здесь нет.
+        // Load the source file copied next to the tests: pack:// URIs resolve only
+        // with a live Application, and there is none here.
         string path = Path.Combine(AppContext.BaseDirectory, "Tokens", theme);
         Assert.True(File.Exists(path), $"словарь токенов не скопирован: {path}");
 
@@ -101,7 +93,7 @@ public sealed class AccentEdgeTests
 
     private static Color Color(ResourceDictionary tokens, string key) => (Color)tokens[key];
 
-    /// <summary>Воспринимаемая яркость цвета.</summary>
+    /// <summary>Perceived luminance of a colour.</summary>
     private static double Luminance(Color color) =>
         (0.299 * color.R) + (0.587 * color.G) + (0.114 * color.B);
 }
