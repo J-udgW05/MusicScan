@@ -3,23 +3,19 @@ using MusicScanIntegrity.Core.Integrity;
 
 namespace MusicScanIntegrity.Core.Tests.Integrity;
 
-/// <summary>
-/// Сборка файлов остальных форматов побайтно — исправных и испорченных.
-/// </summary>
+/// <summary>Builds files of the remaining formats byte by byte, valid and broken.</summary>
 /// <remarks>
-/// Разборщики читают заголовки, длины и суммы, а не звук, поэтому вместо
-/// настоящих записей в кадры кладётся заполнитель. Так проверка не зависит ни
-/// от кодировщиков, ни от файлов, лежащих в репозитории.
+/// Validators read headers, lengths and checksums rather than audio, so frames
+/// carry filler instead of real recordings. The tests then depend neither on
+/// encoders nor on sample files in the repository.
 /// </remarks>
 internal static class SyntheticFiles
 {
     // ── Ogg ──────────────────────────────────────────────────────────────
 
-    /// <summary>Собирает файл Ogg из страниц с правильными суммами.</summary>
-    /// <param name="pages">Сколько страниц положить.</param>
-    /// <param name="withEndFlag">Ставить ли последней странице признак конца потока.</param>
-    /// <param name="skipSequence">Пропустить один номер страницы — как будто кусок потерян.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds an Ogg file from pages with correct checksums.</summary>
+    /// <param name="withEndFlag">Set the end-of-stream flag on the last page.</param>
+    /// <param name="skipSequence">Skip one page number, as if data were lost.</param>
     public static byte[] Ogg(int pages = 3, bool withEndFlag = true, bool skipSequence = false)
     {
         List<byte> file = [];
@@ -45,7 +41,7 @@ internal static class SyntheticFiles
         return [.. file];
     }
 
-    /// <summary>Смещение начала страницы с указанным номером.</summary>
+    /// <summary>Offset of the page with the given sequence number.</summary>
     public static int OggPageOffset(int index)
     {
         int offset = 0;
@@ -59,7 +55,7 @@ internal static class SyntheticFiles
 
     private static byte[] OggPage(byte flags, uint sequence, int payloadSize)
     {
-        // Одна страница, один отрезок — отрезок не длиннее 255 байт.
+        // One page, one segment; a segment is at most 255 bytes.
         byte[] page = new byte[27 + 1 + payloadSize];
 
         "OggS"u8.CopyTo(page);
@@ -89,15 +85,13 @@ internal static class SyntheticFiles
 
     // ── MP3 ──────────────────────────────────────────────────────────────
 
-    /// <summary>Длина кадра MPEG-1 Layer III, 128 кбит/с, 44,1 кГц.</summary>
+    /// <summary>Length of an MPEG-1 Layer III frame at 128 kbps, 44.1 kHz.</summary>
     public const int Mp3FrameLength = 417;
 
-    /// <summary>Собирает файл MP3 из кадров.</summary>
-    /// <param name="frames">Сколько кадров положить.</param>
-    /// <param name="withCrc">Сделать кадры защищёнными: с контрольной суммой.</param>
-    /// <param name="declaredFrames">Записать в заголовок Info другое число кадров.</param>
-    /// <param name="leadingId3">Добавить тег ID3v2 в начало.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds an MP3 file from frames.</summary>
+    /// <param name="withCrc">Make frames protected, carrying a checksum.</param>
+    /// <param name="declaredFrames">Write a different frame count into the Info header.</param>
+    /// <param name="leadingId3">Prepend an ID3v2 tag.</param>
     public static byte[] Mp3(
         int frames = 5,
         bool withCrc = false,
@@ -124,7 +118,7 @@ internal static class SyntheticFiles
         return [.. file];
     }
 
-    /// <summary>Смещение кадра с указанным номером.</summary>
+    /// <summary>Offset of the frame with the given index.</summary>
     public static int Mp3FrameOffset(int index, bool leadingId3 = false) =>
         (leadingId3 ? 110 : 0) + (index * Mp3FrameLength);
 
@@ -134,10 +128,10 @@ internal static class SyntheticFiles
 
         frame[0] = 0xFF;
 
-        // 1111 1011: MPEG-1, слой III; младший бит — «защиты нет».
+        // 1111 1011: MPEG-1, layer III; low bit set means "no protection".
         frame[1] = (byte)(withCrc ? 0xFA : 0xFB);
 
-        // Битрейт 128 кбит/с (индекс 9), частота 44,1 кГц (индекс 0), без набивки.
+        // 128 kbps (index 9), 44.1 kHz (index 0), no padding.
         frame[2] = 0x90;
         frame[3] = 0x00;
 
@@ -146,7 +140,7 @@ internal static class SyntheticFiles
 
         for (int i = payloadStart; i < frame.Length; i++)
         {
-            // Заполнитель без 0xFF: он начинает подпись кадра.
+            // Filler without 0xFF, which starts a frame signature.
             frame[i] = (byte)(((i * 3) + number) & 0xFE);
         }
 
@@ -174,11 +168,10 @@ internal static class SyntheticFiles
 
     // ── MP4 ──────────────────────────────────────────────────────────────
 
-    /// <summary>Собирает файл MP4 из обязательных блоков.</summary>
-    /// <param name="mediaBytes">Сколько байт звука положить в блок mdat.</param>
-    /// <param name="declaredMediaBytes">Что записать в длину блока mdat; по умолчанию — настоящую.</param>
-    /// <param name="withMovie">Класть ли блок moov с описанием дорожек.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds an MP4 file from the mandatory boxes.</summary>
+    /// <param name="mediaBytes">Audio bytes placed in mdat.</param>
+    /// <param name="declaredMediaBytes">Length written to the mdat header; defaults to the real one.</param>
+    /// <param name="withMovie">Include the moov box describing the tracks.</param>
     public static byte[] Mp4(int mediaBytes = 256, int? declaredMediaBytes = null, bool withMovie = true)
     {
         List<byte> file = [];
@@ -217,11 +210,10 @@ internal static class SyntheticFiles
 
     // ── WAV ──────────────────────────────────────────────────────────────
 
-    /// <summary>Собирает файл WAV.</summary>
-    /// <param name="dataBytes">Сколько байт отсчётов положить.</param>
-    /// <param name="declaredDataBytes">Что записать в длину части data.</param>
-    /// <param name="withFormat">Класть ли часть fmt с описанием формата.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds a WAV file.</summary>
+    /// <param name="dataBytes">Sample bytes to include.</param>
+    /// <param name="declaredDataBytes">Length written to the data chunk header.</param>
+    /// <param name="withFormat">Include the fmt chunk.</param>
     public static byte[] Wav(int dataBytes = 512, int? declaredDataBytes = null, bool withFormat = true)
     {
         List<byte> body = [];
@@ -260,11 +252,9 @@ internal static class SyntheticFiles
 
     // ── WavPack ──────────────────────────────────────────────────────────
 
-    /// <summary>Собирает файл WavPack из блоков.</summary>
-    /// <param name="blocks">Сколько блоков положить.</param>
-    /// <param name="payloadBytes">Размер данных в блоке.</param>
-    /// <param name="declaredExtra">Прибавить к объявленной длине последнего блока лишнее.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds a WavPack file from blocks.</summary>
+    /// <param name="payloadBytes">Data size per block.</param>
+    /// <param name="declaredExtra">Extra bytes added to the last block's declared length.</param>
     public static byte[] WavPack(int blocks = 3, int payloadBytes = 64, int declaredExtra = 0)
     {
         List<byte> file = [];
@@ -286,10 +276,9 @@ internal static class SyntheticFiles
 
     // ── APE ──────────────────────────────────────────────────────────────
 
-    /// <summary>Собирает файл Monkey's Audio.</summary>
-    /// <param name="audioBytes">Сколько байт сжатого звука объявить.</param>
-    /// <param name="actualBytes">Сколько байт положить на самом деле; по умолчанию — столько же.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds a Monkey's Audio file.</summary>
+    /// <param name="audioBytes">Compressed audio bytes declared in the descriptor.</param>
+    /// <param name="actualBytes">Bytes actually present; defaults to the declared count.</param>
     public static byte[] Ape(int audioBytes = 512, int? actualBytes = null)
     {
         int descriptor = 52;
@@ -309,18 +298,17 @@ internal static class SyntheticFiles
         return file;
     }
 
-    // ── Теги ─────────────────────────────────────────────────────────────
+    // ── Tags ─────────────────────────────────────────────────────────────
 
-    /// <summary>Тег ID3v2 для начала файла.</summary>
-    /// <param name="payloadBytes">Размер содержимого тега без десяти байт заголовка.</param>
+    /// <summary>Leading ID3v2 tag.</summary>
+    /// <param name="payloadBytes">Tag body size excluding the ten-byte header.</param>
     /// <param name="declaredPayloadBytes">
-    /// Что записать в поле размера; по умолчанию — настоящий размер. Другое
-    /// значение делает тег заведомо испорченным.
+    /// Value written to the size field; defaults to the real size. Anything else
+    /// makes the tag deliberately broken.
     /// </param>
-    /// <returns>Байты тега.</returns>
     /// <remarks>
-    /// Размер записан «синхробезопасно»: в каждом из четырёх байт значащие
-    /// только младшие семь бит, поэтому больше 127 в один байт не положить.
+    /// The size is synch-safe: only the low seven bits of each of the four bytes
+    /// count, so no byte may exceed 127.
     /// </remarks>
     public static byte[] LeadingId3(int payloadBytes = 100, int? declaredPayloadBytes = null)
     {
@@ -338,8 +326,7 @@ internal static class SyntheticFiles
         return tag;
     }
 
-    /// <summary>Тег ID3v1 для конца файла — ровно 128 байт.</summary>
-    /// <returns>Байты тега.</returns>
+    /// <summary>Trailing ID3v1 tag, exactly 128 bytes.</summary>
     public static byte[] TrailingId3v1()
     {
         byte[] tag = new byte[128];
@@ -348,15 +335,14 @@ internal static class SyntheticFiles
         return tag;
     }
 
-    /// <summary>Тег APEv2 для конца файла: только концевик, без заголовка.</summary>
-    /// <returns>Байты тега.</returns>
+    /// <summary>Trailing APEv2 tag: footer only, no header.</summary>
     public static byte[] TrailingApev2()
     {
         byte[] tag = new byte[32];
         "APETAGEX"u8.CopyTo(tag);
         BinaryPrimitives.WriteUInt32LittleEndian(tag.AsSpan(8), 2000);
 
-        // Длина тега считается вместе с концевиком, но без заголовка.
+        // Tag size includes the footer but not the header.
         BinaryPrimitives.WriteUInt32LittleEndian(tag.AsSpan(12), 32);
         BinaryPrimitives.WriteUInt32LittleEndian(tag.AsSpan(16), 0);
         BinaryPrimitives.WriteUInt32LittleEndian(tag.AsSpan(20), 0);

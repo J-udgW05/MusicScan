@@ -8,7 +8,7 @@ namespace MusicScanIntegrity.Core.Tests;
 public sealed class M3uPlaylistParserTests
 {
     [Fact]
-    public void Пропускает_служебные_строки_и_возвращает_только_пути()
+    public void Skips_directives_and_returns_only_paths()
     {
         M3uPlaylistParser parser = new();
 
@@ -27,7 +27,7 @@ public sealed class M3uPlaylistParserTests
     }
 
     [Fact]
-    public void Понимает_переносы_строк_Windows_и_BOM()
+    public void Handles_windows_line_endings_and_bom()
     {
         M3uPlaylistParser parser = new();
 
@@ -40,7 +40,7 @@ public sealed class M3uPlaylistParserTests
 public sealed class PlsPlaylistParserTests
 {
     [Fact]
-    public void Берёт_только_ключи_File_и_упорядочивает_их_по_номеру()
+    public void Takes_only_file_keys_ordered_by_number()
     {
         PlsPlaylistParser parser = new();
 
@@ -59,7 +59,7 @@ public sealed class PlsPlaylistParserTests
     }
 
     [Fact]
-    public void Игнорирует_комментарии_и_пустые_значения()
+    public void Ignores_comments_and_empty_values()
     {
         PlsPlaylistParser parser = new();
 
@@ -77,7 +77,7 @@ public sealed class PlsPlaylistParserTests
 public sealed class CuePlaylistParserTests
 {
     [Fact]
-    public void Берёт_путь_из_директивы_FILE_в_кавычках()
+    public void Takes_path_from_quoted_file_directive()
     {
         CuePlaylistParser parser = new();
 
@@ -96,7 +96,7 @@ public sealed class CuePlaylistParserTests
     }
 
     [Fact]
-    public void Понимает_FILE_без_кавычек()
+    public void Handles_unquoted_file_directive()
     {
         CuePlaylistParser parser = new();
 
@@ -104,7 +104,7 @@ public sealed class CuePlaylistParserTests
     }
 
     [Fact]
-    public void Дорожки_не_считаются_отдельными_путями()
+    public void Tracks_are_not_separate_paths()
     {
         CuePlaylistParser parser = new();
 
@@ -123,7 +123,7 @@ public sealed class CuePlaylistParserTests
 public sealed class PlaylistServiceTests
 {
     [Fact]
-    public void Относительный_путь_разворачивается_от_папки_плейлиста()
+    public void Relative_path_resolves_from_playlist_folder()
     {
         string resolved = PlaylistService.ResolvePath(@"sub\track.mp3", @"D:\Music\Lists")!;
 
@@ -131,7 +131,7 @@ public sealed class PlaylistServiceTests
     }
 
     [Fact]
-    public void Абсолютный_путь_остаётся_как_есть()
+    public void Absolute_path_is_kept()
     {
         string resolved = PlaylistService.ResolvePath(@"D:\Other\track.mp3", @"D:\Music\Lists")!;
 
@@ -139,7 +139,7 @@ public sealed class PlaylistServiceTests
     }
 
     [Fact]
-    public void Косые_черты_в_стиле_Unix_приводятся_к_Windows()
+    public void Unix_slashes_are_normalised()
     {
         string resolved = PlaylistService.ResolvePath("sub/track.mp3", @"D:\Music")!;
 
@@ -147,13 +147,13 @@ public sealed class PlaylistServiceTests
     }
 
     [Fact]
-    public void Ссылка_на_сетевой_поток_путём_не_считается()
+    public void Stream_url_is_not_a_path()
     {
         Assert.Null(PlaylistService.ResolvePath("https://radio.example/stream", @"D:\Music"));
     }
 
     [Fact]
-    public async Task Отсутствующий_файл_отмечается_как_ненайденный()
+    public async Task Missing_file_is_marked_not_found()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("present.mp3", 1, 2, 3);
@@ -170,7 +170,7 @@ public sealed class PlaylistServiceTests
     }
 
     [Fact]
-    public async Task Статус_из_основного_сканирования_переиспользуется_а_не_дублируется()
+    public async Task Main_scan_status_is_reused_not_duplicated()
     {
         using TempDirectory temp = new();
         string track = temp.WriteBytes("track.flac", 1, 2, 3);
@@ -189,13 +189,13 @@ public sealed class PlaylistServiceTests
     }
 
     /// <summary>
-    /// Старые .m3u и .pls без BOM записаны в системной ANSI-кодировке.
-    /// Имя файла подбирается под кодовую страницу той машины, где идёт тест:
-    /// жёстко зашитая кириллица работает только на русской Windows, а на
-    /// англоязычном сборщике (страница 1252) тест падал бы на пустом месте.
+    /// Older .m3u and .pls files without a BOM use the system ANSI code page. The
+    /// file name is chosen for the code page of the test machine: hard-coded
+    /// Cyrillic only works on Russian Windows and would fail on an English build
+    /// agent (code page 1252) for no reason.
     /// </summary>
     [Fact]
-    public async Task Не_юникодный_плейлист_читается_в_системной_кодировке()
+    public async Task Non_unicode_playlist_reads_in_system_code_page()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         Encoding ansi = Encoding.GetEncoding(0);
@@ -205,8 +205,8 @@ public sealed class PlaylistServiceTests
 
         if (name is null)
         {
-            // Системная кодировка не держит ни одного не-ASCII имени из набора —
-            // проверять нечего, но и падать не за что.
+            // The system code page cannot hold any of the non-ASCII candidates; nothing
+            // to test, and nothing to fail.
             return;
         }
 
@@ -221,18 +221,17 @@ public sealed class PlaylistServiceTests
         Assert.True(result.Entries[0].Exists, $"не нашёлся файл «{name}» в кодировке {ansi.WebName}");
     }
 
-    /// <summary>Имя переживает круговой перевод через кодировку без потерь.</summary>
+    /// <summary>The name survives a round trip through the code page losslessly.</summary>
     private static bool RoundTrips(string value, Encoding encoding) =>
         encoding.GetString(encoding.GetBytes(value)) == value;
 
     [Fact]
-    public async Task Байты_недопустимые_в_юникоде_не_роняют_чтение()
+    public async Task Invalid_unicode_bytes_do_not_break_reading()
     {
         using TempDirectory temp = new();
 
-        // 0x80 — байт продолжения без ведущего: в UTF-8 такого быть не может,
-        // и это не метка порядка байт. Разбор обязан не упасть, а прочитать
-        // строку запасной однобайтовой кодировкой.
+        // 0x80 is a continuation byte with no lead byte — impossible in UTF-8 and not
+        // a BOM. Reading must not fail but fall back to the single-byte encoding.
         string playlist = temp.WriteBytes("list.m3u", 0x80, 0x41, 0x2E, 0x6D, 0x70, 0x33, 0x0A);
 
         PlaylistService service = new();
@@ -242,7 +241,7 @@ public sealed class PlaylistServiceTests
     }
 
     [Fact]
-    public async Task Неподдерживаемое_расширение_даёт_понятную_ошибку_а_не_исключение()
+    public async Task Unsupported_extension_gives_clear_error_not_exception()
     {
         using TempDirectory temp = new();
         string file = temp.WriteText("list.xspf", "<playlist/>");
@@ -258,12 +257,12 @@ public sealed class PlaylistServiceTests
 public sealed class ServiceCompositionTests
 {
     /// <summary>
-    /// Контейнер внедрения зависимостей подставляет пустую коллекцию вместо
-    /// значения по умолчанию. Раньше из-за этого служба оставалась без
-    /// разборщиков и молча считала все плейлисты неподдерживаемыми.
+    /// The DI container passes an empty collection instead of the default value,
+    /// which used to leave the service without parsers, silently treating every
+    /// playlist as unsupported.
     /// </summary>
     [Fact]
-    public async Task Пустой_набор_разборщиков_не_оставляет_службу_без_разборщиков()
+    public async Task Empty_parser_set_does_not_leave_service_without_parsers()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("track.wav", 1, 2, 3);
@@ -278,7 +277,7 @@ public sealed class ServiceCompositionTests
     }
 
     [Fact]
-    public void Пустой_набор_экспортёров_не_оставляет_службу_без_форматов()
+    public void Empty_exporter_set_does_not_leave_service_without_formats()
     {
         Reporting.ReportService service = new([]);
 

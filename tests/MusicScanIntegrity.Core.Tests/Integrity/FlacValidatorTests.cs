@@ -12,7 +12,7 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Исправный_файл_проходит_проверку_сумм()
+    public void Healthy_file_passes_checksum_validation()
     {
         byte[] file = FlacFileBuilder.Build(frames: 5);
 
@@ -24,7 +24,7 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Теги_в_начале_и_в_конце_не_мешают()
+    public void Leading_and_trailing_tags_do_not_interfere()
     {
         byte[] file = FlacFileBuilder.Build(frames: 3, leadingId3: true, trailingId3: true);
 
@@ -35,11 +35,11 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Испорченный_байт_внутри_кадра_ловится_по_сумме()
+    public void Corrupted_frame_byte_is_caught_by_checksum()
     {
         byte[] file = FlacFileBuilder.Build(frames: 4);
 
-        // Портим середину третьего кадра — сумма по нему перестаёт сходиться.
+        // Corrupt the middle of the third frame so its checksum no longer matches.
         int thirdFrame = FlacFileBuilder.FirstFrameOffset() + (2 * FlacFileBuilder.FrameLength());
         file[thirdFrame + 20] ^= 0x40;
 
@@ -51,7 +51,7 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Обрыв_внутри_последнего_кадра_называется_обрывом()
+    public void Cut_inside_last_frame_is_truncation()
     {
         byte[] file = FlacFileBuilder.Build(frames: 4);
         byte[] cut = file[..^20];
@@ -64,10 +64,10 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Нехватка_кадров_видна_по_заявленному_числу_отсчётов()
+    public void Missing_frames_show_in_declared_sample_count()
     {
-        // В описании потока обещано шесть кадров, а лежит четыре: файл обрезали
-        // ровно по границе кадра, и суммы оставшихся сходятся.
+        // STREAMINFO promises six frames but four are present: the file was cut exactly
+        // at a frame boundary, so the remaining checksums all match.
         byte[] file = FlacFileBuilder.Build(frames: 4, declaredSamples: 6L * FlacFileBuilder.BlockSize);
 
         ContainerValidation result = Validate(file);
@@ -79,20 +79,20 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Мусор_после_последнего_кадра_замечается()
+    public void Garbage_after_last_frame_is_reported()
     {
         byte[] file = [.. FlacFileBuilder.Build(frames: 3), .. new byte[64]];
 
         ContainerValidation result = Validate(file);
 
-        // Последний кадр «не заканчивается»: разборщик видит, что после него
-        // идут данные, которых там быть не должно.
+        // The last frame "does not end": the validator sees data after it that should
+        // not be there.
         Assert.Equal(ContainerVerdict.Damaged, result.Verdict);
         Assert.Equal(2, result.UnitsChecked);
     }
 
     [Fact]
-    public void Подмена_подписи_файла_даёт_повреждение()
+    public void Wrong_file_signature_is_damage()
     {
         byte[] file = FlacFileBuilder.Build();
         file[0] = (byte)'x';
@@ -104,7 +104,7 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Файл_без_единого_кадра_считается_обрывом()
+    public void File_without_frames_is_truncation()
     {
         byte[] file = FlacFileBuilder.Build(frames: 0, declaredSamples: 0);
 
@@ -115,7 +115,7 @@ public sealed class FlacValidatorTests
     }
 
     [Fact]
-    public void Файл_опознаётся_по_подписи()
+    public void File_is_identified_by_signature()
     {
         FlacValidator validator = new();
 

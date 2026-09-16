@@ -28,7 +28,7 @@ public sealed class FileCheckerTests
     [InlineData(CheckDepth.Quick, DecodeScope.Quick)]
     [InlineData(CheckDepth.Sampled, DecodeScope.Sampled)]
     [InlineData(CheckDepth.Full, DecodeScope.Full)]
-    public async Task Настройка_глубины_доходит_до_декодера(CheckDepth depth, DecodeScope expected)
+    public async Task Depth_setting_reaches_decoder(CheckDepth depth, DecodeScope expected)
     {
         FakeAudioProbe probe = new();
         FileChecker checker = Create(probe);
@@ -44,7 +44,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Обрыв_по_данным_декодера_делает_файл_повреждённым()
+    public async Task Decoder_truncation_marks_file_corrupted()
     {
         FakeAudioProbe probe = new(_ =>
             AudioProbeResult.Success(12, "MP3", declared: 210) with { Truncated = true });
@@ -63,17 +63,17 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Об_обрыве_не_сообщается_дважды()
+    public async Task Truncation_is_not_reported_twice()
     {
-        // Разбор структуры уже назвал файл обрезанным — декодер не должен
-        // добавлять второе такое же замечание.
+        // The structure check already reported truncation; the decoder must not add a
+        // second identical finding.
         FakeAudioProbe probe = new(_ =>
             AudioProbeResult.Success(2, "FLAC", declared: 200) with { Truncated = true });
 
         FileChecker checker = Create(probe);
         using TempDirectory temp = new();
 
-        // Обрезанный FLAC: подпись и описание потока есть, кадров нет.
+        // Truncated FLAC: signature and STREAMINFO present, no frames.
         byte[] flac = [.. "fLaC"u8, 0x80, 0, 0, 34, .. new byte[34]];
         string path = temp.WriteBytes("обрыв.flac", flac);
 
@@ -86,7 +86,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Лослесс_без_верхних_частот_вызывает_подозрение()
+    public async Task Lossless_without_top_end_is_suspected()
     {
         FakeAudioProbe probe = new(_ => AudioProbeResult.Success(60, "FLAC") with
         {
@@ -109,7 +109,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Лослесс_с_полной_полосой_подозрений_не_вызывает()
+    public async Task Full_band_lossless_is_not_suspected()
     {
         FakeAudioProbe probe = new(_ => AudioProbeResult.Success(60, "FLAC") with
         {
@@ -130,10 +130,10 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Тихая_запись_под_подозрение_не_попадает()
+    public async Task Quiet_recording_is_not_suspected()
     {
-        // На тихом куске верхних частот не видно просто потому, что там нечему
-        // звучать. Обвинять такой файл в перекодировании нельзя.
+        // A quiet passage lacks top end only because nothing is sounding; that is no
+        // grounds to call the file re-encoded.
         FakeAudioProbe probe = new(_ => AudioProbeResult.Success(60, "FLAC") with
         {
             Stats = new AudioStats(4_000_000, 0.02, 0.005, 0, 0, 0, 88_200),
@@ -153,7 +153,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Короткое_измерение_спектра_в_расчёт_не_идёт()
+    public async Task Short_spectrum_measurement_is_ignored()
     {
         FakeAudioProbe probe = new(_ => AudioProbeResult.Success(60, "FLAC") with
         {
@@ -179,7 +179,7 @@ public sealed class FileCheckerTests
     private static ScanItem Item(string path, long size = 1024) => new(path, size, ScanItemKind.Audio);
 
     [Fact]
-    public async Task Здоровый_файл_получает_статус_в_порядке()
+    public async Task Healthy_file_is_ok()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("ok.flac", 1, 2, 3, 4);
@@ -191,7 +191,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Исчезнувший_файл_даёт_ошибку_файл_не_найден_а_не_повреждение_аудио()
+    public async Task Vanished_file_reports_not_found_rather_than_damaged_audio()
     {
         using TempDirectory temp = new();
         string path = Path.Combine(temp.Path, "пропал.flac");
@@ -204,7 +204,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Пустой_файл_отмечается_отдельной_причиной()
+    public async Task Empty_file_has_its_own_cause()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("empty.ogg");
@@ -216,7 +216,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Ошибка_декодера_даёт_статус_повреждён()
+    public async Task Decoder_error_marks_file_corrupted()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("bad.mp3", 1, 2, 3);
@@ -232,7 +232,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Защищённый_файл_это_предупреждение_а_не_повреждение()
+    public async Task Protected_file_is_a_warning_not_damage()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("drm.wma", 1, 2, 3);
@@ -247,7 +247,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Таймаут_одного_файла_даёт_предупреждение_и_не_ломает_проверку()
+    public async Task Single_file_timeout_warns_without_breaking_scan()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("slow.wv", 1, 2, 3);
@@ -262,7 +262,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Отсутствие_тегов_это_предупреждение_а_не_повреждение()
+    public async Task Missing_tags_are_a_warning_not_damage()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("notags.flac", 1, 2, 3);
@@ -279,7 +279,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Теги_не_проверяются_если_настройка_выключена()
+    public async Task Tags_are_not_checked_when_setting_is_off()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("notags.flac", 1, 2, 3);
@@ -292,12 +292,12 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Несовпадение_расширения_и_содержимого_даёт_предупреждение()
+    public async Task Extension_mismatch_warns()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("track.mp3", 1, 2, 3);
 
-        // Декодер говорит FLAC, а расширение .mp3 — это ровно тот случай из макета.
+        // The decoder says FLAC while the extension is .mp3.
         FakeAudioProbe probe = new(_ => AudioProbeResult.Success(2, "FLAC"));
 
         FileCheckResult result = await Create(probe).CheckAsync(Item(path, 3), Context(), CancellationToken.None);
@@ -308,7 +308,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Файл_меньше_порога_не_поднимает_предупреждение_о_размере()
+    public async Task File_below_threshold_raises_no_size_warning()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("small.wav", new byte[2048]);
@@ -326,12 +326,12 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Без_ограничения_размера_предупреждение_о_большом_файле_не_появляется()
+    public async Task No_size_limit_means_no_large_file_warning()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("huge.wav", new byte[4096]);
 
-        // 0 означает «без ограничений» — порог не срабатывает никогда.
+        // 0 means no limit; the threshold never fires.
         AppSettings settings = new() { LargeFileThresholdMb = 0, VerifyExtensionMatchesContent = false };
 
         bool notified = false;
@@ -345,7 +345,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Файл_больше_порога_помечается_предупреждением_и_проверяется()
+    public async Task File_above_threshold_warns_and_is_checked()
     {
         using TempDirectory temp = new();
         byte[] payload = new byte[3 * 1024 * 1024];
@@ -362,12 +362,12 @@ public sealed class FileCheckerTests
         Assert.Single(notified);
         Assert.Equal(CheckStatus.Warning, result.Status);
         Assert.Contains(result.Issues, i => i.Code == IssueCode.LargeFile);
-        // Проверка всё равно выполнена — декодер вызывался.
+        // The check still ran: the decoder was called.
         Assert.Equal(1, probe.Calls);
     }
 
     [Fact]
-    public async Task Критический_сбой_декодера_прерывает_проверку_особым_исключением()
+    public async Task Critical_decoder_failure_throws_dedicated_exception()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("any.flac", 1, 2, 3);
@@ -380,7 +380,7 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Непредвиденное_исключение_становится_строкой_результата_а_не_падением()
+    public async Task Unexpected_exception_becomes_result_row_not_crash()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("any.flac", 1, 2, 3);
@@ -394,12 +394,12 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Занятый_файл_пропускается_если_так_настроено()
+    public async Task Locked_file_is_skipped_when_configured()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("locked.wav", 1, 2, 3);
 
-        // Держим файл эксклюзивно — так его видит другая программа.
+        // Hold the file exclusively, as another program would.
         using FileStream hold = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
 
         AppSettings settings = new() { LockedFileAction = LockedFileAction.Skip };
@@ -410,15 +410,14 @@ public sealed class FileCheckerTests
     }
 
     [Fact]
-    public async Task Если_копию_занятого_файла_сделать_нельзя_программа_говорит_об_этом_честно()
+    public async Task Uncopyable_locked_file_is_reported_honestly()
     {
         using TempDirectory temp = new();
         using TempDirectory copies = new();
         string path = temp.WriteBytes("locked.wav", 1, 2, 3, 4, 5);
 
-        // Владелец держит файл вообще без разделения доступа: прочитать его нельзя
-        // ни напрямую, ни для копирования. Программа обязана сказать об этом прямо,
-        // а не делать вид, что проверила файл.
+        // The owner holds the file with no sharing at all: it cannot be read directly
+        // or copied. The app must say so plainly rather than pretend it checked.
         using FileStream hold = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
 
         TempCopyManager manager = new(copies.Path);
@@ -431,18 +430,18 @@ public sealed class FileCheckerTests
         Assert.Contains(result.Issues, i => i.Code == IssueCode.LockedCopyFailed);
         Assert.Equal(0, probe.Calls);
 
-        // И главное: незавершённая копия не осталась на диске.
+        // Crucially, no partial copy is left on disk.
         Assert.Empty(Directory.GetFiles(copies.Path));
     }
 
     [Fact]
-    public async Task Файл_открытый_другой_программой_на_чтение_проверяется_как_обычно()
+    public async Task File_open_for_reading_elsewhere_is_checked_normally()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("playing.wav", 1, 2, 3, 4, 5);
 
-        // Обычный случай: проигрыватель держит файл, но разрешает чтение.
-        // Считать такой файл «занятым» и дёргать пользователя вопросом — неверно.
+        // The usual case: a player holds the file but allows reading. Treating it as
+        // locked and asking the user would be wrong.
         using FileStream hold = new(path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
         AppSettings settings = new() { VerifyExtensionMatchesContent = false };

@@ -3,20 +3,18 @@ using Xunit;
 
 namespace MusicScanIntegrity.Core.Tests.Integrity;
 
-/// <summary>
-/// Скользящее окно над потоком — то, через что читают все разборщики.
-/// </summary>
+/// <summary>The sliding window every validator reads through.</summary>
 /// <remarks>
-/// Ошибка здесь не выглядит ошибкой окна: она выглядит повреждённым файлом.
-/// Поэтому проверяется само окно, а не только вердикты поверх него.
+/// A bug here does not look like a window bug; it looks like a damaged file.
+/// Hence the window itself is tested, not only the verdicts built on it.
 /// </remarks>
 public sealed class StreamWindowTests
 {
-    /// <summary>Наименьший буфер, который окно себе позволяет.</summary>
+    /// <summary>Smallest buffer the window allows itself.</summary>
     private const int MinimumBuffer = 4096;
 
     [Fact]
-    public void Позиция_считается_по_пройденным_байтам()
+    public void Position_counts_consumed_bytes()
     {
         StreamWindow window = Window(1000);
 
@@ -31,7 +29,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Просмотр_вперёд_не_сдвигает_позицию()
+    public void Peek_does_not_advance()
     {
         StreamWindow window = Window(1000);
         window.Ensure(10);
@@ -42,7 +40,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Конец_потока_виден_по_отказу_добрать_байты()
+    public void End_of_stream_shows_as_failed_fill()
     {
         StreamWindow window = Window(100);
 
@@ -53,11 +51,9 @@ public sealed class StreamWindowTests
         Assert.True(window.AtEnd);
     }
 
-    /// <summary>
-    /// Кадр длиннее буфера — обычное дело у файлов с высоким битрейтом.
-    /// </summary>
+    /// <summary>A frame longer than the buffer is routine for high-bitrate files.</summary>
     [Fact]
-    public void Буфер_растёт_под_запрос_длиннее_себя()
+    public void Buffer_grows_for_larger_request()
     {
         StreamWindow window = Window(MinimumBuffer * 5);
         int wanted = MinimumBuffer * 3;
@@ -66,17 +62,14 @@ public sealed class StreamWindowTests
         Assert.Equal(Pattern(0, wanted), window.Peek(wanted).ToArray());
     }
 
-    /// <summary>
-    /// Главное свойство сдвига: байты после него — те же самые.
-    /// </summary>
+    /// <summary>The key property of compaction: bytes after it are unchanged.</summary>
     /// <remarks>
-    /// Когда свободного места в хвосте буфера не осталось, окно сдвигает
-    /// непрочитанный остаток к началу. Шаг подобран так, чтобы за проход
-    /// сдвиг случился много раз: именно на нём теряются байты, если сдвиг
-    /// считает длины неверно.
+    /// When the buffer tail is full, the window moves the unread remainder to the
+    /// front. The step size makes this happen many times per pass, since that is
+    /// exactly where bytes get lost if the lengths are miscalculated.
     /// </remarks>
     [Fact]
-    public void Сдвиг_остатка_к_началу_не_теряет_байты()
+    public void Compaction_loses_no_bytes()
     {
         const int Length = MinimumBuffer * 8;
         const int Step = 300;
@@ -94,7 +87,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Пропуск_переносит_позицию_за_прочитанное()
+    public void Skip_moves_past_buffered_data()
     {
         StreamWindow window = Window(MinimumBuffer * 4);
 
@@ -106,7 +99,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Пропуск_внутри_уже_прочитанного_обходится_без_перемотки()
+    public void Skip_within_buffer_needs_no_seek()
     {
         StreamWindow window = Window(1000);
         window.Ensure(500);
@@ -117,7 +110,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Пропуск_за_конец_файла_не_удаётся()
+    public void Skip_past_end_fails()
     {
         StreamWindow window = Window(500);
 
@@ -127,7 +120,7 @@ public sealed class StreamWindowTests
     }
 
     [Fact]
-    public void Пропуск_нуля_и_отрицательного_ничего_не_меняет()
+    public void Skip_of_zero_or_negative_changes_nothing()
     {
         StreamWindow window = Window(100);
 
@@ -137,11 +130,11 @@ public sealed class StreamWindowTests
     }
 
     /// <summary>
-    /// Поток без перемотки — не выдуманный случай: так читаются копии занятых
-    /// файлов и всё, что приходит не с диска.
+    /// Non-seekable streams are real: copies of locked files and anything not
+    /// coming from disk are read this way.
     /// </summary>
     [Fact]
-    public void Поток_без_перемотки_пропускает_байты_чтением()
+    public void Non_seekable_stream_skips_by_reading()
     {
         using MemoryStream inner = new(Pattern(0, MinimumBuffer * 3), writable: false);
         using ForwardOnlyStream stream = new(inner);
@@ -156,7 +149,7 @@ public sealed class StreamWindowTests
     private static StreamWindow Window(int length) =>
         new(new MemoryStream(Pattern(0, length), writable: false));
 
-    /// <summary>Байты, по которым видно, откуда именно они прочитаны.</summary>
+    /// <summary>Bytes that reveal exactly where they were read from.</summary>
     private static byte[] Pattern(int offset, int count)
     {
         byte[] bytes = new byte[count];
@@ -168,7 +161,7 @@ public sealed class StreamWindowTests
         return bytes;
     }
 
-    /// <summary>Поток, который умеет только читать вперёд.</summary>
+    /// <summary>A stream that can only read forward.</summary>
     private sealed class ForwardOnlyStream(Stream inner) : Stream
     {
         public override bool CanRead => true;

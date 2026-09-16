@@ -12,7 +12,7 @@ public sealed class OggValidatorTests
     }
 
     [Fact]
-    public void Исправный_файл_проходит_проверку_сумм()
+    public void Healthy_file_passes_checksum_validation()
     {
         ContainerValidation result = Validate(SyntheticFiles.Ogg(pages: 4));
 
@@ -21,7 +21,7 @@ public sealed class OggValidatorTests
     }
 
     [Fact]
-    public void Испорченный_байт_страницы_ловится_по_сумме()
+    public void Corrupted_page_byte_is_caught_by_checksum()
     {
         byte[] file = SyntheticFiles.Ogg(pages: 3);
         int second = SyntheticFiles.OggPageOffset(1);
@@ -35,7 +35,7 @@ public sealed class OggValidatorTests
     }
 
     [Fact]
-    public void Отсутствие_признака_конца_считается_обрывом()
+    public void Missing_end_of_stream_flag_is_truncation()
     {
         ContainerValidation result = Validate(SyntheticFiles.Ogg(pages: 3, withEndFlag: false));
 
@@ -44,7 +44,7 @@ public sealed class OggValidatorTests
     }
 
     [Fact]
-    public void Пропуск_номера_страницы_означает_потерю_куска()
+    public void Page_sequence_gap_means_lost_data()
     {
         ContainerValidation result = Validate(SyntheticFiles.Ogg(pages: 3, skipSequence: true));
 
@@ -53,7 +53,7 @@ public sealed class OggValidatorTests
     }
 
     [Fact]
-    public void Обрезанный_файл_называется_обрывом()
+    public void Cut_file_is_reported_as_truncated()
     {
         byte[] file = SyntheticFiles.Ogg(pages: 3);
 
@@ -73,7 +73,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Цепочка_кадров_без_сумм_проверяется_как_структура()
+    public void Frame_chain_without_checksums_is_structure_checked()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp3(frames: 6));
 
@@ -82,7 +82,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Защищённые_кадры_проверяются_по_сумме()
+    public void Protected_frames_are_checksum_verified()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp3(frames: 4, withCrc: true));
 
@@ -91,7 +91,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Испорченная_служебная_часть_защищённого_кадра_ловится()
+    public void Corrupted_side_info_of_protected_frame_is_caught()
     {
         byte[] file = SyntheticFiles.Mp3(frames: 4, withCrc: true);
         file[SyntheticFiles.Mp3FrameOffset(2) + 10] ^= 0x11;
@@ -103,7 +103,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Тег_в_начале_не_мешает()
+    public void Leading_tag_does_not_interfere()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp3(frames: 3, leadingId3: true));
 
@@ -112,9 +112,9 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Нехватка_кадров_видна_по_заголовку_Info()
+    public void Missing_frames_show_in_info_header()
     {
-        // В заголовке обещано двадцать кадров, а в файле пять.
+        // The header promises twenty frames; the file holds five.
         ContainerValidation result = Validate(SyntheticFiles.Mp3(frames: 5, declaredFrames: 20));
 
         Assert.Equal(ContainerVerdict.Damaged, result.Verdict);
@@ -122,7 +122,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Недописанный_последний_кадр_называется_обрывом()
+    public void Incomplete_last_frame_is_truncation()
     {
         byte[] file = SyntheticFiles.Mp3(frames: 4);
 
@@ -134,7 +134,7 @@ public sealed class Mp3ValidatorTests
     }
 
     [Fact]
-    public void Мусор_в_середине_превращает_файл_в_повреждённый()
+    public void Garbage_in_middle_marks_file_damaged()
     {
         byte[] file = SyntheticFiles.Mp3(frames: 6);
         byte[] junk = new byte[4096];
@@ -156,7 +156,7 @@ public sealed class Mp4ValidatorTests
     }
 
     [Fact]
-    public void Целый_файл_проходит_проверку_структуры()
+    public void Whole_file_passes_structure_check()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp4());
 
@@ -165,7 +165,7 @@ public sealed class Mp4ValidatorTests
     }
 
     [Fact]
-    public void Блок_длиннее_остатка_файла_означает_обрыв()
+    public void Box_longer_than_remainder_means_truncation()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp4(mediaBytes: 128, declaredMediaBytes: 4096));
 
@@ -174,7 +174,7 @@ public sealed class Mp4ValidatorTests
     }
 
     [Fact]
-    public void Отсутствие_описания_дорожек_замечается()
+    public void Missing_track_description_is_reported()
     {
         ContainerValidation result = Validate(SyntheticFiles.Mp4(withMovie: false));
 
@@ -192,7 +192,7 @@ public sealed class RiffValidatorTests
     }
 
     [Fact]
-    public void Целый_файл_проходит_проверку_структуры()
+    public void Whole_file_passes_structure_check()
     {
         ContainerValidation result = Validate(SyntheticFiles.Wav());
 
@@ -200,7 +200,7 @@ public sealed class RiffValidatorTests
     }
 
     [Fact]
-    public void Обрезанный_файл_ловится_по_объявленной_длине()
+    public void Cut_file_is_caught_by_declared_length()
     {
         byte[] file = SyntheticFiles.Wav(dataBytes: 512);
 
@@ -210,18 +210,16 @@ public sealed class RiffValidatorTests
         Assert.True(result.Truncated);
     }
 
-    /// <summary>
-    /// Ноль и «все единицы» в поле длины означают «длина не известна».
-    /// </summary>
+    /// <summary>Zero and all-ones in the length field mean "length unknown".</summary>
     /// <remarks>
-    /// Так пишет заголовок тот, кто записывает звук в поток и не может
-    /// вернуться назад, чтобы проставить размер: живая запись, вывод в канал.
-    /// Файл при этом целый, и объявлять его обрывающимся — ложная тревога.
+    /// That is how a header is written by anything streaming audio that cannot
+    /// seek back to fill in the size — live recording, piping. The file is whole,
+    /// and calling it truncated would be a false alarm.
     /// </remarks>
     [Theory]
     [InlineData(0x00u)]
     [InlineData(0xFFu)]
-    public void Незаполненная_длина_в_заголовке_не_считается_обрывом(uint fill)
+    public void Unset_header_length_is_not_truncation(uint fill)
     {
         byte[] file = SyntheticFiles.Wav();
         for (int i = 4; i < 8; i++)
@@ -234,11 +232,9 @@ public sealed class RiffValidatorTests
         Assert.Equal(ContainerVerdict.StructureOnly, result.Verdict);
     }
 
-    /// <summary>
-    /// Обратная сторона: настоящий обрыв по-прежнему находится.
-    /// </summary>
+    /// <summary>The flip side: a real truncation is still found.</summary>
     [Fact]
-    public void Заполненная_длина_длиннее_файла_остаётся_обрывом()
+    public void Declared_length_beyond_file_is_truncation()
     {
         byte[] file = SyntheticFiles.Wav();
         file[4] = 0xFF;
@@ -251,7 +247,7 @@ public sealed class RiffValidatorTests
     }
 
     [Fact]
-    public void Файл_без_описания_формата_повреждён()
+    public void File_without_format_chunk_is_damaged()
     {
         ContainerValidation result = Validate(SyntheticFiles.Wav(withFormat: false));
 
@@ -268,7 +264,7 @@ public sealed class WavPackValidatorTests
     }
 
     [Fact]
-    public void Цепочка_блоков_проверяется_как_структура()
+    public void Block_chain_is_structure_checked()
     {
         ContainerValidation result = Validate(SyntheticFiles.WavPack(blocks: 4));
 
@@ -278,7 +274,7 @@ public sealed class WavPackValidatorTests
     }
 
     [Fact]
-    public void Блок_длиннее_остатка_файла_означает_обрыв()
+    public void Box_longer_than_remainder_means_truncation()
     {
         ContainerValidation result = Validate(SyntheticFiles.WavPack(blocks: 2, declaredExtra: 500));
 
@@ -296,7 +292,7 @@ public sealed class ApeValidatorTests
     }
 
     [Fact]
-    public void Сходящиеся_длины_дают_проверку_структуры()
+    public void Matching_lengths_pass_structure_check()
     {
         ContainerValidation result = Validate(SyntheticFiles.Ape());
 
@@ -304,7 +300,7 @@ public sealed class ApeValidatorTests
     }
 
     [Fact]
-    public void Нехватка_данных_против_описания_означает_обрыв()
+    public void Data_shorter_than_descriptor_means_truncation()
     {
         ContainerValidation result = Validate(SyntheticFiles.Ape(audioBytes: 4096, actualBytes: 256));
 
@@ -329,9 +325,9 @@ public sealed class ContainerIntegrityCheckerTests : IDisposable
     }
 
     [Fact]
-    public void Формат_определяется_по_содержимому_а_не_по_расширению()
+    public void Format_comes_from_contents_not_extension()
     {
-        // Внутри FLAC, а имя обещает MP3 — проверять надо правилами FLAC.
+        // FLAC inside while the name promises MP3; FLAC rules must apply.
         ContainerValidation result = Check("подделка.mp3", FlacFileBuilder.Build(frames: 3));
 
         Assert.Equal("FLAC", result.Format);
@@ -339,7 +335,7 @@ public sealed class ContainerIntegrityCheckerTests : IDisposable
     }
 
     [Fact]
-    public void Незнакомый_формат_остаётся_без_вердикта()
+    public void Unknown_format_gets_no_verdict()
     {
         ContainerValidation result = Check("непонятно.bin", new byte[512]);
 
@@ -347,7 +343,7 @@ public sealed class ContainerIntegrityCheckerTests : IDisposable
     }
 
     [Fact]
-    public void MP3_за_тегом_ID3_опознаётся()
+    public void Mp3_behind_id3_tag_is_identified()
     {
         ContainerValidation result = Check("трек.mp3", SyntheticFiles.Mp3(frames: 3, leadingId3: true));
 
@@ -356,7 +352,7 @@ public sealed class ContainerIntegrityCheckerTests : IDisposable
     }
 
     [Fact]
-    public void Отсутствующий_файл_не_роняет_проверку()
+    public void Missing_file_does_not_throw()
     {
         ContainerValidation result = new ContainerIntegrityChecker()
             .Check(Path.Combine(_folder, "нет-такого.flac"), CancellationToken.None);

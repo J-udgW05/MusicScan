@@ -35,7 +35,7 @@ public sealed class CollectionInspectorTests
         };
 
     [Fact]
-    public void Пропуск_в_нумерации_замечается()
+    public void Numbering_gap_is_reported()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
@@ -49,18 +49,14 @@ public sealed class CollectionInspectorTests
         Assert.Contains("3", finding.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>
-    /// Номер дорожки вне разумных пределов — сломанный тег, а не альбом на
-    /// миллион дорожек.
-    /// </summary>
+    /// <summary>An out-of-range track number is a broken tag, not an album of a million tracks.</summary>
     /// <remarks>
-    /// Считать по такому номеру пропуски значило бы выписать человеку список
-    /// из миллиона недостающих дорожек, а до этого сложить миллион чисел в
-    /// память. На настоящей коллекции с испорченными тегами так и вылетала бы
-    /// вся программа: разбор идёт уже после проверки, когда результаты собраны.
+    /// Honouring it would list a million missing tracks after allocating a million
+    /// integers. On a real collection with damaged tags this crashed the app, since
+    /// the inspection runs after the scan with all results in memory.
     /// </remarks>
     [Fact]
-    public void Невозможный_номер_дорожки_не_считается_краем_альбома()
+    public void Impossible_track_number_is_not_album_end()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
             [
@@ -73,11 +69,9 @@ public sealed class CollectionInspectorTests
         Assert.DoesNotContain(findings, f => f.Kind == CollectionFindingKind.MissingTracks);
     }
 
-    /// <summary>
-    /// Граница разумного: сотни дорожек в сборнике — ещё альбом.
-    /// </summary>
+    /// <summary>Within bounds: hundreds of tracks on a compilation is still an album.</summary>
     [Fact]
-    public void Большой_но_возможный_номер_дорожки_разбирается_как_обычно()
+    public void Large_but_possible_track_number_is_handled_normally()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
             [
@@ -95,9 +89,9 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Папка_без_номеров_пропуском_не_считается()
+    public void Unnumbered_folder_is_not_a_gap()
     {
-        // Номеров нет вовсе — судить не о чем.
+        // No numbers at all; nothing to judge.
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
             File(@"C:\Музыка\Сборник\a.flac"),
@@ -109,7 +103,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Разные_форматы_в_одной_папке_замечаются()
+    public void Mixed_formats_in_folder_are_reported()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
@@ -124,7 +118,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Разные_альбомы_в_папке_замечаются()
+    public void Mixed_albums_in_folder_are_reported()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
@@ -137,7 +131,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Повтор_трека_находится_по_тегам_и_длительности()
+    public void Duplicate_is_found_by_tags_and_duration()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
@@ -151,15 +145,13 @@ public sealed class CollectionInspectorTests
         Assert.Contains(@"D:\Копии\песня.flac", finding.Detail!, StringComparison.Ordinal);
     }
 
-    /// <summary>
-    /// Число мест склоняется: «в 1 месте», но «в 3 местах».
-    /// </summary>
+    /// <summary>The place count agrees in number: "в 1 месте" but "в 3 местах".</summary>
     [Theory]
     [InlineData(2, "ещё в 1 месте")]
     [InlineData(3, "ещё в 2 местах")]
     [InlineData(6, "ещё в 5 местах")]
     [InlineData(22, "ещё в 21 месте")]
-    public void Число_мест_с_повтором_склоняется(int copies, string expected)
+    public void Duplicate_place_count_agrees_in_number(int copies, string expected)
     {
         List<FileCheckResult> files = [];
         for (int i = 0; i < copies; i++)
@@ -175,9 +167,9 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Разная_длительность_повтором_не_считается()
+    public void Different_duration_is_not_a_duplicate()
     {
-        // Концертная версия называется так же, а трек другой.
+        // A live version shares the title but is a different recording.
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
             File(@"C:\Музыка\Студия\01.flac", title: "Песня", duration: 214),
@@ -188,9 +180,9 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Отсутствие_обложки_замечается()
+    public void Missing_cover_is_reported()
     {
-        // Папка настоящая: проверка ищет в ней ещё и файл обложки рядом с музыкой.
+        // A real folder: the check also looks for a cover image next to the music.
         using TempDirectory temp = new();
 
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
@@ -204,7 +196,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Обложка_отдельным_файлом_замечаний_не_вызывает()
+    public void Cover_image_file_raises_no_finding()
     {
         using TempDirectory temp = new();
         temp.WriteBytes("cover.jpg", new byte[16]);
@@ -220,7 +212,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Маленькая_папка_альбомом_не_считается()
+    public void Small_folder_is_not_an_album()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
         [
@@ -232,7 +224,7 @@ public sealed class CollectionInspectorTests
     }
 
     [Fact]
-    public void Повторы_можно_не_искать()
+    public void Duplicate_search_can_be_skipped()
     {
         IReadOnlyList<CollectionFinding> findings = CollectionInspector.Inspect(
             [

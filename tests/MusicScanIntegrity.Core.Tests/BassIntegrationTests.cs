@@ -13,20 +13,18 @@ using Xunit;
 namespace MusicScanIntegrity.Core.Tests;
 
 /// <summary>
-/// Проверки с настоящей библиотекой BASS: остальные тесты работают с подставным
-/// декодером, а здесь проверяется, что реальное декодирование действительно
-/// отличает исправный файл от битого.
+/// Tests against the real BASS library; the rest use a fake decoder. These check
+/// that real decoding actually tells a healthy file from a broken one.
 /// </summary>
 /// <remarks>
-/// Если библиотеки BASS не скачаны (tools\fetch-bass.ps1), тесты пропускаются:
-/// падать из-за отсутствующей внешней зависимости они не должны.
+/// Skipped when the BASS binaries are not downloaded (tools/fetch-bass.ps1): a
+/// missing external dependency is no reason to fail.
 /// </remarks>
 public sealed class BassIntegrationTests : IDisposable
 {
     /// <summary>
-    /// Тест, который выполняется только при наличии native-библиотек BASS.
-    /// Без них он помечается пропущенным, а не падает: внешняя зависимость
-    /// скачивается отдельно (tools/fetch-bass.ps1).
+    /// A fact that runs only when the native BASS libraries are present, and is
+    /// reported as skipped otherwise.
     /// </summary>
     private sealed class BassFactAttribute : FactAttribute
     {
@@ -48,7 +46,7 @@ public sealed class BassIntegrationTests : IDisposable
 
     public void Dispose() => _probe.Dispose();
 
-    /// <summary>Пишет корректный WAV — такой файл декодер обязан прочитать.</summary>
+    /// <summary>Writes a valid WAV that the decoder must be able to read.</summary>
     private static string WriteWav(TempDirectory temp, string name, double seconds = 1.0, int rate = 8000)
     {
         int samples = (int)(rate * seconds);
@@ -86,7 +84,7 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public void Библиотека_bass_загружается()
+    public void Bass_library_loads()
     {
         Assert.Null(_unavailable);
 
@@ -95,7 +93,7 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public void Корректный_wav_декодируется()
+    public void Valid_wav_decodes()
     {
         using TempDirectory temp = new();
         string path = WriteWav(temp, "ok.wav", 1.5);
@@ -108,12 +106,12 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public void Выборочная_проверка_читает_несколько_окон()
+    public void Sampled_check_reads_several_windows()
     {
         using TempDirectory temp = new();
 
-        // Файл длиннее, чем пять окон по полторы секунды: иначе выборочная
-        // проверка честно перейдёт в полную.
+        // Longer than five 1.5 s windows, or a sampled check falls back to reading the
+        // whole file.
         string path = WriteWav(temp, "длинный.wav", seconds: 30);
 
         AudioProbeResult quick = _probe.Probe(path, DecodeScope.Quick, CancellationToken.None);
@@ -132,11 +130,11 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [Fact]
-    public void Обрезанный_WAV_ловится_разбором_структуры()
+    public void Truncated_wav_is_caught_by_structure_check()
     {
-        // Декодер здесь бесполезен: длину WAV он берёт из размера файла, а не
-        // из заголовка, поэтому нехватки данных не видит. Зато её видно по
-        // объявленной длине части data — этим и занимается разбор структуры.
+        // The decoder is no help here: it derives WAV length from the file size, not
+        // the header, so it cannot see missing data. The declared length of the data
+        // chunk shows it, which is what the structure check reads.
         using TempDirectory temp = new();
         string path = WriteWav(temp, "обрезанный.wav", seconds: 30);
 
@@ -150,7 +148,7 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public void Мусор_вместо_аудио_не_декодируется()
+    public void Garbage_does_not_decode()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("broken.mp3", new byte[4096]);
@@ -162,7 +160,7 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public void Пустой_файл_не_декодируется()
+    public void Empty_file_does_not_decode()
     {
         using TempDirectory temp = new();
         string path = temp.WriteBytes("empty.ogg");
@@ -173,7 +171,7 @@ public sealed class BassIntegrationTests : IDisposable
     }
 
     [BassFact]
-    public async Task Полный_проход_по_папке_разделяет_исправные_и_битые_файлы()
+    public async Task Full_folder_scan_separates_healthy_and_broken_files()
     {
         using TempDirectory temp = new();
 
@@ -185,8 +183,8 @@ public sealed class BassIntegrationTests : IDisposable
 
         AppSettings settings = new()
         {
-            // Сверку расширения выключаем: битый MP3 из нулей и так не откроется,
-            // а тест здесь про разделение исправных и битых.
+            // Extension check off: a zero-filled MP3 will not open anyway, and this test
+            // is about separating healthy from broken files.
             VerifyExtensionMatchesContent = false,
             LockedFileAction = LockedFileAction.Skip,
         };
@@ -224,7 +222,7 @@ public sealed class BassIntegrationTests : IDisposable
         Assert.Equal(2, results.Count(r => r.Status == CheckStatus.Ok));
         Assert.Equal(2, results.Count(r => r.Status == CheckStatus.Corrupted));
 
-        // Плейлист нашёл один отсутствующий путь.
+        // The playlist found one missing path.
         Assert.Equal(1, summary.PlaylistMissingLinks);
         Assert.Equal(1, summary.PlaylistCount);
     }

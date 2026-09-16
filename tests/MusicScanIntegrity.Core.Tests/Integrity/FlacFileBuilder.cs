@@ -2,30 +2,26 @@ using MusicScanIntegrity.Core.Integrity;
 
 namespace MusicScanIntegrity.Core.Tests.Integrity;
 
-/// <summary>
-/// Собирает файлы FLAC побайтно: правильные и намеренно испорченные.
-/// </summary>
+/// <summary>Builds FLAC files byte by byte, valid and deliberately broken.</summary>
 /// <remarks>
-/// Разборщику всё равно, что лежит внутри кадра: он проверяет заголовок, границу
-/// и контрольную сумму. Поэтому вместо настоящего сжатого звука в кадры кладётся
-/// заполнитель — это позволяет проверять разборщик без готовых файлов в репозитории
-/// и без кодировщика.
+/// The validator does not care what is inside a frame: it checks the header, the
+/// boundary and the checksum. Frames therefore carry filler instead of real
+/// compressed audio, which allows testing without sample files in the
+/// repository and without an encoder.
 /// </remarks>
 internal static class FlacFileBuilder
 {
-    /// <summary>Размер блока в отсчётах — код 12 в заголовке кадра.</summary>
+    /// <summary>Block size in samples: code 12 in the frame header.</summary>
     public const int BlockSize = 4096;
 
-    /// <summary>Частота дискретизации — код 9 в заголовке кадра.</summary>
+    /// <summary>Sample rate: code 9 in the frame header.</summary>
     public const int SampleRate = 44100;
 
-    /// <summary>Собирает исправный файл.</summary>
-    /// <param name="frames">Сколько кадров положить.</param>
-    /// <param name="declaredSamples">Что записать в описание потока; по умолчанию — ровно столько, сколько кадров.</param>
-    /// <param name="payloadBytes">Размер заполнителя внутри кадра.</param>
-    /// <param name="leadingId3">Добавить тег ID3v2 в начало.</param>
-    /// <param name="trailingId3">Добавить тег ID3v1 в конец.</param>
-    /// <returns>Содержимое файла.</returns>
+    /// <summary>Builds a valid file.</summary>
+    /// <param name="declaredSamples">Sample count written to STREAMINFO; defaults to exactly what the frames hold.</param>
+    /// <param name="payloadBytes">Filler size inside each frame.</param>
+    /// <param name="leadingId3">Prepend an ID3v2 tag.</param>
+    /// <param name="trailingId3">Append an ID3v1 tag.</param>
     public static byte[] Build(
         int frames = 3,
         long? declaredSamples = null,
@@ -60,11 +56,11 @@ internal static class FlacFileBuilder
         return [.. file];
     }
 
-    /// <summary>Смещение первого кадра в файле, собранном с теми же настройками.</summary>
+    /// <summary>Offset of the first frame in a file built with the same options.</summary>
     public static int FirstFrameOffset(bool leadingId3 = false) =>
         (leadingId3 ? 210 : 0) + 4 + 4 + 34;
 
-    /// <summary>Длина одного кадра в байтах.</summary>
+    /// <summary>Length of one frame in bytes.</summary>
     public static int FrameLength(int payloadBytes = 64) => 6 + payloadBytes + 2;
 
     private static byte[] BuildId3v2(int payloadSize)
@@ -77,7 +73,7 @@ internal static class FlacFileBuilder
         tag[4] = 0;
         tag[5] = 0;
 
-        // Размер пишется «синхробезопасно»: по семь значащих бит на байт.
+        // The size is synch-safe: seven significant bits per byte.
         tag[6] = (byte)((payloadSize >> 21) & 0x7F);
         tag[7] = (byte)((payloadSize >> 14) & 0x7F);
         tag[8] = (byte)((payloadSize >> 7) & 0x7F);
@@ -90,7 +86,7 @@ internal static class FlacFileBuilder
     {
         byte[] block = new byte[4 + 34];
 
-        // Заголовок блока: последний в цепочке, тип 0, длина 34.
+        // Block header: last in chain, type 0, length 34.
         block[0] = 0x80;
         block[1] = 0;
         block[2] = 0;
@@ -103,7 +99,7 @@ internal static class FlacFileBuilder
         WriteBigEndian(block, 8, frameLength, 3);
         WriteBigEndian(block, 11, frameLength, 3);
 
-        // Двадцать бит частоты, три канала, пять разрядности, тридцать шесть отсчётов.
+        // Twenty bits of sample rate, three of channels, five of bit depth, thirty-six of samples.
         ulong packed = ((ulong)SampleRate << 44)
             | ((ulong)(2 - 1) << 41)
             | ((ulong)(16 - 1) << 36)
@@ -132,8 +128,8 @@ internal static class FlacFileBuilder
 
         for (int i = 0; i < payloadBytes; i++)
         {
-            // Заполнитель без байта 0xFF: он начинает подпись кадра, и случайная
-            // «граница» в середине кадра сделала бы проверку бессмысленной.
+            // Filler without 0xFF bytes: that byte starts a frame signature, and a stray
+            // "boundary" mid-frame would make the check meaningless.
             frame.Add((byte)(((i * 7) + number + 1) & 0xFE));
         }
 
