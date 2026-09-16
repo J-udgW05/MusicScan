@@ -1,8 +1,7 @@
 namespace MusicScanIntegrity.App.Views;
 
-/// <summary>Вкладка «Настройки».</summary>
+/// <summary>Settings tab.</summary>
 public partial class SettingsView
 {
-    /// <summary>Создаёт представление.</summary>
     public SettingsView() => InitializeComponent();
 }

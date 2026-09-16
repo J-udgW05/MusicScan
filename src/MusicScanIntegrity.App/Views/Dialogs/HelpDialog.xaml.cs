@@ -2,14 +2,13 @@
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>Окно справки: значения статусов, принцип работы, горячие клавиши.</summary>
+/// <summary>Help window: status meanings, how the check works, keyboard shortcuts.</summary>
 public partial class HelpDialog
 {
-    /// <summary>Создаёт окно.</summary>
     public HelpDialog() => InitializeComponent();
 
-    // Кнопок у справки нет, поэтому Esc обрабатывается вручную: окно, которое
-    // не закрывается по Esc, ощущается сломанным.
+    // No buttons here, so Esc is handled by hand: a window that ignores Esc
+    // feels broken.
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)

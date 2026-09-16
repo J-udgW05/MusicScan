@@ -4,55 +4,49 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
-/// <summary>
-/// Строка таблицы результатов.
-/// </summary>
+/// <summary>A row in the results table.</summary>
 /// <remarks>
-/// Тип намеренно неизменяемый и без <c>INotifyPropertyChanged</c>: строк бывают
-/// сотни тысяч, и каждая подписка на уведомления — это лишняя память и лишние
-/// обработчики. Результат проверки после получения не меняется, уведомлять не о чем.
+/// Immutable and without <c>INotifyPropertyChanged</c> on purpose: there can be
+/// hundreds of thousands of rows, and a result never changes once it arrives.
 /// </remarks>
 public sealed class FileResultViewModel(FileCheckResult result)
 {
-    /// <summary>Исходный результат проверки.</summary>
+    /// <summary>The underlying check result.</summary>
     public FileCheckResult Result { get; } = result;
 
-    /// <summary>Имя файла.</summary>
     public string FileName => Result.FileName;
 
-    /// <summary>Папка, в которой лежит файл.</summary>
+    /// <summary>Folder containing the file.</summary>
     public string DirectoryPath => Result.DirectoryPath;
 
-    /// <summary>Полный путь.</summary>
     public string FullPath => Result.FullPath;
 
-    /// <summary>Формат («FLAC», либо «FLAC?» при несовпадении с расширением).</summary>
+    /// <summary>Format, e.g. "FLAC", or "FLAC?" when it disagrees with the extension.</summary>
     public string Format => Result.Format;
 
-    /// <summary>Размер в человеческом виде.</summary>
+    /// <summary>Human-readable size.</summary>
     public string Size => CoreFormat.Size(Result.SizeBytes);
 
-    /// <summary>Размер в байтах — по нему сортируется колонка «Размер».</summary>
+    /// <summary>Size in bytes; the size column sorts on this.</summary>
     public long SizeBytes => Result.SizeBytes;
 
-    /// <summary>Статус.</summary>
     public CheckStatus Status => Result.Status;
 
-    /// <summary>Подпись статуса — уточняющая, если замечание одно.</summary>
+    /// <summary>Status caption; specific when there is a single finding.</summary>
     public string StatusLabel => Result.StatusLabel;
 
-    /// <summary>Знак статуса для квадрата 20×20 в строке таблицы.</summary>
+    /// <summary>Status glyph for the 20×20 square in the row.</summary>
     public string StatusIcon => Result.Status.MarkKey();
 
-    /// <summary>Человеческое описание для панели подробностей.</summary>
+    /// <summary>Human-readable description for the details pane.</summary>
     public string Description => Result.Description;
 
-    /// <summary>Техническая причина — второй строкой в подробностях.</summary>
+    /// <summary>Technical cause, the second line in the details pane.</summary>
     public string? TechnicalDetail => Result.TechnicalDetail;
 
-    /// <summary>Заголовок панели подробностей: «имя · статус».</summary>
+    /// <summary>Details pane heading: "name · status".</summary>
     public string DetailsTitle => $"{FileName} · {StatusLabel}";
 
-    /// <summary>Расширение в верхнем регистре — для фильтра по формату.</summary>
+    /// <summary>Upper-case extension used by the format filter.</summary>
     public string Extension => Path.GetExtension(Result.FullPath).TrimStart('.').ToUpperInvariant();
 }

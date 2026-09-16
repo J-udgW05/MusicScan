@@ -5,29 +5,21 @@ using System.Windows.Media.Imaging;
 
 namespace MusicScanIntegrity.App.Controls;
 
-/// <summary>
-/// Отдаёт знак программы кадром нужного размера.
-/// </summary>
+/// <summary>Provides the application mark at the frame size needed.</summary>
 /// <remarks>
-/// Раньше знак лежал отдельными картинками: 128 точек для окна «О программе»
-/// и 40 — для заголовка. Заголовок показывает знак в 20 точек, то есть WPF
-/// ужимал картинку ещё раз, уже своими средствами, и от резкости, наведённой
-/// при сборке значка, ничего не оставалось: линии рисунка тоньше точки, и
-/// второй пересчёт растирает их в серое.
-///
-/// Здесь кадр берётся из <c>app.ico</c> — того же файла, из которого значок
-/// берёт Windows. Там есть размеры 16…256, и нужный находится точно, без
-/// повторного пересчёта. Экранный масштаб учитывается: при 200 % под знак
-/// в 20 точек уходит кадр в 40.
+/// The mark used to ship as separate 128 and 40 px images, and the 20 px title
+/// bar made WPF downscale again, smearing strokes thinner than a pixel into
+/// grey. Frames now come straight from <c>app.ico</c> — the same file Windows
+/// uses — which carries 16 to 256 px, so the right one is picked without
+/// resampling. DPI is honoured: at 200 % a 20 px mark takes the 40 px frame.
 /// </remarks>
 public static class AppMark
 {
     private static readonly Uri IconUri =
         new("pack://application:,,,/Assets/app.ico", UriKind.Absolute);
 
-    /// <summary>Кадр под указанный размер в точках макета.</summary>
-    /// <param name="owner">Элемент, по которому определяется масштаб экрана.</param>
-    /// <param name="size">Размер в точках макета, в котором знак будет показан.</param>
+    /// <summary>Frame for the given size in layout units.</summary>
+    /// <param name="owner">Element whose DPI decides the scale.</param>
     public static BitmapSource ForSize(Visual owner, double size)
     {
         ArgumentNullException.ThrowIfNull(owner);
@@ -38,9 +30,8 @@ public static class AppMark
         BitmapDecoder decoder = BitmapDecoder.Create(
             IconUri, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
 
-        // Кадр берётся не меньше нужного: растянуть растр — снова его размыть.
-        // Если экран настолько крупный, что подходящего кадра нет, берётся самый
-        // большой из имеющихся.
+        // Never pick a smaller frame: stretching a bitmap blurs it again. If the
+        // screen is so dense that none fits, take the largest available.
         return decoder.Frames
                    .Where(frame => frame.PixelWidth >= wanted)
                    .MinBy(frame => frame.PixelWidth)

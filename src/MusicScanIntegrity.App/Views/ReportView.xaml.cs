@@ -1,8 +1,7 @@
 namespace MusicScanIntegrity.App.Views;
 
-/// <summary>Вкладка «Отчёт»: сводка, распределение по статусам, экспорт.</summary>
+/// <summary>Report tab: summary, status breakdown and export.</summary>
 public partial class ReportView
 {
-    /// <summary>Создаёт представление.</summary>
     public ReportView() => InitializeComponent();
 }

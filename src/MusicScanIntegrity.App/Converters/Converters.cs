@@ -7,12 +7,12 @@ using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.Converters;
 
-// Конвертеров «статус -> кисть» здесь намеренно нет. Конвертер разрешает
-// ресурс один раз и отдаёт готовую кисть, а привязка при смене темы заново
-// не считается — цвета так и остаются от прежней темы. Цвет по статусу
-// раздают стили с DataTrigger и DynamicResource (Views/ResultsView.xaml).
+// There is deliberately no status-to-brush converter. A converter resolves
+// the resource once and the binding is not re-evaluated on a theme change, so
+// colours would stick to the old theme. Status colours come from styles with
+// DataTrigger and DynamicResource instead (Views/ResultsView.xaml).
 
-/// <summary>Показывает элемент, когда значение не пусто.</summary>
+/// <summary>Visible when the value is not empty.</summary>
 public sealed class NotEmptyToVisibilityConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -42,7 +42,7 @@ public sealed class NotEmptyToVisibilityConverter : IValueConverter
         throw new NotSupportedException();
 }
 
-/// <summary>Логическое значение в видимость (с необязательной инверсией через параметр «invert»).</summary>
+/// <summary>Boolean to visibility; pass "invert" as the parameter to invert.</summary>
 public sealed class BoolToVisibilityConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -63,7 +63,7 @@ public sealed class BoolToVisibilityConverter : IValueConverter
         value is Visibility.Visible;
 }
 
-/// <summary>Сравнение значения с параметром — для выбора варианта из нескольких кнопок.</summary>
+/// <summary>Compares the value with the parameter; used by radio-style button groups.</summary>
 public sealed class EqualsConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -75,7 +75,7 @@ public sealed class EqualsConverter : IValueConverter
         value is true && parameter is not null ? parameter : Binding.DoNothing;
 }
 
-/// <summary>Число байт в человеческий размер («24,1 МБ»).</summary>
+/// <summary>Byte count to a human-readable size.</summary>
 public sealed class SizeConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -87,7 +87,7 @@ public sealed class SizeConverter : IValueConverter
         throw new NotSupportedException();
 }
 
-/// <summary>Число с разрядами через неразрывный пробел.</summary>
+/// <summary>Number with non-breaking-space digit groups.</summary>
 public sealed class NumberConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -103,13 +103,10 @@ public sealed class NumberConverter : IValueConverter
         throw new NotSupportedException();
 }
 
-/// <summary>
-/// Счётчик статуса в ширину сегмента полосы распределения.
-/// </summary>
+/// <summary>Status count to a segment width in the distribution bar.</summary>
 /// <remarks>
-/// Привязать число прямо к <c>ColumnDefinition.Width</c> нельзя: WPF считает его
-/// шириной в пикселях, и полоса схлопывается. Нужна именно звёздочная доля,
-/// чтобы сегменты делили ширину пропорционально счётчикам.
+/// A plain number bound to <c>ColumnDefinition.Width</c> is taken as pixels and
+/// the bar collapses; a star share is needed for proportional segments.
 /// </remarks>
 public sealed class ShareToWidthConverter : IValueConverter
 {
@@ -131,7 +128,7 @@ public sealed class ShareToWidthConverter : IValueConverter
         throw new NotSupportedException();
 }
 
-/// <summary>Цвет из строки «#RRGGBB» — для образцов цвета статусов в настройках.</summary>
+/// <summary>Brush from a "#RRGGBB" string, for the status colour swatches.</summary>
 public sealed class HexToBrushConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -159,7 +156,7 @@ public sealed class HexToBrushConverter : IValueConverter
         throw new NotSupportedException();
 }
 
-/// <summary>Инверсия логического значения — например «включено вручную» = «не авто».</summary>
+/// <summary>Inverts a boolean, e.g. "manual" as "not automatic".</summary>
 public sealed class InvertBoolConverter : IValueConverter
 {
     /// <inheritdoc />
@@ -169,12 +166,9 @@ public sealed class InvertBoolConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => value is not true;
 }
 
-/// <summary>
-/// Русская подпись значения перечисления.
-/// </summary>
+/// <summary>Display caption for an enum value.</summary>
 /// <remarks>
-/// Без него выпадающие списки показывали бы имена из кода — «All», «Html», «Ask».
-/// Интерфейс полностью на русском, английских служебных слов в нём быть не должно.
+/// Without it combo boxes would show code names such as "Html" or "Ask".
 /// </remarks>
 public sealed class EnumDisplayConverter : IValueConverter
 {

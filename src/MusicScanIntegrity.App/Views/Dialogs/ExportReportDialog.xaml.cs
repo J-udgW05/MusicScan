@@ -7,14 +7,13 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>Диалог экспорта отчёта: формат, состав, путь сохранения.</summary>
+/// <summary>Report export dialog: format, contents and save path.</summary>
 public partial class ExportReportDialog
 {
     private readonly ExportContext _context;
     private string _folder;
     private string _fileName;
 
-    /// <summary>Создаёт диалог.</summary>
     public ExportReportDialog(ExportContext context)
     {
         InitializeComponent();
@@ -27,7 +26,7 @@ public partial class ExportReportDialog
         WarningCount.Text = CoreFormat.Number(context.WarningCount);
         PlaylistCount.Text = CoreFormat.Number(context.PlaylistMissingCount);
 
-        // Честно предупреждаем, что полный отчёт будет тяжёлым.
+        // Warn up front that a full report will be large.
         OkCount.Text = context.OkCount > 5000
             ? $"{CoreFormat.Number(context.OkCount)} — отчёт станет тяжёлым"
             : CoreFormat.Number(context.OkCount);
@@ -45,7 +44,7 @@ public partial class ExportReportDialog
         UpdateTargetPath();
     }
 
-    /// <summary>Что пользователь выбрал; заполнено, когда диалог закрыт кнопкой «Сохранить».</summary>
+    /// <summary>The user's choice; set once the dialog is closed with Save.</summary>
     public ExportChoice? Choice { get; private set; }
 
     private ReportFormat SelectedFormat { get; set; }
@@ -62,8 +61,7 @@ public partial class ExportReportDialog
             TextOption.IsChecked == true ? ReportFormat.Text :
             ReportFormat.Html;
 
-        // Расширение файла следует за форматом, чтобы пользователю
-        // не приходилось править его руками.
+        // Keep the file extension in step with the format.
         string extension = SelectedFormat switch
         {
             ReportFormat.Csv => ".csv",

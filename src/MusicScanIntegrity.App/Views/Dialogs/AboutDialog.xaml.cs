@@ -3,10 +3,9 @@ using MusicScanIntegrity.App.Services;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>Окно «О программе».</summary>
+/// <summary>About window.</summary>
 public partial class AboutDialog
 {
-    /// <summary>Создаёт окно.</summary>
     public AboutDialog(AboutInfo info)
     {
         ArgumentNullException.ThrowIfNull(info);

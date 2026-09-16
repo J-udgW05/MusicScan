@@ -6,34 +6,27 @@ using Wpf.Ui.Controls;
 
 namespace MusicScanIntegrity.App.Services;
 
-/// <summary>
-/// Читает, включены ли зрительные эффекты в самой Windows.
-/// </summary>
+/// <summary>Reads whether visual effects are enabled in Windows.</summary>
 /// <remarks>
-/// Нужно ровно один раз — при первом запуске, чтобы программа открылась с тем
-/// же оформлением, к которому человек привык в системе. Дальше решает то, что
-/// он выбрал в настройках, и сюда мы больше не заглядываем.
+/// Used only on first run, so the app opens looking the way the user is used
+/// to; afterwards the user's own settings decide.
 /// </remarks>
 internal static class SystemEffectsReader
 {
-    /// <summary>Где Windows хранит переключатель эффектов прозрачности.</summary>
+    /// <summary>Registry location of the transparency effects switch.</summary>
     private const string PersonalizeKey =
         @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
 
-    /// <summary>Снимает состояние системных настроек.</summary>
-    /// <returns>Что система думает о прозрачности, анимациях и подложке.</returns>
+    /// <summary>Takes a snapshot of the relevant system settings.</summary>
     public static SystemEffects Read() => new(
         TransparencyEnabled: ReadTransparency(),
         AnimationsEnabled: ReadAnimations(),
         MicaSupported: ReadMicaSupport());
 
-    /// <summary>
-    /// «Персонализация → Цвета → Эффекты прозрачности».
-    /// </summary>
+    /// <summary>Personalisation → Colours → Transparency effects.</summary>
     /// <remarks>
-    /// Отдельного переключателя Mica в Windows нет — есть общий тумблер
-    /// прозрачности, и подложка подчиняется ему. Поэтому при первом запуске
-    /// смотрим именно на него.
+    /// Windows has no separate Mica switch; the backdrop follows the general
+    /// transparency toggle, so that is what first run looks at.
     /// </remarks>
     private static bool ReadTransparency()
     {
@@ -41,26 +34,23 @@ internal static class SystemEffectsReader
         {
             using RegistryKey? key = Registry.CurrentUser.OpenSubKey(PersonalizeKey);
 
-            // Значения может не быть вовсе — в Windows это означает «включено».
+            // A missing value means "on" in Windows.
             return key?.GetValue("EnableTransparency") is not int value || value != 0;
         }
         catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or IOException)
         {
-            // К реестру не пустили — считаем, что эффекты включены: так выглядит
-            // свежая Windows, и это менее неожиданно, чем программа без оформления.
+            // Registry access denied: assume effects are on, as in a fresh Windows
+            // install — less surprising than an app with no styling.
             return true;
         }
     }
 
-    /// <summary>
-    /// «Специальные возможности → Визуальные эффекты → Эффекты анимации».
-    /// </summary>
+    /// <summary>Accessibility → Visual effects → Animation effects.</summary>
     /// <remarks>
-    /// Читается через <see cref="SystemParameters.ClientAreaAnimation" /> — это
-    /// обёртка над системным запросом <c>SPI_GETCLIENTAREAANIMATION</c>, тем
-    /// самым, по которому положено проверять этот тумблер. Человек, выключивший
-    /// анимации из-за укачивания, не должен получить их обратно от нашей
-    /// программы.
+    /// Read through <see cref="SystemParameters.ClientAreaAnimation" />, a wrapper
+    /// over <c>SPI_GETCLIENTAREAANIMATION</c>, the documented query for this
+    /// toggle. Someone who turned animations off because of motion sickness must
+    /// not get them back from this app.
     /// </remarks>
     private static bool ReadAnimations()
     {
@@ -74,7 +64,7 @@ internal static class SystemEffectsReader
         }
     }
 
-    /// <summary>Умеет ли система рисовать Mica — то есть Windows 11 это или нет.</summary>
+    /// <summary>Whether the OS can draw Mica, i.e. Windows 11 or later.</summary>
     private static bool ReadMicaSupport()
     {
         try

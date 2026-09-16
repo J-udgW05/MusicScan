@@ -2,13 +2,12 @@ using System.Windows;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>Приветствие при первом запуске: три шага и обещание ничего не менять на диске.</summary>
+/// <summary>First-run welcome: three steps and a promise not to modify anything on disk.</summary>
 public partial class FirstRunDialog
 {
-    /// <summary>Создаёт окно.</summary>
     public FirstRunDialog() => InitializeComponent();
 
-    /// <summary>Пользователь попросил больше не показывать приветствие.</summary>
+    /// <summary>The user asked not to show the welcome again.</summary>
     public bool DoNotShowAgain => DoNotShow.IsChecked == true;
 
     private void OnPickFolder(object sender, RoutedEventArgs e)

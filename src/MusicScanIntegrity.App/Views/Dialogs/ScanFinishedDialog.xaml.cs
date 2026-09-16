@@ -6,10 +6,10 @@ using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>Итоги завершённой проверки.</summary>
+/// <summary>Summary of a finished scan.</summary>
 public partial class ScanFinishedDialog
 {
-    /// <summary>Создаёт диалог по сводке проверки.</summary>
+    /// <summary>Creates the dialog from the scan summary.</summary>
     public ScanFinishedDialog(ScanSummary summary)
     {
         InitializeComponent();
@@ -31,8 +31,8 @@ public partial class ScanFinishedDialog
 
         if (summary.WasStopped)
         {
-            // SetResourceReference, а не FindResource: иначе кисть застынет
-            // в текущей теме и при её смене значок останется прежним.
+            // SetResourceReference rather than FindResource, so the icon brush follows
+            // theme changes.
             StoppedNote.Visibility = Visibility.Visible;
             StatusIcon.Kind = "status-warning";
             StatusIcon.SetResourceReference(ForegroundProperty, "Brush.Warn");
@@ -49,7 +49,7 @@ public partial class ScanFinishedDialog
         }
     }
 
-    /// <summary>Что пользователь выбрал.</summary>
+    /// <summary>What the user chose.</summary>
     public ScanFinishedAction Action { get; private set; } = ScanFinishedAction.Close;
 
     private void OnGoToResults(object sender, RoutedEventArgs e) => CloseWith(ScanFinishedAction.GoToResults);
@@ -58,7 +58,7 @@ public partial class ScanFinishedDialog
 
     private void OnOpenFolder(object sender, RoutedEventArgs e) => CloseWith(ScanFinishedAction.OpenFolder);
 
-    // Esc = «ничего не делать»: Action остаётся Close.
+    // Esc means "do nothing": Action stays Close.
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)

@@ -3,22 +3,17 @@
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
 /// <summary>
-/// Универсальный диалог: подтверждение или сообщение.
-/// Человеческая формулировка сверху, техническая причина — отдельным блоком
-/// (UI_SPEC.md, раздел 9).
+/// General-purpose confirmation or message dialog. The human wording goes on
+/// top, the technical cause in a separate block.
 /// </summary>
 public partial class MessageDialog
 {
-    /// <summary>Создаёт диалог.</summary>
-    /// <param name="title">Заголовок сообщения — крупная строка внутри окна.</param>
-    /// <param name="message">Человеческая формулировка.</param>
-    /// <param name="confirmText">Подпись основной кнопки.</param>
-    /// <param name="cancelText">Подпись второстепенной кнопки; <see langword="null"/> — кнопки не будет.</param>
-    /// <param name="destructive">Основное действие деструктивное — красная кнопка.</param>
-    /// <param name="technicalDetail">Техническая причина.</param>
-    /// <param name="isError">Показать значок ошибки вместо предупреждения.</param>
-    /// <param name="windowTitle">Короткая подпись в заголовке окна; по умолчанию — по типу сообщения.</param>
-    /// <param name="copyPath">Путь для кнопки «Скопировать путь»; <see langword="null"/> — кнопки не будет.</param>
+    /// <param name="title">Heading shown inside the window.</param>
+    /// <param name="cancelText">Secondary button caption; <see langword="null"/> hides the button.</param>
+    /// <param name="destructive">Render the primary action as destructive (red).</param>
+    /// <param name="isError">Show the error icon instead of the warning icon.</param>
+    /// <param name="windowTitle">Title bar caption; defaults by message kind.</param>
+    /// <param name="copyPath">Path for the "Copy path" button; <see langword="null"/> hides it.</param>
     public MessageDialog(
         string title,
         string message,
@@ -34,7 +29,7 @@ public partial class MessageDialog
 
         _copyPath = copyPath;
 
-        // В заголовке окна — короткая подпись, внутри — сама формулировка.
+        // Short caption in the title bar, full wording inside.
         Title = windowTitle ?? (isError ? "Ошибка" : cancelText is null ? "Сообщение" : "Подтверждение");
         TitleText.Text = Title;
         HeadlineText.Text = title;
@@ -58,9 +53,8 @@ public partial class MessageDialog
 
         if (isError)
         {
-            // Именно SetResourceReference, а не FindResource: тот отдал бы кисть
-            // текущей темы намертво, и при переключении темы значок остался бы
-            // в прежних цветах.
+            // SetResourceReference rather than FindResource, so the icon brush follows
+            // theme changes.
             StatusIcon.Kind = "status-broken";
             StatusIcon.SetResourceReference(ForegroundProperty, "Brush.Err");
             IconBox.SetResourceReference(BackgroundProperty, "Brush.ErrBg");
@@ -93,8 +87,8 @@ public partial class MessageDialog
         }
         catch (Exception)
         {
-            // Буфер обмена может быть занят другой программой — это не повод
-            // ронять диалог: пользователь просто нажмёт ещё раз.
+            // The clipboard may be held by another process; not worth failing the
+            // dialog over — the user can click again.
         }
     }
 

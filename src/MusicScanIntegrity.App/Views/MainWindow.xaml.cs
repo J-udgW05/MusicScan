@@ -7,13 +7,12 @@ using MusicScanIntegrity.App.ViewModels;
 
 namespace MusicScanIntegrity.App.Views;
 
-/// <summary>Главное окно программы.</summary>
+/// <summary>Main application window.</summary>
 public partial class MainWindow
 {
     private readonly MainViewModel _viewModel;
     private readonly IDialogService _dialogs;
 
-    /// <summary>Создаёт главное окно.</summary>
     public MainWindow(MainViewModel viewModel, IDialogService dialogs)
     {
         _viewModel = viewModel;
@@ -26,14 +25,13 @@ public partial class MainWindow
     }
 
     /// <summary>
-    /// Ход проверки на кнопке в панели задач: на длинной проверке окно обычно
-    /// свёрнуто, и полоса на кнопке — единственный способ видеть прогресс.
+    /// Scan progress on the taskbar button; during a long scan the window is
+    /// usually minimised and this is the only visible progress.
     /// </summary>
     /// <remarks>
-    /// Привязки задаются здесь, а не в XAML: <see cref="TaskbarItemInfo"/> —
-    /// это Freezable, он не входит в визуальное дерево и DataContext не
-    /// наследует, поэтому <c>{Binding TaskbarState}</c> в разметке молча ни к
-    /// чему не привязывается. Источник приходится указывать явно.
+    /// Bound in code rather than XAML: <see cref="TaskbarItemInfo"/> is a
+    /// Freezable outside the visual tree and does not inherit DataContext, so
+    /// <c>{Binding TaskbarState}</c> in markup silently binds to nothing.
     /// </remarks>
     private void SetUpTaskbarProgress(MainViewModel viewModel)
     {
@@ -52,18 +50,15 @@ public partial class MainWindow
         TaskbarItemInfo = info;
     }
 
-    /// <summary>
-    /// Перетаскивание папки прямо на окно — такой же способ выбора, как диалог
-    /// (01_SPECIFICATION.md, раздел 6).
-    /// </summary>
+    /// <summary>Dropping a folder onto the window selects it, same as the picker.</summary>
     private void OnDragOver(object sender, DragEventArgs e)
     {
         bool acceptable = TryGetFolder(e, out _);
         e.Effects = acceptable ? DragDropEffects.Copy : DragDropEffects.None;
         DropOverlay.Visibility = acceptable ? Visibility.Visible : Visibility.Collapsed;
 
-        // Тот же признак подсвечивает и саму зону перетаскивания: если
-        // подсказка окна почему-то не замечена, зона всё равно отзовётся.
+        // The same flag highlights the drop zone, so it responds even if the window
+        // hint goes unnoticed.
         _viewModel.IsDragActive = acceptable;
         e.Handled = true;
     }
@@ -85,16 +80,12 @@ public partial class MainWindow
         }
     }
 
-    /// <summary>
-    /// Закрытие во время активной проверки требует подтверждения
-    /// (02_ARCHITECTURE.md, раздел 3).
-    /// </summary>
+    /// <summary>Closing during an active scan asks for confirmation.</summary>
     private async void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        // Согласие спрашивают один раз. Второй заход сюда — это наш же
-        // повторный Close(), и проверка к этому моменту ещё может доживать
-        // последние файлы: IsBusy остаётся истинным, и вопрос задавался
-        // снова и снова, а программа так и не закрывалась.
+        // Ask only once. Re-entry here is our own second Close() while the scan is
+        // still finishing its last files; IsBusy stays true, and the question used
+        // to repeat forever without the window ever closing.
         if (_closeConfirmed || !_viewModel.IsBusy)
         {
             return;
@@ -115,19 +106,18 @@ public partial class MainWindow
         {
             _closeConfirmed = true;
 
-            // Именно StopImmediately, а не StopCommand: команда задаёт свой
-            // вопрос «Остановить проверку?», и пользователь получал два
-            // подтверждения подряд об одном и том же.
+            // StopImmediately rather than StopCommand: the command asks "Stop the
+            // scan?" itself, and the user got two confirmations in a row.
             _viewModel.StopImmediately();
 
             await Dispatcher.InvokeAsync(Close, System.Windows.Threading.DispatcherPriority.Background);
         }
     }
 
-    /// <summary>Пользователь уже согласился выйти — больше не переспрашиваем.</summary>
+    /// <summary>The user already agreed to exit; do not ask again.</summary>
     private bool _closeConfirmed;
 
-    /// <summary>Достаёт из перетаскиваемых данных путь к папке.</summary>
+    /// <summary>Extracts a folder path from drag-and-drop data.</summary>
     private static bool TryGetFolder(DragEventArgs e, out string? folder)
     {
         folder = null;
@@ -150,8 +140,8 @@ public partial class MainWindow
             return true;
         }
 
-        // Бросили файл — берём папку, в которой он лежит: пользователь почти
-        // наверняка имел в виду именно её.
+        // A dropped file means its containing folder, which is almost certainly
+        // what the user meant.
         if (File.Exists(candidate) && Path.GetDirectoryName(candidate) is { } parent && Directory.Exists(parent))
         {
             folder = parent;

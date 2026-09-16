@@ -6,23 +6,18 @@ using MusicScanIntegrity.Core.Common;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
-/// <summary>
-/// Выбор цвета статуса.
-/// </summary>
+/// <summary>Status colour picker.</summary>
 /// <remarks>
-/// Решение по неоднозначности: системный диалог выбора цвета живёт в Windows Forms,
-/// тянуть которую в WPF-приложение ради одного окна не хочется — вид получился бы
-/// чужим для остального интерфейса. Поэтому здесь своё поле оттенков: по горизонтали
-/// цвет разбавляется белым, по вертикали уходит в чёрный, полоса снизу задаёт
-/// оттенок. Готовые оттенки и поле кода остаются: первое — на случай «просто дай
-/// нормальный красный», второе — единственный способ ввести цвет с клавиатуры,
-/// потому что мышью по градиенту точное значение не поймать.
-/// Сам расчёт цвета лежит в <see cref="ColorMath" />: здесь только перенос
-/// координат курсора в доли.
+/// The system colour dialog lives in Windows Forms and would look foreign
+/// here, so this window draws its own field: horizontally the colour fades to
+/// white, vertically to black, and the strip below selects the hue. Presets
+/// cover "just give me a proper red"; the hex box is the only way to enter an
+/// exact value, which a mouse on a gradient cannot hit. The maths lives in
+/// <see cref="ColorMath" />.
 /// </remarks>
 public partial class ColorPickDialog
 {
-    /// <summary>Готовые оттенки: по три варианта на каждый статус в обеих темах.</summary>
+    /// <summary>Presets: three shades per status for both themes.</summary>
     private static readonly string[] Palette =
     [
         "#0F7B3F", "#2E9E5B", "#5EC27F",
@@ -34,13 +29,12 @@ public partial class ColorPickDialog
 
     private ColorMath.Hsv _hsv = new(0, 0, 1);
 
-    // Поле и полоса меняют код цвета, код цвета двигает поле и полосу.
-    // Флаг разрывает это кольцо, иначе округление гоняло бы курсор по полю.
+    // Field and strip update the hex code, and the hex code moves them back.
+    // This flag breaks the loop; otherwise rounding would drift the cursor.
     private bool _syncing;
 
-    /// <summary>Создаёт окно выбора цвета.</summary>
-    /// <param name="label">Название статуса.</param>
-    /// <param name="currentHex">Текущий цвет.</param>
+    /// <param name="label">Status name.</param>
+    /// <param name="currentHex">Current colour.</param>
     public ColorPickDialog(string label, string currentHex)
     {
         InitializeComponent();
@@ -52,12 +46,11 @@ public partial class ColorPickDialog
         SelectedHex = currentHex;
         HexBox.Text = currentHex;
 
-        // Размеры поля известны только после разметки — до неё ползунки
-        // некуда ставить.
+        // Field size is only known after layout.
         Loaded += (_, _) => ApplyHexToPickers(SelectedHex);
     }
 
-    /// <summary>Выбранный цвет в формате «#RRGGBB».</summary>
+    /// <summary>Selected colour as "#RRGGBB".</summary>
     public string SelectedHex { get; private set; }
 
     private static Color ToMedia(ColorMath.Rgb color) => Color.FromRgb(color.R, color.G, color.B);
@@ -93,7 +86,7 @@ public partial class ColorPickDialog
         }
     }
 
-    /// <summary>Ставит поле и полосу в положение, отвечающее коду цвета.</summary>
+    /// <summary>Positions the field and strip to match the hex code.</summary>
     private void ApplyHexToPickers(string hex)
     {
         if (!ColorMath.TryParse(hex, out ColorMath.Rgb color))
@@ -103,8 +96,7 @@ public partial class ColorPickDialog
 
         ColorMath.Hsv hsv = ColorMath.ToHsv(color);
 
-        // Серый цвет не имеет оттенка — у полосы остаётся прежнее положение,
-        // иначе она прыгала бы в красный при каждом выборе серого.
+        // Grey has no hue; keep the strip where it was instead of jumping to red.
         _hsv = hsv.Saturation > 0
             ? hsv
             : _hsv with { Saturation = hsv.Saturation, Value = hsv.Value };
@@ -129,7 +121,7 @@ public partial class ColorPickDialog
         }
     }
 
-    /// <summary>Переносит выбранное мышью значение в код цвета.</summary>
+    /// <summary>Writes the mouse-picked value into the hex code.</summary>
     private void PushToHex()
     {
         _syncing = true;

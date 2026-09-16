@@ -5,21 +5,17 @@ using MusicScanIntegrity.App.ViewModels;
 
 namespace MusicScanIntegrity.App.Views;
 
-/// <summary>Вкладка «Результаты»: таблица, фильтры, подробности выбранного файла.</summary>
+/// <summary>Results tab: table, filters and details of the selected file.</summary>
 public partial class ResultsView
 {
-    /// <summary>Создаёт представление.</summary>
     public ResultsView() => InitializeComponent();
 
-    /// <summary>
-    /// Правый щелчок выделяет строку под курсором.
-    /// </summary>
+    /// <summary>Right-click selects the row under the cursor.</summary>
     /// <remarks>
-    /// Сам по себе он этого не делает: список отдаёт меню, но выделение
-    /// остаётся прежним — и команда открывала бы не тот файл, по которому
-    /// щёлкнули, а то и ничего, если выделения не было вовсе. Щелчок внутри
-    /// уже выделенного набора выделение не сбрасывает: иначе «Копировать
-    /// путь» для нескольких строк было бы недостижимо.
+    /// ListBox does not do this itself: the menu opens but the selection stays,
+    /// so commands would act on the wrong file or on nothing. A click inside an
+    /// existing multi-selection keeps it, so "Copy path" still works for several
+    /// rows.
     /// </remarks>
     private void OnRowRightClick(object sender, MouseButtonEventArgs e)
     {
@@ -33,10 +29,7 @@ public partial class ResultsView
         item.Focus();
     }
 
-    /// <summary>
-    /// Двойной клик по строке открывает папку файла в проводнике —
-    /// это самое частое, что хочется сделать с найденной проблемой.
-    /// </summary>
+    /// <summary>Double-click reveals the file in Explorer.</summary>
     private void OnRowDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (DataContext is MainViewModel main &&
