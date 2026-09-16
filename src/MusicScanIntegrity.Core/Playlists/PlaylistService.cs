@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Playlists;
 
@@ -69,8 +70,8 @@ public sealed class PlaylistService : IPlaylistService
                 Entries = [],
                 ParseIssue = new CheckIssue(
                     IssueCode.PlaylistUnreadable,
-                    "Формат плейлиста не поддерживается.",
-                    $"Расширение {extension}"),
+                    Strings.Playlist_Unsupported,
+                    Common.Format.Text(Strings.Playlist_Unsupported_Detail, extension)),
             };
         }
 
@@ -91,7 +92,7 @@ public sealed class PlaylistService : IPlaylistService
                 Entries = [],
                 ParseIssue = new CheckIssue(
                     IssueCode.PlaylistUnreadable,
-                    "Файл плейлиста не удалось прочитать.",
+                    Strings.Playlist_Unreadable,
                     $"{ex.GetType().Name} · {ex.Message}"),
             };
         }
@@ -171,8 +172,8 @@ public sealed class PlaylistService : IPlaylistService
 
         return new CheckIssue(
             IssueCode.CueMarksBeyondFile,
-            $"Разметка не подходит к файлу: дорожка {last.Track} начинается позже, чем он заканчивается.",
-            $"Метка {last.Seconds:0.#} с, длительность файла {duration:0.#} с");
+            Common.Format.Text(Strings.Playlist_CueBeyondFile, last.Track),
+            Common.Format.Text(Strings.Playlist_CueBeyondFile_Detail, last.Seconds, duration));
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Locking;
 
@@ -28,10 +29,10 @@ public sealed record LockOwnerResult(
 
     /// <summary>Text for the user; never invents what is not known.</summary>
     public string DisplayText => !IsReliable
-        ? "Определить программу-владельца не удалось."
+        ? Strings.Lock_OwnerUnknown
         : Owners.Count == 0
-            ? "Похоже, файл уже освободился — ни одна программа его не держит."
-            : "Файл держит: " + string.Join(", ", Owners.Select(o => o.DisplayName));
+            ? Strings.Lock_NoOwner
+            : Common.Format.Text(Strings.Lock_HeldBy, string.Join(", ", Owners.Select(o => o.DisplayName)));
 }
 
 /// <summary>A process holding the file.</summary>

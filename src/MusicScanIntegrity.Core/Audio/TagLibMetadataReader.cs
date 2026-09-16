@@ -1,4 +1,5 @@
 ﻿using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Audio;
 
@@ -42,17 +43,17 @@ public sealed class TagLibMetadataReader : IMetadataReader
         catch (TagLib.UnsupportedFormatException ex)
         {
             // TagLib cannot read tags for this container; the file is fine.
-            error = $"TagLib не поддерживает контейнер: {ex.Message}";
+            error = Common.Format.Text(Strings.Tags_UnsupportedContainer, ex.Message);
             return null;
         }
         catch (TagLib.CorruptFileException ex)
         {
-            error = $"Теги повреждены: {ex.Message}";
+            error = Common.Format.Text(Strings.Tags_Corrupt, ex.Message);
             return null;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            error = $"Файл недоступен для чтения тегов: {ex.Message}";
+            error = Common.Format.Text(Strings.Tags_Unreadable, ex.Message);
             return null;
         }
         catch (Exception ex)

@@ -33,6 +33,120 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Bass_CannotOpen" xml:space="preserve">
+    <value>Файл не удалось открыть для чтения.</value>
+  </data>
+  <data name="Bass_DecodeStartFailed" xml:space="preserve">
+    <value>Не удалось начать декодирование: {0}.</value>
+  </data>
+  <data name="Bass_DllMissing" xml:space="preserve">
+    <value>Не найдена библиотека bass.dll в {0}. Запустите tools\fetch-bass.ps1 (см. README). Подробности: {1}{2}</value>
+  </data>
+  <data name="Bass_Empty" xml:space="preserve">
+    <value>Файл пустой — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Bass_EngineFailed" xml:space="preserve">
+    <value>Механизм декодирования отказал: {0}.</value>
+  </data>
+  <data name="Bass_Error_Code" xml:space="preserve">
+    <value>код {0}</value>
+  </data>
+  <data name="Bass_Error_Codec" xml:space="preserve">
+    <value>нет декодера для этого формата</value>
+  </data>
+  <data name="Bass_Error_Empty" xml:space="preserve">
+    <value>файл пустой</value>
+  </data>
+  <data name="Bass_Error_Ended" xml:space="preserve">
+    <value>данные закончились</value>
+  </data>
+  <data name="Bass_Error_FileFormat" xml:space="preserve">
+    <value>формат файла не распознан</value>
+  </data>
+  <data name="Bass_Error_FileOpen" xml:space="preserve">
+    <value>файл не открывается</value>
+  </data>
+  <data name="Bass_Error_Handle" xml:space="preserve">
+    <value>неверный дескриптор потока</value>
+  </data>
+  <data name="Bass_Error_Init" xml:space="preserve">
+    <value>звуковая подсистема не инициализирована</value>
+  </data>
+  <data name="Bass_Error_Memory" xml:space="preserve">
+    <value>не хватило памяти</value>
+  </data>
+  <data name="Bass_Error_Mp4NoStream" xml:space="preserve">
+    <value>в контейнере MP4 нет аудиодорожки</value>
+  </data>
+  <data name="Bass_Error_NotAvailable" xml:space="preserve">
+    <value>функция недоступна</value>
+  </data>
+  <data name="Bass_Error_OK" xml:space="preserve">
+    <value>ошибок нет</value>
+  </data>
+  <data name="Bass_Error_Position" xml:space="preserve">
+    <value>неверная позиция в потоке</value>
+  </data>
+  <data name="Bass_Error_SampleFormat" xml:space="preserve">
+    <value>формат отсчётов не поддерживается</value>
+  </data>
+  <data name="Bass_Error_Timeout" xml:space="preserve">
+    <value>истекло время ожидания</value>
+  </data>
+  <data name="Bass_Error_Unknown" xml:space="preserve">
+    <value>неизвестная ошибка декодера</value>
+  </data>
+  <data name="Bass_Error_Unstreamable" xml:space="preserve">
+    <value>файл нельзя декодировать потоком</value>
+  </data>
+  <data name="Bass_Error_WmaAccessDenied" xml:space="preserve">
+    <value>доступ к защищённому файлу запрещён</value>
+  </data>
+  <data name="Bass_Error_WmaIndividual" xml:space="preserve">
+    <value>требуется индивидуализация проигрывателя</value>
+  </data>
+  <data name="Bass_Error_WmaLicense" xml:space="preserve">
+    <value>нужна лицензия на воспроизведение</value>
+  </data>
+  <data name="Bass_FolderMissing" xml:space="preserve">
+    <value>Не найдена папка с библиотеками BASS: {0}. Запустите tools\fetch-bass.ps1 или скопируйте библиотеки вручную (см. README).</value>
+  </data>
+  <data name="Bass_InitFailed" xml:space="preserve">
+    <value>BASS не удалось инициализировать: {0} ({1}).{2}</value>
+  </data>
+  <data name="Bass_NoSamples" xml:space="preserve">
+    <value>Декодер не получил ни одного отсчёта — аудиоданных в файле нет.</value>
+  </data>
+  <data name="Bass_NoSamples_Detail" xml:space="preserve">
+    <value>BASS_ChannelGetData вернул 0 байт</value>
+  </data>
+  <data name="Bass_NotInitialised" xml:space="preserve">
+    <value>BASS не инициализирована</value>
+  </data>
+  <data name="Bass_NotStarted" xml:space="preserve">
+    <value>Механизм декодирования аудио не запущен.</value>
+  </data>
+  <data name="Bass_Protected" xml:space="preserve">
+    <value>Файл защищён лицензией или паролем — декодировать его нельзя.</value>
+  </data>
+  <data name="Bass_ReadInterrupted" xml:space="preserve">
+    <value>Чтение аудиоданных прервалось: {0}.</value>
+  </data>
+  <data name="Bass_SearchPathFailed" xml:space="preserve">
+    <value> Не удалось добавить {0} в пути поиска библиотек (код {1}).</value>
+  </data>
+  <data name="Bass_SeekUnavailable" xml:space="preserve">
+    <value>Перемотка недоступна — прочитано только начало</value>
+  </data>
+  <data name="Bass_StartFailed" xml:space="preserve">
+    <value>Не удалось запустить механизм декодирования: {0}</value>
+  </data>
+  <data name="Bass_UnexpectedRead" xml:space="preserve">
+    <value>Непредвиденная ошибка при чтении файла.</value>
+  </data>
+  <data name="Bass_WrongBitness" xml:space="preserve">
+    <value>Библиотека bass.dll не подходит по разрядности — нужна 64-битная версия. Подробности: {0}</value>
+  </data>
   <data name="Check_AccessDenied" xml:space="preserve">
     <value>Windows не дал прочитать файл — проверить его не получилось.</value>
   </data>
@@ -132,6 +246,30 @@
   <data name="Check_Unexpected" xml:space="preserve">
     <value>Проверить файл не удалось из-за непредвиденной ошибки.</value>
   </data>
+  <data name="Collection_AndMore" xml:space="preserve">
+    <value> и другие</value>
+  </data>
+  <data name="Collection_MissingTracks" xml:space="preserve">
+    <value>В альбоме не хватает дорожек: {0}.</value>
+  </data>
+  <data name="Collection_MissingTracks_Detail" xml:space="preserve">
+    <value>Найдено {0} из {1} по нумерации в тегах</value>
+  </data>
+  <data name="Collection_MixedAlbums" xml:space="preserve">
+    <value>В папке лежат треки разных альбомов: {0}.</value>
+  </data>
+  <data name="Collection_MixedAlbums_Detail" xml:space="preserve">
+    <value>Всего разных значений тега: {0}</value>
+  </data>
+  <data name="Collection_MixedFormats" xml:space="preserve">
+    <value>В одной папке файлы разных форматов: {0}.</value>
+  </data>
+  <data name="Collection_MixedFormats_Detail" xml:space="preserve">
+    <value>Обычно так выходит, когда часть альбома докачали в другом качестве</value>
+  </data>
+  <data name="Collection_NoCover" xml:space="preserve">
+    <value>У альбома нет обложки: ни в тегах, ни отдельным файлом.</value>
+  </data>
   <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
     <value>{0}; контрольные суммы формата не сверялись</value>
   </data>
@@ -179,6 +317,18 @@
   </data>
   <data name="Finding_Other" xml:space="preserve">
     <value>Замечание</value>
+  </data>
+  <data name="Folder_AccessDenied" xml:space="preserve">
+    <value>Windows отказал в доступе к папке.</value>
+  </data>
+  <data name="Folder_NotFound" xml:space="preserve">
+    <value>Папка не найдена.</value>
+  </data>
+  <data name="Folder_Unreadable" xml:space="preserve">
+    <value>Папку не удалось прочитать.</value>
+  </data>
+  <data name="Format_Unknown" xml:space="preserve">
+    <value>неизвестный</value>
   </data>
   <data name="Issue_Short_AudioDropout" xml:space="preserve">
     <value>Провал в тишину</value>
@@ -240,14 +390,56 @@
   <data name="Lock_CopyFailed" xml:space="preserve">
     <value>Файл занят, и сделать его временную копию не удалось.</value>
   </data>
+  <data name="Lock_HeldBy" xml:space="preserve">
+    <value>Файл держит: {0}</value>
+  </data>
+  <data name="Lock_NoOwner" xml:space="preserve">
+    <value>Похоже, файл уже освободился — ни одна программа его не держит.</value>
+  </data>
   <data name="Lock_OwnerDetectionOff" xml:space="preserve">
     <value>Определение владельца выключено в настройках</value>
+  </data>
+  <data name="Lock_OwnerUnknown" xml:space="preserve">
+    <value>Определить программу-владельца не удалось.</value>
   </data>
   <data name="Lock_Skipped" xml:space="preserve">
     <value>Файл занят другой программой и пропущен.</value>
   </data>
   <data name="Lock_WaitTimeout" xml:space="preserve">
     <value>Файл оставался занят все {0} с ожидания — проверить его не удалось.</value>
+  </data>
+  <data name="Mojibake_ReplacementChars" xml:space="preserve">
+    <value>в тексте есть знаки, которые система не смогла прочитать</value>
+  </data>
+  <data name="Mojibake_Utf8Bytes" xml:space="preserve">
+    <value>похоже на UTF-8, прочитанный побайтно</value>
+  </data>
+  <data name="Mojibake_WesternTable" xml:space="preserve">
+    <value>похоже на кириллицу, прочитанную западноевропейской таблицей</value>
+  </data>
+  <data name="Playlist_CueBeyondFile" xml:space="preserve">
+    <value>Разметка не подходит к файлу: дорожка {0} начинается позже, чем он заканчивается.</value>
+  </data>
+  <data name="Playlist_CueBeyondFile_Detail" xml:space="preserve">
+    <value>Метка {0:0.#} с, длительность файла {1:0.#} с</value>
+  </data>
+  <data name="Playlist_Unreadable" xml:space="preserve">
+    <value>Файл плейлиста не удалось прочитать.</value>
+  </data>
+  <data name="Playlist_Unsupported" xml:space="preserve">
+    <value>Формат плейлиста не поддерживается.</value>
+  </data>
+  <data name="Playlist_Unsupported_Detail" xml:space="preserve">
+    <value>Расширение {0}</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Few" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} местах: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Many" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} местах: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_One" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} месте: {1} — {2}.</value>
   </data>
   <data name="Plural_Files_Few" xml:space="preserve">
     <value>{0} файла</value>
@@ -350,6 +542,15 @@
   </data>
   <data name="Tag_Title" xml:space="preserve">
     <value>название</value>
+  </data>
+  <data name="Tags_Corrupt" xml:space="preserve">
+    <value>Теги повреждены: {0}</value>
+  </data>
+  <data name="Tags_Unreadable" xml:space="preserve">
+    <value>Файл недоступен для чтения тегов: {0}</value>
+  </data>
+  <data name="Tags_UnsupportedContainer" xml:space="preserve">
+    <value>TagLib не поддерживает контейнер: {0}</value>
   </data>
   <data name="Unit_B" xml:space="preserve">
     <value>Б</value>

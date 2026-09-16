@@ -1,3 +1,5 @@
+using MusicScanIntegrity.Core.Resources;
+
 namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
@@ -55,7 +57,7 @@ public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
 
             if (length < HeaderSize)
             {
-                return ContainerValidation.NotSupported("неизвестный");
+                return ContainerValidation.NotSupported(Strings.Format_Unknown);
             }
 
             ContainerBounds bounds = ContainerBounds.Measure(stream, length);
@@ -63,7 +65,7 @@ public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
 
             if (validator is null)
             {
-                return ContainerValidation.NotSupported("неизвестный");
+                return ContainerValidation.NotSupported(Strings.Format_Unknown);
             }
 
             return validator.Validate(stream, bounds, cancellationToken);
@@ -74,7 +76,7 @@ public sealed class ContainerIntegrityChecker : IContainerIntegrityChecker
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
         {
-            return ContainerValidation.Unreadable("неизвестный", $"{ex.GetType().Name} · {ex.Message}");
+            return ContainerValidation.Unreadable(Strings.Format_Unknown, $"{ex.GetType().Name} · {ex.Message}");
         }
     }
 

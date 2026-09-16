@@ -33,6 +33,120 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Bass_CannotOpen" xml:space="preserve">
+    <value>The file could not be opened for reading.</value>
+  </data>
+  <data name="Bass_DecodeStartFailed" xml:space="preserve">
+    <value>Decoding could not be started: {0}.</value>
+  </data>
+  <data name="Bass_DllMissing" xml:space="preserve">
+    <value>bass.dll not found in {0}. Run tools\fetch-bass.ps1 (see README). Details: {1}{2}</value>
+  </data>
+  <data name="Bass_Empty" xml:space="preserve">
+    <value>The file is empty and holds no audio.</value>
+  </data>
+  <data name="Bass_EngineFailed" xml:space="preserve">
+    <value>The audio decoder failed: {0}.</value>
+  </data>
+  <data name="Bass_Error_Code" xml:space="preserve">
+    <value>code {0}</value>
+  </data>
+  <data name="Bass_Error_Codec" xml:space="preserve">
+    <value>no decoder for this format</value>
+  </data>
+  <data name="Bass_Error_Empty" xml:space="preserve">
+    <value>the file is empty</value>
+  </data>
+  <data name="Bass_Error_Ended" xml:space="preserve">
+    <value>end of data</value>
+  </data>
+  <data name="Bass_Error_FileFormat" xml:space="preserve">
+    <value>file format not recognised</value>
+  </data>
+  <data name="Bass_Error_FileOpen" xml:space="preserve">
+    <value>the file cannot be opened</value>
+  </data>
+  <data name="Bass_Error_Handle" xml:space="preserve">
+    <value>invalid stream handle</value>
+  </data>
+  <data name="Bass_Error_Init" xml:space="preserve">
+    <value>audio subsystem not initialised</value>
+  </data>
+  <data name="Bass_Error_Memory" xml:space="preserve">
+    <value>out of memory</value>
+  </data>
+  <data name="Bass_Error_Mp4NoStream" xml:space="preserve">
+    <value>the MP4 container has no audio track</value>
+  </data>
+  <data name="Bass_Error_NotAvailable" xml:space="preserve">
+    <value>feature not available</value>
+  </data>
+  <data name="Bass_Error_OK" xml:space="preserve">
+    <value>no error</value>
+  </data>
+  <data name="Bass_Error_Position" xml:space="preserve">
+    <value>invalid stream position</value>
+  </data>
+  <data name="Bass_Error_SampleFormat" xml:space="preserve">
+    <value>sample format not supported</value>
+  </data>
+  <data name="Bass_Error_Timeout" xml:space="preserve">
+    <value>timed out</value>
+  </data>
+  <data name="Bass_Error_Unknown" xml:space="preserve">
+    <value>unknown decoder error</value>
+  </data>
+  <data name="Bass_Error_Unstreamable" xml:space="preserve">
+    <value>the file cannot be decoded as a stream</value>
+  </data>
+  <data name="Bass_Error_WmaAccessDenied" xml:space="preserve">
+    <value>access to the protected file denied</value>
+  </data>
+  <data name="Bass_Error_WmaIndividual" xml:space="preserve">
+    <value>player individualisation required</value>
+  </data>
+  <data name="Bass_Error_WmaLicense" xml:space="preserve">
+    <value>a playback licence is required</value>
+  </data>
+  <data name="Bass_FolderMissing" xml:space="preserve">
+    <value>BASS library folder not found: {0}. Run tools\fetch-bass.ps1 or copy the libraries manually (see README).</value>
+  </data>
+  <data name="Bass_InitFailed" xml:space="preserve">
+    <value>BASS failed to initialise: {0} ({1}).{2}</value>
+  </data>
+  <data name="Bass_NoSamples" xml:space="preserve">
+    <value>The decoder got no samples; the file holds no audio data.</value>
+  </data>
+  <data name="Bass_NoSamples_Detail" xml:space="preserve">
+    <value>BASS_ChannelGetData returned 0 bytes</value>
+  </data>
+  <data name="Bass_NotInitialised" xml:space="preserve">
+    <value>BASS is not initialised</value>
+  </data>
+  <data name="Bass_NotStarted" xml:space="preserve">
+    <value>The audio decoder is not running.</value>
+  </data>
+  <data name="Bass_Protected" xml:space="preserve">
+    <value>The file is protected by a licence or password and cannot be decoded.</value>
+  </data>
+  <data name="Bass_ReadInterrupted" xml:space="preserve">
+    <value>Reading audio data was interrupted: {0}.</value>
+  </data>
+  <data name="Bass_SearchPathFailed" xml:space="preserve">
+    <value> Could not add {0} to the library search path (code {1}).</value>
+  </data>
+  <data name="Bass_SeekUnavailable" xml:space="preserve">
+    <value>Seeking unavailable; only the start was read</value>
+  </data>
+  <data name="Bass_StartFailed" xml:space="preserve">
+    <value>Could not start the audio decoder: {0}</value>
+  </data>
+  <data name="Bass_UnexpectedRead" xml:space="preserve">
+    <value>Unexpected error while reading the file.</value>
+  </data>
+  <data name="Bass_WrongBitness" xml:space="preserve">
+    <value>bass.dll has the wrong bitness; the 64-bit version is required. Details: {0}</value>
+  </data>
   <data name="Check_AccessDenied" xml:space="preserve">
     <value>Windows denied reading the file, so it could not be checked.</value>
   </data>
@@ -132,6 +246,30 @@
   <data name="Check_Unexpected" xml:space="preserve">
     <value>The file could not be checked due to an unexpected error.</value>
   </data>
+  <data name="Collection_AndMore" xml:space="preserve">
+    <value> and more</value>
+  </data>
+  <data name="Collection_MissingTracks" xml:space="preserve">
+    <value>Tracks missing from the album: {0}.</value>
+  </data>
+  <data name="Collection_MissingTracks_Detail" xml:space="preserve">
+    <value>{0} of {1} found by tag numbering</value>
+  </data>
+  <data name="Collection_MixedAlbums" xml:space="preserve">
+    <value>The folder holds tracks from different albums: {0}.</value>
+  </data>
+  <data name="Collection_MixedAlbums_Detail" xml:space="preserve">
+    <value>Distinct tag values in total: {0}</value>
+  </data>
+  <data name="Collection_MixedFormats" xml:space="preserve">
+    <value>One folder holds several formats: {0}.</value>
+  </data>
+  <data name="Collection_MixedFormats_Detail" xml:space="preserve">
+    <value>Usually part of the album was downloaded again in a different quality</value>
+  </data>
+  <data name="Collection_NoCover" xml:space="preserve">
+    <value>The album has no cover art, neither in tags nor as a file.</value>
+  </data>
   <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
     <value>{0}; container checksums not verified</value>
   </data>
@@ -179,6 +317,18 @@
   </data>
   <data name="Finding_Other" xml:space="preserve">
     <value>Finding</value>
+  </data>
+  <data name="Folder_AccessDenied" xml:space="preserve">
+    <value>Windows denied access to the folder.</value>
+  </data>
+  <data name="Folder_NotFound" xml:space="preserve">
+    <value>Folder not found.</value>
+  </data>
+  <data name="Folder_Unreadable" xml:space="preserve">
+    <value>The folder could not be read.</value>
+  </data>
+  <data name="Format_Unknown" xml:space="preserve">
+    <value>unknown</value>
   </data>
   <data name="Issue_Short_AudioDropout" xml:space="preserve">
     <value>Dropout</value>
@@ -240,14 +390,56 @@
   <data name="Lock_CopyFailed" xml:space="preserve">
     <value>The file is locked and a temporary copy could not be made.</value>
   </data>
+  <data name="Lock_HeldBy" xml:space="preserve">
+    <value>Held by: {0}</value>
+  </data>
+  <data name="Lock_NoOwner" xml:space="preserve">
+    <value>The file seems to be free now; no program holds it.</value>
+  </data>
   <data name="Lock_OwnerDetectionOff" xml:space="preserve">
     <value>Owner detection is turned off in settings</value>
+  </data>
+  <data name="Lock_OwnerUnknown" xml:space="preserve">
+    <value>Could not determine which program holds the file.</value>
   </data>
   <data name="Lock_Skipped" xml:space="preserve">
     <value>The file is locked by another program and was skipped.</value>
   </data>
   <data name="Lock_WaitTimeout" xml:space="preserve">
     <value>The file stayed locked for the whole {0} s wait and could not be checked.</value>
+  </data>
+  <data name="Mojibake_ReplacementChars" xml:space="preserve">
+    <value>the text contains characters the system could not read</value>
+  </data>
+  <data name="Mojibake_Utf8Bytes" xml:space="preserve">
+    <value>looks like UTF-8 read byte by byte</value>
+  </data>
+  <data name="Mojibake_WesternTable" xml:space="preserve">
+    <value>looks like Cyrillic read with a Western European code page</value>
+  </data>
+  <data name="Playlist_CueBeyondFile" xml:space="preserve">
+    <value>The cue sheet does not fit the file: track {0} starts after the file ends.</value>
+  </data>
+  <data name="Playlist_CueBeyondFile_Detail" xml:space="preserve">
+    <value>Mark at {0:0.#} s, file length {1:0.#} s</value>
+  </data>
+  <data name="Playlist_Unreadable" xml:space="preserve">
+    <value>The playlist file could not be read.</value>
+  </data>
+  <data name="Playlist_Unsupported" xml:space="preserve">
+    <value>Playlist format not supported.</value>
+  </data>
+  <data name="Playlist_Unsupported_Detail" xml:space="preserve">
+    <value>Extension {0}</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Few" xml:space="preserve">
+    <value>The same track exists in {0} other places: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Many" xml:space="preserve">
+    <value>The same track exists in {0} other places: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_One" xml:space="preserve">
+    <value>The same track exists in {0} other place: {1} — {2}.</value>
   </data>
   <data name="Plural_Files_Few" xml:space="preserve">
     <value>{0} files</value>
@@ -350,6 +542,15 @@
   </data>
   <data name="Tag_Title" xml:space="preserve">
     <value>title</value>
+  </data>
+  <data name="Tags_Corrupt" xml:space="preserve">
+    <value>Tags are corrupt: {0}</value>
+  </data>
+  <data name="Tags_Unreadable" xml:space="preserve">
+    <value>The file cannot be read for tags: {0}</value>
+  </data>
+  <data name="Tags_UnsupportedContainer" xml:space="preserve">
+    <value>TagLib does not support this container: {0}</value>
   </data>
   <data name="Unit_B" xml:space="preserve">
     <value>B</value>

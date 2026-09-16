@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Discovery;
@@ -69,7 +70,7 @@ public sealed class FileDiscoveryService : IFileDiscoveryService
 
         if (!Directory.Exists(rootPath))
         {
-            inaccessible.Add(new InaccessibleFolder(rootPath, "Папка не найдена.", "DirectoryNotFound"));
+            inaccessible.Add(new InaccessibleFolder(rootPath, Strings.Folder_NotFound, "DirectoryNotFound"));
             return Build(rootPath, audio, playlists, folderCount, inaccessible, stopwatch.Elapsed);
         }
 
@@ -138,14 +139,14 @@ public sealed class FileDiscoveryService : IFileDiscoveryService
             {
                 inaccessible.Add(new InaccessibleFolder(
                     folder,
-                    "Windows отказал в доступе к папке.",
+                    Strings.Folder_AccessDenied,
                     $"UnauthorizedAccessException · {ex.Message}"));
             }
             catch (IOException ex)
             {
                 inaccessible.Add(new InaccessibleFolder(
                     folder,
-                    "Папку не удалось прочитать.",
+                    Strings.Folder_Unreadable,
                     $"IOException · {ex.Message}"));
             }
         }

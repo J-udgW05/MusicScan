@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using ManagedBass;
 using MusicScanIntegrity.Core.Analysis;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Audio;
 
@@ -88,8 +89,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
 
             if (!Directory.Exists(NativeFolder))
             {
-                return $"Не найдена папка с библиотеками BASS: {NativeFolder}. " +
-                       "Запустите tools\\fetch-bass.ps1 или скопируйте библиотеки вручную (см. README).";
+                return Common.Format.Text(Strings.Bass_FolderMissing, NativeFolder);
             }
 
             // Add bass\ to the DLL search path explicitly: LoadLibrary only
@@ -98,8 +98,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             // initialisation then fails, this is the cause to report.
             string? searchPathNote = SetDllDirectory(NativeFolder)
                 ? null
-                : $" Не удалось добавить {NativeFolder} в пути поиска библиотек " +
-                  $"(код {Marshal.GetLastWin32Error()}).";
+                : Common.Format.Text(Strings.Bass_SearchPathFailed, NativeFolder, Marshal.GetLastWin32Error());
 
             try
             {
@@ -115,7 +114,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
                     Errors error = Bass.LastError;
                     if (error != Errors.Already)
                     {
-                        return $"BASS не удалось инициализировать: {Describe(error)} ({error}).{searchPathNote}";
+                        return Common.Format.Text(Strings.Bass_InitFailed, Describe(error), error, searchPathNote);
                     }
                 }
 
@@ -126,17 +125,15 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             }
             catch (DllNotFoundException ex)
             {
-                return $"Не найдена библиотека bass.dll в {NativeFolder}. " +
-                       $"Запустите tools\\fetch-bass.ps1 (см. README). Подробности: {ex.Message}{searchPathNote}";
+                return Common.Format.Text(Strings.Bass_DllMissing, NativeFolder, ex.Message, searchPathNote);
             }
             catch (BadImageFormatException ex)
             {
-                return "Библиотека bass.dll не подходит по разрядности — нужна 64-битная версия. " +
-                       $"Подробности: {ex.Message}";
+                return Common.Format.Text(Strings.Bass_WrongBitness, ex.Message);
             }
             catch (Exception ex)
             {
-                return $"Не удалось запустить механизм декодирования: {ex.Message}";
+                return Common.Format.Text(Strings.Bass_StartFailed, ex.Message);
             }
         }
     }
@@ -148,8 +145,8 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         {
             return new AudioProbeResult(
                 AudioProbeOutcome.EngineFailure,
-                "Механизм декодирования аудио не запущен.",
-                "BASS не инициализирована");
+                Strings.Bass_NotStarted,
+                Strings.Bass_NotInitialised);
         }
 
         int handle = 0;
@@ -211,7 +208,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
             // One bad file must not bring the whole scan down.
             return new AudioProbeResult(
                 AudioProbeOutcome.ReadFailed,
-                "Непредвиденная ошибка при чтении файла.",
+                Strings.Bass_UnexpectedRead,
                 $"{ex.GetType().Name} · {ex.Message}");
         }
         finally
@@ -365,7 +362,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         return AudioProbeResult.Success(decoded, format, declared) with
         {
             TechnicalDetail = seekFailed
-                ? "Перемотка недоступна — прочитано только начало"
+                ? Strings.Bass_SeekUnavailable
                 : null,
         };
     }
@@ -430,7 +427,7 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         double declared) =>
         new(
             AudioProbeOutcome.ReadFailed,
-            $"Чтение аудиоданных прервалось: {Describe(error)}.",
+            Common.Format.Text(Strings.Bass_ReadInterrupted, Describe(error)),
             $"BASS_ChannelGetData → {error}",
             Bass.ChannelBytes2Seconds(handle, decodedBytes),
             format,
@@ -439,8 +436,8 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
     private static AudioProbeResult Empty(string? format, double declared) =>
         new(
             AudioProbeOutcome.Empty,
-            "Декодер не получил ни одного отсчёта — аудиоданных в файле нет.",
-            "BASS_ChannelGetData вернул 0 байт",
+            Strings.Bass_NoSamples,
+            Strings.Bass_NoSamples_Detail,
             0,
             format,
             declared);
@@ -576,53 +573,53 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
     {
         Errors.WmaLicense or Errors.WmaAccesDenied or Errors.WmaIndividual => new AudioProbeResult(
             AudioProbeOutcome.PasswordProtected,
-            "Файл защищён лицензией или паролем — декодировать его нельзя.",
+            Strings.Bass_Protected,
             $"BASS → {error}"),
 
         Errors.Empty => new AudioProbeResult(
             AudioProbeOutcome.Empty,
-            "Файл пустой — аудиоданных в нём нет.",
+            Strings.Bass_Empty,
             $"BASS → {error}"),
 
         Errors.FileOpen => new AudioProbeResult(
             AudioProbeOutcome.OpenFailed,
-            "Файл не удалось открыть для чтения.",
+            Strings.Bass_CannotOpen,
             $"BASS → {error}"),
 
         Errors.Memory or Errors.Init or Errors.NotAvailable => new AudioProbeResult(
             AudioProbeOutcome.EngineFailure,
-            $"Механизм декодирования отказал: {Describe(error)}.",
+            Common.Format.Text(Strings.Bass_EngineFailed, Describe(error)),
             $"BASS → {error}"),
 
         _ => new AudioProbeResult(
             AudioProbeOutcome.OpenFailed,
-            $"Не удалось начать декодирование: {Describe(error)}.",
+            Common.Format.Text(Strings.Bass_DecodeStartFailed, Describe(error)),
             $"BASS → {error}"),
     };
 
     /// <summary>Human wording for a BASS error code; no "Error 0x…" in the main text.</summary>
     internal static string Describe(Errors error) => error switch
     {
-        Errors.OK => "ошибок нет",
-        Errors.FileOpen => "файл не открывается",
-        Errors.FileFormat => "формат файла не распознан",
-        Errors.Codec => "нет декодера для этого формата",
-        Errors.Empty => "файл пустой",
-        Errors.Memory => "не хватило памяти",
-        Errors.Init => "звуковая подсистема не инициализирована",
-        Errors.NotAvailable => "функция недоступна",
-        Errors.Unstreamable => "файл нельзя декодировать потоком",
-        Errors.WmaLicense => "нужна лицензия на воспроизведение",
-        Errors.WmaAccesDenied => "доступ к защищённому файлу запрещён",
-        Errors.WmaIndividual => "требуется индивидуализация проигрывателя",
-        Errors.Timeout => "истекло время ожидания",
-        Errors.Ended => "данные закончились",
-        Errors.Handle => "неверный дескриптор потока",
-        Errors.Position => "неверная позиция в потоке",
-        Errors.SampleFormat => "формат отсчётов не поддерживается",
-        Errors.Mp4NoStream => "в контейнере MP4 нет аудиодорожки",
-        Errors.Unknown => "неизвестная ошибка декодера",
-        _ => $"код {error}",
+        Errors.OK => Strings.Bass_Error_OK,
+        Errors.FileOpen => Strings.Bass_Error_FileOpen,
+        Errors.FileFormat => Strings.Bass_Error_FileFormat,
+        Errors.Codec => Strings.Bass_Error_Codec,
+        Errors.Empty => Strings.Bass_Error_Empty,
+        Errors.Memory => Strings.Bass_Error_Memory,
+        Errors.Init => Strings.Bass_Error_Init,
+        Errors.NotAvailable => Strings.Bass_Error_NotAvailable,
+        Errors.Unstreamable => Strings.Bass_Error_Unstreamable,
+        Errors.WmaLicense => Strings.Bass_Error_WmaLicense,
+        Errors.WmaAccesDenied => Strings.Bass_Error_WmaAccessDenied,
+        Errors.WmaIndividual => Strings.Bass_Error_WmaIndividual,
+        Errors.Timeout => Strings.Bass_Error_Timeout,
+        Errors.Ended => Strings.Bass_Error_Ended,
+        Errors.Handle => Strings.Bass_Error_Handle,
+        Errors.Position => Strings.Bass_Error_Position,
+        Errors.SampleFormat => Strings.Bass_Error_SampleFormat,
+        Errors.Mp4NoStream => Strings.Bass_Error_Mp4NoStream,
+        Errors.Unknown => Strings.Bass_Error_Unknown,
+        _ => Common.Format.Text(Strings.Bass_Error_Code, error),
     };
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

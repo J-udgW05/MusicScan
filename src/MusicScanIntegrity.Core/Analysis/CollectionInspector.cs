@@ -1,5 +1,6 @@
 using System.Globalization;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Analysis;
 
@@ -107,14 +108,14 @@ public static class CollectionInspector
         string listed = string.Join(", ", missing.Take(MaxListed));
         if (missing.Length > MaxListed)
         {
-            listed += " и другие";
+            listed += Strings.Collection_AndMore;
         }
 
         findings.Add(new CollectionFinding(
             CollectionFindingKind.MissingTracks,
             folder,
-            $"В альбоме не хватает дорожек: {listed}.",
-            $"Найдено {numbers.Length} из {numbers[^1]} по нумерации в тегах"));
+            Common.Format.Text(Strings.Collection_MissingTracks, listed),
+            Common.Format.Text(Strings.Collection_MissingTracks_Detail, numbers.Length, numbers[^1])));
     }
 
     /// <summary>Notices mixed formats inside one folder.</summary>
@@ -134,8 +135,8 @@ public static class CollectionInspector
         findings.Add(new CollectionFinding(
             CollectionFindingKind.MixedFormats,
             folder,
-            $"В одной папке файлы разных форматов: {string.Join(", ", formats)}.",
-            "Обычно так выходит, когда часть альбома докачали в другом качестве"));
+            Common.Format.Text(Strings.Collection_MixedFormats, string.Join(", ", formats)),
+            Strings.Collection_MixedFormats_Detail));
     }
 
     /// <summary>Notices differing album tags inside one folder.</summary>
@@ -155,8 +156,8 @@ public static class CollectionInspector
         findings.Add(new CollectionFinding(
             CollectionFindingKind.MixedAlbums,
             folder,
-            $"В папке лежат треки разных альбомов: {string.Join(", ", albums.Take(3))}.",
-            albums.Length > 3 ? $"Всего разных значений тега: {albums.Length}" : null));
+            Common.Format.Text(Strings.Collection_MixedAlbums, string.Join(", ", albums.Take(3))),
+            albums.Length > 3 ? Common.Format.Text(Strings.Collection_MixedAlbums_Detail, albums.Length) : null));
     }
 
     /// <summary>Notices a folder without any cover art.</summary>
@@ -176,7 +177,7 @@ public static class CollectionInspector
         findings.Add(new CollectionFinding(
             CollectionFindingKind.NoCover,
             folder,
-            "У альбома нет обложки: ни в тегах, ни отдельным файлом.",
+            Strings.Collection_NoCover,
             null));
     }
 
@@ -240,8 +241,7 @@ public static class CollectionInspector
             findings.Add(new CollectionFinding(
                 CollectionFindingKind.Duplicate,
                 first.FullPath,
-                $"Тот же трек лежит ещё в {elsewhere} {Common.Format.Plural(elsewhere, "месте", "местах", "местах")}: "
-                    + $"{first.Metadata!.Artist} — {first.Metadata.Title}.",
+                Common.Format.Count(elsewhere, "Plural_DuplicateElsewhere", first.Metadata!.Artist, first.Metadata.Title),
                 string.Join("; ", copies.Skip(1).Take(MaxListed).Select(c => c.FullPath))));
         }
     }

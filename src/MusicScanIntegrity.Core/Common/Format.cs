@@ -122,13 +122,14 @@ public static class Format
     /// Resource key prefix. The catalogue holds <c>key_One</c>, <c>key_Few</c> and
     /// <c>key_Many</c>; English uses the same text for Few and Many.
     /// </param>
-    public static string Count(long count, string key)
+    /// <param name="extra">Values for placeholders {1} onwards.</param>
+    public static string Count(long count, string key, params object?[] extra)
     {
         string form = key + "_" + PluralForm(count);
         string pattern = Strings.ResourceManager.GetString(form, CultureInfo.CurrentUICulture)
             ?? throw new InvalidOperationException("Missing plural resource: " + form);
 
-        return string.Format(CultureInfo.InvariantCulture, pattern, Number(count));
+        return string.Format(CultureInfo.CurrentUICulture, pattern, [Number(count), .. extra]);
     }
 
     /// <summary>Fills the placeholders of a catalogue pattern.</summary>

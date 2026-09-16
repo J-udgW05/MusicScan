@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Analysis;
 
@@ -48,19 +49,19 @@ public static class TextIntegrity
 
         if (value.Contains(Replacement, StringComparison.Ordinal))
         {
-            return "в тексте есть знаки, которые система не смогла прочитать";
+            return Strings.Mojibake_ReplacementChars;
         }
 
         // UTF-8 read byte by byte: Cyrillic becomes "Ð" and "Ñ" followed by
         // characters from the control range of the table.
         if (HasUtf8Wreckage(value))
         {
-            return "похоже на UTF-8, прочитанный побайтно";
+            return Strings.Mojibake_Utf8Bytes;
         }
 
         if (HasAccentedRun(value))
         {
-            return "похоже на кириллицу, прочитанную западноевропейской таблицей";
+            return Strings.Mojibake_WesternTable;
         }
 
         return null;
