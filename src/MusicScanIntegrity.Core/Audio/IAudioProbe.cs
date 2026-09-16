@@ -1,4 +1,5 @@
 ﻿using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Audio;
 
@@ -69,30 +70,30 @@ public sealed record AudioProbeResult(
 
         AudioProbeOutcome.OpenFailed => new CheckIssue(
             IssueCode.DecodeStartFailed,
-            Message ?? "Не удалось начать декодирование файла.",
+            Message ?? Strings.Probe_DecodeStartFailed,
             TechnicalDetail),
 
         AudioProbeOutcome.ReadFailed => new CheckIssue(
             IssueCode.AudioReadFailed,
-            Message ?? "Чтение аудиоданных прервалось ошибкой.",
+            Message ?? Strings.Probe_AudioReadFailed,
             TechnicalDetail),
 
         AudioProbeOutcome.PasswordProtected => new CheckIssue(
             IssueCode.PasswordProtected,
-            Message ?? "Файл защищён паролем или лицензией.",
+            Message ?? Strings.Probe_PasswordProtected,
             TechnicalDetail),
 
         AudioProbeOutcome.Empty => new CheckIssue(
             IssueCode.EmptyFile,
-            Message ?? "Файл пустой — аудиоданных в нём нет.",
+            Message ?? Strings.Probe_EmptyFile,
             TechnicalDetail),
 
         AudioProbeOutcome.EngineFailure => new CheckIssue(
             IssueCode.UnexpectedError,
-            Message ?? "Механизм декодирования аудио отказал.",
+            Message ?? Strings.Probe_EngineFailure,
             TechnicalDetail),
 
-        _ => new CheckIssue(IssueCode.UnexpectedError, Message ?? "Неизвестная ошибка.", TechnicalDetail),
+        _ => new CheckIssue(IssueCode.UnexpectedError, Message ?? Strings.Probe_Unknown, TechnicalDetail),
     };
 }
 

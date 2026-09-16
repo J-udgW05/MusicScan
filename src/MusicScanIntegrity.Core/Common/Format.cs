@@ -17,7 +17,7 @@ namespace MusicScanIntegrity.Core.Common;
 public static class Format
 {
     /// <summary>Non-breaking space: Russian digit group separator and the gap before units.</summary>
-    public const char NarrowSpace = ' ';
+    public const char NarrowSpace = '\u00A0';
 
     private static readonly NumberFormatInfo RussianNumbers = new()
     {
@@ -130,6 +130,10 @@ public static class Format
 
         return string.Format(CultureInfo.InvariantCulture, pattern, Number(count));
     }
+
+    /// <summary>Fills the placeholders of a catalogue pattern.</summary>
+    public static string Text(string pattern, params object?[] args) =>
+        string.Format(CultureInfo.CurrentUICulture, pattern, args);
 
     /// <summary>Count with the agreeing noun: "12 480 файлов" / "12,480 files".</summary>
     public static string Files(long count) => Count(count, "Plural_Files");

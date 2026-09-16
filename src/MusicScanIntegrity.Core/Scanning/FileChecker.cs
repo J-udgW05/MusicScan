@@ -5,6 +5,7 @@ using MusicScanIntegrity.Core.History;
 using MusicScanIntegrity.Core.Integrity;
 using MusicScanIntegrity.Core.Locking;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Scanning;
@@ -92,7 +93,7 @@ public sealed class FileChecker(
             {
                 issues.Add(new CheckIssue(
                     IssueCode.FileNotFound,
-                    "Файл не найден — он исчез с диска после того, как программа его нашла.",
+                    Strings.Check_FileNotFound,
                     "File.Exists == false"));
 
                 return FileCheckResult.From(item, issues, stopwatch.Elapsed, format);
@@ -108,8 +109,8 @@ public sealed class FileChecker(
                     context.OnLargeFile?.Invoke(item, size);
                     issues.Add(new CheckIssue(
                         IssueCode.LargeFile,
-                        $"Очень большой файл ({Common.Format.Size(size)}) — проверка займёт больше времени.",
-                        $"Размер {size} Б, порог {threshold} Б"));
+                        Common.Format.Text(Strings.Check_LargeFile, Common.Format.Size(size)),
+                        Common.Format.Text(Strings.Check_LargeFile_Detail, size, threshold)));
                 }
             }
 
@@ -135,8 +136,8 @@ public sealed class FileChecker(
             {
                 issues.Add(new CheckIssue(
                     IssueCode.EmptyFile,
-                    "Файл пустой (0 байт) — аудиоданных в нём нет.",
-                    "Размер файла равен нулю"));
+                    Strings.Check_EmptyFile,
+                    Strings.Check_EmptyFile_Detail));
 
                 return FileCheckResult.From(item, issues, stopwatch.Elapsed, format, actualSize: size);
             }
@@ -198,8 +199,8 @@ public sealed class FileChecker(
             {
                 issues.Add(new CheckIssue(
                     IssueCode.CheckTimeout,
-                    $"Проверка заняла больше {settings.FileTimeoutSeconds} с и была прервана — файл подозрительный.",
-                    $"Таймаут {settings.FileTimeoutSeconds} с"));
+                    Common.Format.Text(Strings.Check_Timeout, settings.FileTimeoutSeconds),
+                    Common.Format.Text(Strings.Check_Timeout_Detail, settings.FileTimeoutSeconds)));
             }
             else if (probe.ToIssue() is { } probeIssue)
             {
@@ -208,7 +209,7 @@ public sealed class FileChecker(
                 if (probe.Outcome == AudioProbeOutcome.EngineFailure)
                 {
                     // Critical decoder failure; the engine stops the scan.
-                    throw new AudioEngineFailureException(probe.Message ?? "Механизм декодирования отказал.", probe.TechnicalDetail);
+                    throw new AudioEngineFailureException(probe.Message ?? Strings.Check_DecoderFailed, probe.TechnicalDetail);
                 }
             }
 
@@ -241,8 +242,8 @@ public sealed class FileChecker(
                     integrity = null;
                     issues.Add(new CheckIssue(
                         IssueCode.CheckTimeout,
-                        $"Проверка заняла больше {settings.FileTimeoutSeconds} с и была прервана — файл подозрительный.",
-                        $"Таймаут {settings.FileTimeoutSeconds} с на разборе структуры"));
+                        Common.Format.Text(Strings.Check_Timeout, settings.FileTimeoutSeconds),
+                        Common.Format.Text(Strings.Check_Timeout_StructureDetail, settings.FileTimeoutSeconds)));
                 }
             }
 
@@ -253,8 +254,8 @@ public sealed class FileChecker(
             {
                 issues.Add(new CheckIssue(
                     IssueCode.Truncated,
-                    "Файл обрывается: звука в нём меньше, чем обещает заголовок.",
-                    $"Заявлено {probe.DeclaredSeconds:0.#} с, прочитано {probe.DecodedSeconds:0.#} с"));
+                    Strings.Check_Truncated,
+                    Common.Format.Text(Strings.Check_Truncated_Detail, probe.DeclaredSeconds, probe.DecodedSeconds)));
             }
 
             // 8. What the samples themselves show. Computed from data the
@@ -278,8 +279,8 @@ public sealed class FileChecker(
                     format = $"{actual}?";
                     issues.Add(new CheckIssue(
                         IssueCode.ExtensionMismatch,
-                        $"Расширение не совпадает с содержимым: это {actual}, а не {AudioFormats.DisplayName(item.Extension)}.",
-                        $"Сигнатура → {actual}"));
+                        Common.Format.Text(Strings.Check_ExtensionMismatch, actual, AudioFormats.DisplayName(item.Extension)),
+                        Common.Format.Text(Strings.Check_ExtensionMismatch_Detail, actual)));
                 }
             }
 
@@ -293,29 +294,29 @@ public sealed class FileChecker(
                 {
                     issues.Add(new CheckIssue(
                         IssueCode.MetadataProblem,
-                        "Теги не читаются — с самим аудио при этом всё в порядке.",
+                        Strings.Check_TagsUnreadable,
                         metadataError));
                 }
                 else if (!metadata.IsComplete)
                 {
                     issues.Add(new CheckIssue(
                         IssueCode.MetadataProblem,
-                        $"Не заполнены теги: {string.Join(", ", metadata.MissingFields)}. Это не повреждение файла.",
+                        Common.Format.Text(Strings.Check_TagsMissing, string.Join(", ", metadata.MissingFields)),
                         null));
                 }
 
                 if (metadata is not null)
                 {
                     IReadOnlyList<string> broken = Analysis.TextIntegrity.BrokenFields(
-                        ("Название", metadata.Title),
-                        ("Исполнитель", metadata.Artist),
-                        ("Альбом", metadata.Album));
+                        (Strings.Tag_Field_Title, metadata.Title),
+                        (Strings.Tag_Field_Artist, metadata.Artist),
+                        (Strings.Tag_Field_Album, metadata.Album));
 
                     if (broken.Count > 0)
                     {
                         issues.Add(new CheckIssue(
                             IssueCode.BrokenTagText,
-                            $"Теги прочитаны не в той кодировке — вместо букв кракозябры: {string.Join(", ", broken)}.",
+                            Common.Format.Text(Strings.Check_BrokenTagText, string.Join(", ", broken)),
                             Analysis.TextIntegrity.Describe(metadata.Title)
                                 ?? Analysis.TextIntegrity.Describe(metadata.Artist)
                                 ?? Analysis.TextIntegrity.Describe(metadata.Album)));
@@ -351,7 +352,7 @@ public sealed class FileChecker(
             // reason to stop the scan.
             issues.Add(new CheckIssue(
                 IssueCode.UnexpectedError,
-                "Проверить файл не удалось из-за непредвиденной ошибки.",
+                Strings.Check_Unexpected,
                 $"{ex.GetType().Name} · {ex.Message}"));
 
             return FileCheckResult.From(item, issues, stopwatch.Elapsed, format);
@@ -378,15 +379,15 @@ public sealed class FileChecker(
             {
                 issues.Add(new CheckIssue(
                     IssueCode.DigitalSilence,
-                    "Файл читается, но звука в нём нет — сплошная тишина.",
-                    $"Наибольший уровень {stats.Peak:0.####}"));
+                    Strings.Check_DigitalSilence,
+                    Common.Format.Text(Strings.Check_DigitalSilence_Detail, stats.Peak)));
             }
             else if (stats.LongestSilentSeconds >= DropoutSeconds && stats.Rms > QuietRms)
             {
                 issues.Add(new CheckIssue(
                     IssueCode.AudioDropout,
-                    $"Внутри трека провал в тишину на {stats.LongestSilentSeconds:0.#} с — похоже на потерянный кусок.",
-                    $"Тишина {stats.LongestSilentRun} отсчётов подряд при средней громкости {stats.Rms:0.###}"));
+                    Common.Format.Text(Strings.Check_Dropout, stats.LongestSilentSeconds),
+                    Common.Format.Text(Strings.Check_Dropout_Detail, stats.LongestSilentRun, stats.Rms)));
             }
         }
 
@@ -399,16 +400,16 @@ public sealed class FileChecker(
         {
             issues.Add(new CheckIssue(
                 IssueCode.Clipping,
-                $"Звук упирается в предел громкости: {stats.ClippedShare * 100:0.#} % отсчётов.",
-                $"{stats.ClippedSamples} отсчётов из {stats.Samples}"));
+                Common.Format.Text(Strings.Check_Clipping, stats.ClippedShare * 100),
+                Common.Format.Text(Strings.Check_Clipping_Detail, stats.ClippedSamples, stats.Samples)));
         }
 
         if (Math.Abs(stats.DcOffset) > DcOffsetThreshold)
         {
             issues.Add(new CheckIssue(
                 IssueCode.DcOffset,
-                "У записи смещён ноль — признак плохой оцифровки.",
-                $"Постоянная составляющая {stats.DcOffset:0.###}"));
+                Strings.Check_DcOffset,
+                Common.Format.Text(Strings.Check_DcOffset_Detail, stats.DcOffset)));
         }
     }
 
@@ -442,8 +443,8 @@ public sealed class FileChecker(
         {
             issues.Add(new CheckIssue(
                 IssueCode.TranscodeSuspected,
-                $"Похоже на перекодирование: формат без потерь, а звук обрывается на {spectrum.CutoffHz / 1000:0.#} кГц.",
-                $"Верхняя граница {spectrum.CutoffHz:0} Гц из возможных {spectrum.NyquistHz:0} Гц, кусков {spectrum.Blocks}"));
+                Common.Format.Text(Strings.Check_TranscodeLossless, spectrum.CutoffHz / 1000),
+                Common.Format.Text(Strings.Check_TranscodeLossless_Detail, spectrum.CutoffHz, spectrum.NyquistHz, spectrum.Blocks)));
 
             return;
         }
@@ -452,8 +453,8 @@ public sealed class FileChecker(
         {
             issues.Add(new CheckIssue(
                 IssueCode.TranscodeSuspected,
-                $"Похоже на перекодирование: битрейт {probe.BitrateKbps} кбит/с, а звук обрывается на {spectrum.CutoffHz / 1000:0.#} кГц.",
-                $"Верхняя граница {spectrum.CutoffHz:0} Гц, кусков {spectrum.Blocks}"));
+                Common.Format.Text(Strings.Check_TranscodeBitrate, probe.BitrateKbps, spectrum.CutoffHz / 1000),
+                Common.Format.Text(Strings.Check_TranscodeBitrate_Detail, spectrum.CutoffHz, spectrum.Blocks)));
         }
     }
 
@@ -494,8 +495,8 @@ public sealed class FileChecker(
         {
             issues.Add(new CheckIssue(
                 IssueCode.SilentCorruption,
-                "Содержимое файла изменилось само собой: размер и дата прежние, а байты другие.",
-                $"Было {previous.Hash}, стало {hash}; прошлая проверка {previous.CheckedAt:dd.MM.yyyy}"));
+                Strings.Check_SilentCorruption,
+                Common.Format.Text(Strings.Check_SilentCorruption_Detail, previous.Hash, hash, previous.CheckedAt)));
 
             return new HistoryOutcome(hash, false, CheckStatus.Ok);
         }
@@ -558,7 +559,7 @@ public sealed class FileChecker(
                 ContainerDamage.Truncation => IssueCode.Truncated,
                 _ => IssueCode.ContainerDamaged,
             },
-            validation.Message ?? "Файл повреждён.",
+            validation.Message ?? Strings.Check_FileDamaged,
             validation.TechnicalDetail),
 
         _ => null,
@@ -601,14 +602,14 @@ public sealed class FileChecker(
             case FileAccessState.NotFound:
                 issues.Add(new CheckIssue(
                     IssueCode.FileNotFound,
-                    "Файл не найден — он исчез с диска после того, как программа его нашла.",
+                    Strings.Check_FileNotFound,
                     access.TechnicalDetail));
                 return new LockResolution(LockOutcome.Failed);
 
             case FileAccessState.AccessDenied:
                 issues.Add(new CheckIssue(
                     IssueCode.AccessDenied,
-                    "Windows не дал прочитать файл — проверить его не получилось.",
+                    Strings.Check_AccessDenied,
                     access.TechnicalDetail));
                 return new LockResolution(LockOutcome.Failed);
         }
@@ -620,7 +621,7 @@ public sealed class FileChecker(
         {
             LockOwnerResult owner = settings.DetectOwnerProcess
                 ? lockOwnerDetector.Detect(item.FullPath)
-                : LockOwnerResult.Unknown("Определение владельца выключено в настройках");
+                : LockOwnerResult.Unknown(Strings.Lock_OwnerDetectionOff);
 
             if (context.LockedQuestions is null)
             {
@@ -646,7 +647,7 @@ public sealed class FileChecker(
             case LockedFileAction.Skip:
                 issues.Add(new CheckIssue(
                     IssueCode.LockedSkippedByUser,
-                    "Файл занят другой программой и пропущен.",
+                    Strings.Lock_Skipped,
                     access.TechnicalDetail));
                 return new LockResolution(LockOutcome.Skip);
 
@@ -664,21 +665,21 @@ public sealed class FileChecker(
                 {
                     issues.Add(new CheckIssue(
                         IssueCode.LockedCopyFailed,
-                        "Файл занят, и сделать его временную копию не удалось.",
+                        Strings.Lock_CopyFailed,
                         copy.Error));
                     return new LockResolution(LockOutcome.Failed, copy);
                 }
 
                 issues.Add(new CheckIssue(
                     IssueCode.LockedCheckedViaCopy,
-                    "Файл был занят другой программой — проверен по временной копии.",
+                    Strings.Lock_CheckedViaCopy,
                     access.TechnicalDetail));
                 return new LockResolution(LockOutcome.Proceed, copy);
 
             default:
                 issues.Add(new CheckIssue(
                     IssueCode.LockedSkippedByUser,
-                    "Файл занят другой программой и пропущен.",
+                    Strings.Lock_Skipped,
                     access.TechnicalDetail));
                 return new LockResolution(LockOutcome.Skip);
         }
@@ -709,7 +710,7 @@ public sealed class FileChecker(
 
         issues.Add(new CheckIssue(
             IssueCode.LockedWaitTimeout,
-            $"Файл оставался занят все {settings.LockedWaitSeconds} с ожидания — проверить его не удалось.",
+            Common.Format.Text(Strings.Lock_WaitTimeout, settings.LockedWaitSeconds),
             lastAccess.TechnicalDetail));
 
         return new LockResolution(LockOutcome.Failed);

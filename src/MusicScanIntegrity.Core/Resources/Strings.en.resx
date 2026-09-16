@@ -33,8 +33,221 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Check_AccessDenied" xml:space="preserve">
+    <value>Windows denied reading the file, so it could not be checked.</value>
+  </data>
+  <data name="Check_BrokenTagText" xml:space="preserve">
+    <value>Tags were read with the wrong encoding and show garbled text: {0}.</value>
+  </data>
+  <data name="Check_Clipping" xml:space="preserve">
+    <value>Audio hits full scale: {0:0.#}% of samples.</value>
+  </data>
+  <data name="Check_Clipping_Detail" xml:space="preserve">
+    <value>{0} of {1} samples</value>
+  </data>
+  <data name="Check_DcOffset" xml:space="preserve">
+    <value>The recording has a DC offset, a sign of poor digitisation.</value>
+  </data>
+  <data name="Check_DcOffset_Detail" xml:space="preserve">
+    <value>DC component {0:0.###}</value>
+  </data>
+  <data name="Check_DecoderFailed" xml:space="preserve">
+    <value>The audio decoder failed.</value>
+  </data>
+  <data name="Check_DigitalSilence" xml:space="preserve">
+    <value>The file reads, but contains nothing but silence.</value>
+  </data>
+  <data name="Check_DigitalSilence_Detail" xml:space="preserve">
+    <value>Peak level {0:0.####}</value>
+  </data>
+  <data name="Check_Dropout" xml:space="preserve">
+    <value>A {0:0.#} s silent gap inside the track; looks like lost data.</value>
+  </data>
+  <data name="Check_Dropout_Detail" xml:space="preserve">
+    <value>{0} consecutive silent samples at mean level {1:0.###}</value>
+  </data>
+  <data name="Check_EmptyFile" xml:space="preserve">
+    <value>The file is empty (0 bytes) and holds no audio.</value>
+  </data>
+  <data name="Check_EmptyFile_Detail" xml:space="preserve">
+    <value>File size is zero</value>
+  </data>
+  <data name="Check_ExtensionMismatch" xml:space="preserve">
+    <value>Extension does not match contents: this is {0}, not {1}.</value>
+  </data>
+  <data name="Check_ExtensionMismatch_Detail" xml:space="preserve">
+    <value>Signature → {0}</value>
+  </data>
+  <data name="Check_FileDamaged" xml:space="preserve">
+    <value>The file is damaged.</value>
+  </data>
+  <data name="Check_FileNotFound" xml:space="preserve">
+    <value>File not found: it disappeared from disk after it was listed.</value>
+  </data>
+  <data name="Check_LargeFile" xml:space="preserve">
+    <value>Very large file ({0}); checking will take longer.</value>
+  </data>
+  <data name="Check_LargeFile_Detail" xml:space="preserve">
+    <value>Size {0} B, threshold {1} B</value>
+  </data>
+  <data name="Check_SilentCorruption" xml:space="preserve">
+    <value>The file changed on its own: same size and date, different bytes.</value>
+  </data>
+  <data name="Check_SilentCorruption_Detail" xml:space="preserve">
+    <value>Was {0}, now {1}; previous scan {2:yyyy-MM-dd}</value>
+  </data>
+  <data name="Check_TagsMissing" xml:space="preserve">
+    <value>Missing tags: {0}. This is not file damage.</value>
+  </data>
+  <data name="Check_TagsUnreadable" xml:space="preserve">
+    <value>Tags cannot be read; the audio itself is fine.</value>
+  </data>
+  <data name="Check_Timeout" xml:space="preserve">
+    <value>Checking took longer than {0} s and was aborted; the file is suspicious.</value>
+  </data>
+  <data name="Check_Timeout_Detail" xml:space="preserve">
+    <value>Timeout {0} s</value>
+  </data>
+  <data name="Check_Timeout_StructureDetail" xml:space="preserve">
+    <value>Timeout {0} s while parsing structure</value>
+  </data>
+  <data name="Check_TranscodeBitrate" xml:space="preserve">
+    <value>Looks re-encoded: {0} kbps, but the audio stops at {1:0.#} kHz.</value>
+  </data>
+  <data name="Check_TranscodeBitrate_Detail" xml:space="preserve">
+    <value>Upper edge {0:0} Hz, {1} blocks</value>
+  </data>
+  <data name="Check_TranscodeLossless" xml:space="preserve">
+    <value>Looks re-encoded: a lossless format, but the audio stops at {0:0.#} kHz.</value>
+  </data>
+  <data name="Check_TranscodeLossless_Detail" xml:space="preserve">
+    <value>Upper edge {0:0} Hz of a possible {1:0} Hz, {2} blocks</value>
+  </data>
+  <data name="Check_Truncated" xml:space="preserve">
+    <value>The file is truncated: it holds less audio than its header promises.</value>
+  </data>
+  <data name="Check_Truncated_Detail" xml:space="preserve">
+    <value>Declared {0:0.#} s, read {1:0.#} s</value>
+  </data>
+  <data name="Check_Unexpected" xml:space="preserve">
+    <value>The file could not be checked due to an unexpected error.</value>
+  </data>
+  <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
+    <value>{0}; container checksums not verified</value>
+  </data>
+  <data name="Depth_ChecksumsVerified" xml:space="preserve">
+    <value>{0}; container checksums verified</value>
+  </data>
+  <data name="Depth_Full" xml:space="preserve">
+    <value>every file was read in full</value>
+  </data>
+  <data name="Depth_Quick" xml:space="preserve">
+    <value>the start of each file was read</value>
+  </data>
+  <data name="Depth_Sampled" xml:space="preserve">
+    <value>the start, end and middle of each file were read</value>
+  </data>
   <data name="Duration_LessThanSecond" xml:space="preserve">
     <value>less than a second</value>
+  </data>
+  <data name="Engine_AlreadyRunning" xml:space="preserve">
+    <value>A scan is already running.</value>
+  </data>
+  <data name="Engine_LargeFile" xml:space="preserve">
+    <value>Very large file ({0}); checking will take longer</value>
+  </data>
+  <data name="Engine_PlaylistMissing" xml:space="preserve">
+    <value>Files missing from playlist: {0}</value>
+  </data>
+  <data name="Engine_UnexpectedFailure" xml:space="preserve">
+    <value>The scan was aborted by an unexpected error: {0}</value>
+  </data>
+  <data name="Finding_Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
+  <data name="Finding_MissingTracks" xml:space="preserve">
+    <value>Numbering gaps</value>
+  </data>
+  <data name="Finding_MixedAlbums" xml:space="preserve">
+    <value>Mixed albums in folder</value>
+  </data>
+  <data name="Finding_MixedFormats" xml:space="preserve">
+    <value>Mixed formats</value>
+  </data>
+  <data name="Finding_NoCover" xml:space="preserve">
+    <value>No cover art</value>
+  </data>
+  <data name="Finding_Other" xml:space="preserve">
+    <value>Finding</value>
+  </data>
+  <data name="Issue_Short_AudioDropout" xml:space="preserve">
+    <value>Dropout</value>
+  </data>
+  <data name="Issue_Short_BrokenTagText" xml:space="preserve">
+    <value>Garbled tags</value>
+  </data>
+  <data name="Issue_Short_ChecksumMismatch" xml:space="preserve">
+    <value>Checksum mismatch</value>
+  </data>
+  <data name="Issue_Short_CheckTimeout" xml:space="preserve">
+    <value>Slow check</value>
+  </data>
+  <data name="Issue_Short_Clipping" xml:space="preserve">
+    <value>Clipping</value>
+  </data>
+  <data name="Issue_Short_ContainerDamaged" xml:space="preserve">
+    <value>Broken structure</value>
+  </data>
+  <data name="Issue_Short_CueMarksBeyondFile" xml:space="preserve">
+    <value>Cue marks past end</value>
+  </data>
+  <data name="Issue_Short_DcOffset" xml:space="preserve">
+    <value>DC offset</value>
+  </data>
+  <data name="Issue_Short_DigitalSilence" xml:space="preserve">
+    <value>No sound</value>
+  </data>
+  <data name="Issue_Short_ExtensionMismatch" xml:space="preserve">
+    <value>Wrong extension</value>
+  </data>
+  <data name="Issue_Short_LargeFile" xml:space="preserve">
+    <value>Large file</value>
+  </data>
+  <data name="Issue_Short_LockedCheckedViaCopy" xml:space="preserve">
+    <value>Checked via copy</value>
+  </data>
+  <data name="Issue_Short_LockedWaitTimeout" xml:space="preserve">
+    <value>Was locked</value>
+  </data>
+  <data name="Issue_Short_MetadataProblem" xml:space="preserve">
+    <value>No tags</value>
+  </data>
+  <data name="Issue_Short_PasswordProtected" xml:space="preserve">
+    <value>Protected</value>
+  </data>
+  <data name="Issue_Short_SilentCorruption" xml:space="preserve">
+    <value>Changed on its own</value>
+  </data>
+  <data name="Issue_Short_TranscodeSuspected" xml:space="preserve">
+    <value>Top end cut off</value>
+  </data>
+  <data name="Issue_Short_Truncated" xml:space="preserve">
+    <value>Truncated</value>
+  </data>
+  <data name="Lock_CheckedViaCopy" xml:space="preserve">
+    <value>The file was locked by another program; checked through a temporary copy.</value>
+  </data>
+  <data name="Lock_CopyFailed" xml:space="preserve">
+    <value>The file is locked and a temporary copy could not be made.</value>
+  </data>
+  <data name="Lock_OwnerDetectionOff" xml:space="preserve">
+    <value>Owner detection is turned off in settings</value>
+  </data>
+  <data name="Lock_Skipped" xml:space="preserve">
+    <value>The file is locked by another program and was skipped.</value>
+  </data>
+  <data name="Lock_WaitTimeout" xml:space="preserve">
+    <value>The file stayed locked for the whole {0} s wait and could not be checked.</value>
   </data>
   <data name="Plural_Files_Few" xml:space="preserve">
     <value>{0} files</value>
@@ -72,8 +285,71 @@
   <data name="Plural_Seconds_One" xml:space="preserve">
     <value>{0} second</value>
   </data>
+  <data name="Probe_AudioReadFailed" xml:space="preserve">
+    <value>Reading audio data failed.</value>
+  </data>
+  <data name="Probe_DecodeStartFailed" xml:space="preserve">
+    <value>Decoding could not be started.</value>
+  </data>
+  <data name="Probe_EmptyFile" xml:space="preserve">
+    <value>The file is empty and holds no audio.</value>
+  </data>
+  <data name="Probe_EngineFailure" xml:space="preserve">
+    <value>The audio decoder failed.</value>
+  </data>
+  <data name="Probe_PasswordProtected" xml:space="preserve">
+    <value>The file is protected by a password or licence.</value>
+  </data>
+  <data name="Probe_Unknown" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
+  <data name="Result_Decoded" xml:space="preserve">
+    <value>Read and decoded without errors.</value>
+  </data>
+  <data name="Result_StructureOnly" xml:space="preserve">
+    <value>Read successfully, structure intact. This format has no checksums, so declared lengths were checked.</value>
+  </data>
+  <data name="Result_Unchanged" xml:space="preserve">
+    <value>Unchanged since the last scan; checked by content fingerprint.</value>
+  </data>
+  <data name="Result_Verified" xml:space="preserve">
+    <value>Read successfully; container checksums matched ({0} units checked).</value>
+  </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="Status_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Status_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Status_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Status_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Status_Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Tag_Album" xml:space="preserve">
+    <value>album</value>
+  </data>
+  <data name="Tag_Artist" xml:space="preserve">
+    <value>artist</value>
+  </data>
+  <data name="Tag_Field_Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Tag_Field_Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Tag_Field_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Tag_Title" xml:space="preserve">
+    <value>title</value>
   </data>
   <data name="Unit_B" xml:space="preserve">
     <value>B</value>

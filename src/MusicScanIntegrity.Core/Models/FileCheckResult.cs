@@ -1,4 +1,5 @@
 ﻿using MusicScanIntegrity.Core.Integrity;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Models;
 
@@ -88,14 +89,14 @@ public sealed class FileCheckResult
 
     /// <summary>What exactly was confirmed about a healthy file.</summary>
     private string IntegrityNote => Unchanged
-        ? "Файл не изменился с прошлой проверки — проверен по отпечатку содержимого."
+        ? Strings.Result_Unchanged
         : Integrity?.Verdict switch
     {
         ContainerVerdict.Verified =>
-            $"Файл прочитан, контрольные суммы формата сошлись (проверено единиц: {Integrity.UnitsChecked}).",
+            Common.Format.Text(Strings.Result_Verified, Common.Format.Number(Integrity.UnitsChecked)),
         ContainerVerdict.StructureOnly =>
-            "Файл прочитан, структура цела. Контрольных сумм в этом формате нет — проверены объявленные длины.",
-        _ => "Файл прочитан и декодирован без ошибок.",
+            Strings.Result_StructureOnly,
+        _ => Strings.Result_Decoded,
     };
 
     /// <summary>Technical causes of every finding; the second line in the details.</summary>
@@ -165,9 +166,9 @@ public sealed record TrackMetadata(
         get
         {
             List<string> missing = [];
-            if (string.IsNullOrWhiteSpace(Title)) missing.Add("название");
-            if (string.IsNullOrWhiteSpace(Artist)) missing.Add("исполнитель");
-            if (string.IsNullOrWhiteSpace(Album)) missing.Add("альбом");
+            if (string.IsNullOrWhiteSpace(Title)) missing.Add(Strings.Tag_Title);
+            if (string.IsNullOrWhiteSpace(Artist)) missing.Add(Strings.Tag_Artist);
+            if (string.IsNullOrWhiteSpace(Album)) missing.Add(Strings.Tag_Album);
             return missing;
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Models;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>Status captions and glyphs, shared by the UI and the reports.</summary>
 public static class CheckStatusExtensions
@@ -6,11 +8,11 @@ public static class CheckStatusExtensions
     /// <summary>Status name as the user sees it.</summary>
     public static string DisplayName(this CheckStatus status) => status switch
     {
-        CheckStatus.Ok => "В порядке",
-        CheckStatus.Warning => "Предупреждение",
-        CheckStatus.Corrupted => "Повреждён",
-        CheckStatus.Skipped => "Пропущен",
-        _ => "Неизвестно",
+        CheckStatus.Ok => Strings.Status_Ok,
+        CheckStatus.Warning => Strings.Status_Warning,
+        CheckStatus.Corrupted => Strings.Status_Corrupted,
+        CheckStatus.Skipped => Strings.Status_Skipped,
+        _ => Strings.Status_Unknown,
     };
 
     /// <summary>

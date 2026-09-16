@@ -1,3 +1,5 @@
+using MusicScanIntegrity.Core.Resources;
+
 namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>What a collection-level finding is about.</summary>
@@ -36,11 +38,11 @@ public sealed record CollectionFinding(
     /// <summary>Short caption for the kind of finding.</summary>
     public string KindLabel => Kind switch
     {
-        CollectionFindingKind.MissingTracks => "Пропуски в нумерации",
-        CollectionFindingKind.MixedFormats => "Разные форматы",
-        CollectionFindingKind.NoCover => "Нет обложки",
-        CollectionFindingKind.MixedAlbums => "Разные альбомы в папке",
-        CollectionFindingKind.Duplicate => "Дубликат",
-        _ => "Замечание",
+        CollectionFindingKind.MissingTracks => Strings.Finding_MissingTracks,
+        CollectionFindingKind.MixedFormats => Strings.Finding_MixedFormats,
+        CollectionFindingKind.NoCover => Strings.Finding_NoCover,
+        CollectionFindingKind.MixedAlbums => Strings.Finding_MixedAlbums,
+        CollectionFindingKind.Duplicate => Strings.Finding_Duplicate,
+        _ => Strings.Finding_Other,
     };
 }

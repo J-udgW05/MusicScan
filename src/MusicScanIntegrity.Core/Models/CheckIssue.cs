@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Models;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>
 /// One finding about a file: a code, a human wording and a technical cause.
@@ -34,24 +36,24 @@ public sealed record CheckIssue(IssueCode Code, string Message, string? Technica
     /// <summary>Short caption for the status column of the results table.</summary>
     public string ShortLabel => Code switch
     {
-        IssueCode.MetadataProblem => "Нет тегов",
-        IssueCode.CheckTimeout => "Долгая проверка",
-        IssueCode.ExtensionMismatch => "Не то расширение",
-        IssueCode.PasswordProtected => "Защищён",
-        IssueCode.LockedWaitTimeout => "Был занят",
-        IssueCode.LockedCheckedViaCopy => "Проверен по копии",
-        IssueCode.LargeFile => "Большой файл",
-        IssueCode.ChecksumMismatch => "Сумма не сошлась",
-        IssueCode.ContainerDamaged => "Структура разрушена",
-        IssueCode.Truncated => "Файл обрывается",
-        IssueCode.DigitalSilence => "Нет звука",
-        IssueCode.AudioDropout => "Провал в тишину",
-        IssueCode.Clipping => "Перегрузка",
-        IssueCode.DcOffset => "Смещение нуля",
-        IssueCode.TranscodeSuspected => "Срезан верх",
-        IssueCode.BrokenTagText => "Кракозябры в тегах",
-        IssueCode.SilentCorruption => "Изменился сам собой",
-        IssueCode.CueMarksBeyondFile => "Метки за пределом файла",
+        IssueCode.MetadataProblem => Strings.Issue_Short_MetadataProblem,
+        IssueCode.CheckTimeout => Strings.Issue_Short_CheckTimeout,
+        IssueCode.ExtensionMismatch => Strings.Issue_Short_ExtensionMismatch,
+        IssueCode.PasswordProtected => Strings.Issue_Short_PasswordProtected,
+        IssueCode.LockedWaitTimeout => Strings.Issue_Short_LockedWaitTimeout,
+        IssueCode.LockedCheckedViaCopy => Strings.Issue_Short_LockedCheckedViaCopy,
+        IssueCode.LargeFile => Strings.Issue_Short_LargeFile,
+        IssueCode.ChecksumMismatch => Strings.Issue_Short_ChecksumMismatch,
+        IssueCode.ContainerDamaged => Strings.Issue_Short_ContainerDamaged,
+        IssueCode.Truncated => Strings.Issue_Short_Truncated,
+        IssueCode.DigitalSilence => Strings.Issue_Short_DigitalSilence,
+        IssueCode.AudioDropout => Strings.Issue_Short_AudioDropout,
+        IssueCode.Clipping => Strings.Issue_Short_Clipping,
+        IssueCode.DcOffset => Strings.Issue_Short_DcOffset,
+        IssueCode.TranscodeSuspected => Strings.Issue_Short_TranscodeSuspected,
+        IssueCode.BrokenTagText => Strings.Issue_Short_BrokenTagText,
+        IssueCode.SilentCorruption => Strings.Issue_Short_SilentCorruption,
+        IssueCode.CueMarksBeyondFile => Strings.Issue_Short_CueMarksBeyondFile,
         _ => Severity.DisplayName(),
     };
 }

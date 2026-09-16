@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Models;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Models;
 
 /// <summary>Summary of a finished or stopped scan; the basis of the report tab.</summary>
 public sealed class ScanSummary
@@ -35,14 +37,14 @@ public sealed class ScanSummary
         {
             string depth = Depth switch
             {
-                Settings.CheckDepth.Quick => "прочитано начало каждого файла",
-                Settings.CheckDepth.Full => "каждый файл прочитан целиком",
-                _ => "прочитаны начало, конец и середина каждого файла",
+                Settings.CheckDepth.Quick => Strings.Depth_Quick,
+                Settings.CheckDepth.Full => Strings.Depth_Full,
+                _ => Strings.Depth_Sampled,
             };
 
             return ContainerIntegrityChecked
-                ? $"{depth}; контрольные суммы формата сверены"
-                : $"{depth}; контрольные суммы формата не сверялись";
+                ? Common.Format.Text(Strings.Depth_ChecksumsVerified, depth)
+                : Common.Format.Text(Strings.Depth_ChecksumsNotVerified, depth);
         }
     }
 

@@ -4,6 +4,7 @@ using MusicScanIntegrity.Core.Discovery;
 using MusicScanIntegrity.Core.Locking;
 using MusicScanIntegrity.Core.Models;
 using MusicScanIntegrity.Core.Playlists;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Scanning;
@@ -119,7 +120,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
 
         if (State is ScanState.Running or ScanState.Paused or ScanState.Discovering)
         {
-            throw new InvalidOperationException("Проверка уже идёт.");
+            throw new InvalidOperationException(Strings.Engine_AlreadyRunning);
         }
 
         _pause?.Dispose();
@@ -216,7 +217,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         catch (Exception ex)
         {
             State = ScanState.Failed;
-            criticalFailure = $"Проверка прервана непредвиденной ошибкой: {ex.Message}";
+            criticalFailure = Common.Format.Text(Strings.Engine_UnexpectedFailure, ex.Message);
         }
         finally
         {
@@ -312,7 +313,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
             if (result.MissingCount > 0)
             {
                 WarningRaised?.Invoke(this, new LiveWarning(
-                    $"В плейлисте не найдено файлов: {result.MissingCount}",
+                    Common.Format.Text(Strings.Engine_PlaylistMissing, result.MissingCount),
                     result.FullPath,
                     IssueCode.PlaylistTargetMissing));
             }
@@ -391,7 +392,7 @@ public sealed class ScanEngine : IScanEngine, IDisposable
 
     private void OnLargeFile(ScanItem item, long size) =>
         WarningRaised?.Invoke(this, new LiveWarning(
-            $"Очень большой файл ({Common.Format.Size(size)}) — проверка займёт больше времени",
+            Common.Format.Text(Strings.Engine_LargeFile, Common.Format.Size(size)),
             item.FullPath,
             IssueCode.LargeFile));
 

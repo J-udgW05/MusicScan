@@ -33,8 +33,221 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Check_AccessDenied" xml:space="preserve">
+    <value>Windows не дал прочитать файл — проверить его не получилось.</value>
+  </data>
+  <data name="Check_BrokenTagText" xml:space="preserve">
+    <value>Теги прочитаны не в той кодировке — вместо букв кракозябры: {0}.</value>
+  </data>
+  <data name="Check_Clipping" xml:space="preserve">
+    <value>Звук упирается в предел громкости: {0:0.#} % отсчётов.</value>
+  </data>
+  <data name="Check_Clipping_Detail" xml:space="preserve">
+    <value>{0} отсчётов из {1}</value>
+  </data>
+  <data name="Check_DcOffset" xml:space="preserve">
+    <value>У записи смещён ноль — признак плохой оцифровки.</value>
+  </data>
+  <data name="Check_DcOffset_Detail" xml:space="preserve">
+    <value>Постоянная составляющая {0:0.###}</value>
+  </data>
+  <data name="Check_DecoderFailed" xml:space="preserve">
+    <value>Механизм декодирования отказал.</value>
+  </data>
+  <data name="Check_DigitalSilence" xml:space="preserve">
+    <value>Файл читается, но звука в нём нет — сплошная тишина.</value>
+  </data>
+  <data name="Check_DigitalSilence_Detail" xml:space="preserve">
+    <value>Наибольший уровень {0:0.####}</value>
+  </data>
+  <data name="Check_Dropout" xml:space="preserve">
+    <value>Внутри трека провал в тишину на {0:0.#} с — похоже на потерянный кусок.</value>
+  </data>
+  <data name="Check_Dropout_Detail" xml:space="preserve">
+    <value>Тишина {0} отсчётов подряд при средней громкости {1:0.###}</value>
+  </data>
+  <data name="Check_EmptyFile" xml:space="preserve">
+    <value>Файл пустой (0 байт) — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Check_EmptyFile_Detail" xml:space="preserve">
+    <value>Размер файла равен нулю</value>
+  </data>
+  <data name="Check_ExtensionMismatch" xml:space="preserve">
+    <value>Расширение не совпадает с содержимым: это {0}, а не {1}.</value>
+  </data>
+  <data name="Check_ExtensionMismatch_Detail" xml:space="preserve">
+    <value>Сигнатура → {0}</value>
+  </data>
+  <data name="Check_FileDamaged" xml:space="preserve">
+    <value>Файл повреждён.</value>
+  </data>
+  <data name="Check_FileNotFound" xml:space="preserve">
+    <value>Файл не найден — он исчез с диска после того, как программа его нашла.</value>
+  </data>
+  <data name="Check_LargeFile" xml:space="preserve">
+    <value>Очень большой файл ({0}) — проверка займёт больше времени.</value>
+  </data>
+  <data name="Check_LargeFile_Detail" xml:space="preserve">
+    <value>Размер {0} Б, порог {1} Б</value>
+  </data>
+  <data name="Check_SilentCorruption" xml:space="preserve">
+    <value>Содержимое файла изменилось само собой: размер и дата прежние, а байты другие.</value>
+  </data>
+  <data name="Check_SilentCorruption_Detail" xml:space="preserve">
+    <value>Было {0}, стало {1}; прошлая проверка {2:dd.MM.yyyy}</value>
+  </data>
+  <data name="Check_TagsMissing" xml:space="preserve">
+    <value>Не заполнены теги: {0}. Это не повреждение файла.</value>
+  </data>
+  <data name="Check_TagsUnreadable" xml:space="preserve">
+    <value>Теги не читаются — с самим аудио при этом всё в порядке.</value>
+  </data>
+  <data name="Check_Timeout" xml:space="preserve">
+    <value>Проверка заняла больше {0} с и была прервана — файл подозрительный.</value>
+  </data>
+  <data name="Check_Timeout_Detail" xml:space="preserve">
+    <value>Таймаут {0} с</value>
+  </data>
+  <data name="Check_Timeout_StructureDetail" xml:space="preserve">
+    <value>Таймаут {0} с на разборе структуры</value>
+  </data>
+  <data name="Check_TranscodeBitrate" xml:space="preserve">
+    <value>Похоже на перекодирование: битрейт {0} кбит/с, а звук обрывается на {1:0.#} кГц.</value>
+  </data>
+  <data name="Check_TranscodeBitrate_Detail" xml:space="preserve">
+    <value>Верхняя граница {0:0} Гц, кусков {1}</value>
+  </data>
+  <data name="Check_TranscodeLossless" xml:space="preserve">
+    <value>Похоже на перекодирование: формат без потерь, а звук обрывается на {0:0.#} кГц.</value>
+  </data>
+  <data name="Check_TranscodeLossless_Detail" xml:space="preserve">
+    <value>Верхняя граница {0:0} Гц из возможных {1:0} Гц, кусков {2}</value>
+  </data>
+  <data name="Check_Truncated" xml:space="preserve">
+    <value>Файл обрывается: звука в нём меньше, чем обещает заголовок.</value>
+  </data>
+  <data name="Check_Truncated_Detail" xml:space="preserve">
+    <value>Заявлено {0:0.#} с, прочитано {1:0.#} с</value>
+  </data>
+  <data name="Check_Unexpected" xml:space="preserve">
+    <value>Проверить файл не удалось из-за непредвиденной ошибки.</value>
+  </data>
+  <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
+    <value>{0}; контрольные суммы формата не сверялись</value>
+  </data>
+  <data name="Depth_ChecksumsVerified" xml:space="preserve">
+    <value>{0}; контрольные суммы формата сверены</value>
+  </data>
+  <data name="Depth_Full" xml:space="preserve">
+    <value>каждый файл прочитан целиком</value>
+  </data>
+  <data name="Depth_Quick" xml:space="preserve">
+    <value>прочитано начало каждого файла</value>
+  </data>
+  <data name="Depth_Sampled" xml:space="preserve">
+    <value>прочитаны начало, конец и середина каждого файла</value>
+  </data>
   <data name="Duration_LessThanSecond" xml:space="preserve">
     <value>меньше секунды</value>
+  </data>
+  <data name="Engine_AlreadyRunning" xml:space="preserve">
+    <value>Проверка уже идёт.</value>
+  </data>
+  <data name="Engine_LargeFile" xml:space="preserve">
+    <value>Очень большой файл ({0}) — проверка займёт больше времени</value>
+  </data>
+  <data name="Engine_PlaylistMissing" xml:space="preserve">
+    <value>В плейлисте не найдено файлов: {0}</value>
+  </data>
+  <data name="Engine_UnexpectedFailure" xml:space="preserve">
+    <value>Проверка прервана непредвиденной ошибкой: {0}</value>
+  </data>
+  <data name="Finding_Duplicate" xml:space="preserve">
+    <value>Дубликат</value>
+  </data>
+  <data name="Finding_MissingTracks" xml:space="preserve">
+    <value>Пропуски в нумерации</value>
+  </data>
+  <data name="Finding_MixedAlbums" xml:space="preserve">
+    <value>Разные альбомы в папке</value>
+  </data>
+  <data name="Finding_MixedFormats" xml:space="preserve">
+    <value>Разные форматы</value>
+  </data>
+  <data name="Finding_NoCover" xml:space="preserve">
+    <value>Нет обложки</value>
+  </data>
+  <data name="Finding_Other" xml:space="preserve">
+    <value>Замечание</value>
+  </data>
+  <data name="Issue_Short_AudioDropout" xml:space="preserve">
+    <value>Провал в тишину</value>
+  </data>
+  <data name="Issue_Short_BrokenTagText" xml:space="preserve">
+    <value>Кракозябры в тегах</value>
+  </data>
+  <data name="Issue_Short_ChecksumMismatch" xml:space="preserve">
+    <value>Сумма не сошлась</value>
+  </data>
+  <data name="Issue_Short_CheckTimeout" xml:space="preserve">
+    <value>Долгая проверка</value>
+  </data>
+  <data name="Issue_Short_Clipping" xml:space="preserve">
+    <value>Перегрузка</value>
+  </data>
+  <data name="Issue_Short_ContainerDamaged" xml:space="preserve">
+    <value>Структура разрушена</value>
+  </data>
+  <data name="Issue_Short_CueMarksBeyondFile" xml:space="preserve">
+    <value>Метки за пределом файла</value>
+  </data>
+  <data name="Issue_Short_DcOffset" xml:space="preserve">
+    <value>Смещение нуля</value>
+  </data>
+  <data name="Issue_Short_DigitalSilence" xml:space="preserve">
+    <value>Нет звука</value>
+  </data>
+  <data name="Issue_Short_ExtensionMismatch" xml:space="preserve">
+    <value>Не то расширение</value>
+  </data>
+  <data name="Issue_Short_LargeFile" xml:space="preserve">
+    <value>Большой файл</value>
+  </data>
+  <data name="Issue_Short_LockedCheckedViaCopy" xml:space="preserve">
+    <value>Проверен по копии</value>
+  </data>
+  <data name="Issue_Short_LockedWaitTimeout" xml:space="preserve">
+    <value>Был занят</value>
+  </data>
+  <data name="Issue_Short_MetadataProblem" xml:space="preserve">
+    <value>Нет тегов</value>
+  </data>
+  <data name="Issue_Short_PasswordProtected" xml:space="preserve">
+    <value>Защищён</value>
+  </data>
+  <data name="Issue_Short_SilentCorruption" xml:space="preserve">
+    <value>Изменился сам собой</value>
+  </data>
+  <data name="Issue_Short_TranscodeSuspected" xml:space="preserve">
+    <value>Срезан верх</value>
+  </data>
+  <data name="Issue_Short_Truncated" xml:space="preserve">
+    <value>Файл обрывается</value>
+  </data>
+  <data name="Lock_CheckedViaCopy" xml:space="preserve">
+    <value>Файл был занят другой программой — проверен по временной копии.</value>
+  </data>
+  <data name="Lock_CopyFailed" xml:space="preserve">
+    <value>Файл занят, и сделать его временную копию не удалось.</value>
+  </data>
+  <data name="Lock_OwnerDetectionOff" xml:space="preserve">
+    <value>Определение владельца выключено в настройках</value>
+  </data>
+  <data name="Lock_Skipped" xml:space="preserve">
+    <value>Файл занят другой программой и пропущен.</value>
+  </data>
+  <data name="Lock_WaitTimeout" xml:space="preserve">
+    <value>Файл оставался занят все {0} с ожидания — проверить его не удалось.</value>
   </data>
   <data name="Plural_Files_Few" xml:space="preserve">
     <value>{0} файла</value>
@@ -72,8 +285,71 @@
   <data name="Plural_Seconds_One" xml:space="preserve">
     <value>{0} секунда</value>
   </data>
+  <data name="Probe_AudioReadFailed" xml:space="preserve">
+    <value>Чтение аудиоданных прервалось ошибкой.</value>
+  </data>
+  <data name="Probe_DecodeStartFailed" xml:space="preserve">
+    <value>Не удалось начать декодирование файла.</value>
+  </data>
+  <data name="Probe_EmptyFile" xml:space="preserve">
+    <value>Файл пустой — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Probe_EngineFailure" xml:space="preserve">
+    <value>Механизм декодирования аудио отказал.</value>
+  </data>
+  <data name="Probe_PasswordProtected" xml:space="preserve">
+    <value>Файл защищён паролем или лицензией.</value>
+  </data>
+  <data name="Probe_Unknown" xml:space="preserve">
+    <value>Неизвестная ошибка.</value>
+  </data>
+  <data name="Result_Decoded" xml:space="preserve">
+    <value>Файл прочитан и декодирован без ошибок.</value>
+  </data>
+  <data name="Result_StructureOnly" xml:space="preserve">
+    <value>Файл прочитан, структура цела. Контрольных сумм в этом формате нет — проверены объявленные длины.</value>
+  </data>
+  <data name="Result_Unchanged" xml:space="preserve">
+    <value>Файл не изменился с прошлой проверки — проверен по отпечатку содержимого.</value>
+  </data>
+  <data name="Result_Verified" xml:space="preserve">
+    <value>Файл прочитан, контрольные суммы формата сошлись (проверено единиц: {0}).</value>
+  </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Язык</value>
+  </data>
+  <data name="Status_Corrupted" xml:space="preserve">
+    <value>Повреждён</value>
+  </data>
+  <data name="Status_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Status_Skipped" xml:space="preserve">
+    <value>Пропущен</value>
+  </data>
+  <data name="Status_Unknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="Status_Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Tag_Album" xml:space="preserve">
+    <value>альбом</value>
+  </data>
+  <data name="Tag_Artist" xml:space="preserve">
+    <value>исполнитель</value>
+  </data>
+  <data name="Tag_Field_Album" xml:space="preserve">
+    <value>Альбом</value>
+  </data>
+  <data name="Tag_Field_Artist" xml:space="preserve">
+    <value>Исполнитель</value>
+  </data>
+  <data name="Tag_Field_Title" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Tag_Title" xml:space="preserve">
+    <value>название</value>
   </data>
   <data name="Unit_B" xml:space="preserve">
     <value>Б</value>

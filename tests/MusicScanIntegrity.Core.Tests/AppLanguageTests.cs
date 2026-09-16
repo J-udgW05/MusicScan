@@ -114,7 +114,7 @@ public sealed class AppLanguageTests
     public void English_catalogue_has_no_cyrillic()
     {
         string[] offenders = [.. ReadCatalogue("Strings.en.resx")
-            .Where(pair => pair.Value.Any(c => c is >= 'Ѐ' and <= 'ӿ'))
+            .Where(pair => pair.Value.Any(c => c is >= '\u0400' and <= '\u04FF'))
             .Select(pair => pair.Key)];
 
         Assert.Empty(offenders);
