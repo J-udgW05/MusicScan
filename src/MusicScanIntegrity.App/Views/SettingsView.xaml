@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
              xmlns:vm="clr-namespace:MusicScanIntegrity.App.ViewModels"
+             xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
              xmlns:core="clr-namespace:MusicScanIntegrity.Core.Settings;assembly=MusicScanIntegrity.Core"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -73,6 +74,19 @@
                                              Style="{StaticResource ThemeChoice}" Content="Тёмная"
                                              IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.Dark}}" />
                             </UniformGrid>
+
+                            <Grid Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource Text.Base}" VerticalAlignment="Center"
+                                           Text="{svc:T Settings_Language}" />
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                          AutomationProperties.Name="{svc:T Settings_Language}"
+                                          ItemsSource="{x:Static vm:SettingsViewModel.LanguageOptions}"
+                                          SelectedItem="{Binding Language}" />
+                            </Grid>
 
                             <TextBlock Style="{StaticResource Text.Base}" Text="Цвета статусов" Margin="0,18,0,2" />
 

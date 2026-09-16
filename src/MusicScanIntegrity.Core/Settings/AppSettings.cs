@@ -215,6 +215,13 @@ public sealed class AppSettings
     /// </remarks>
     public bool? Animations { get; set; }
 
+    /// <summary>Interface language code; <see langword="null" /> means never chosen.</summary>
+    /// <remarks>
+    /// Resolved once on first run from the Windows language and region, then
+    /// written back; see <see cref="AppLanguage.Resolve" />.
+    /// </remarks>
+    public string? Language { get; set; }
+
     // ── Derived values ───────────────────────────────────────────────────────
 
     /// <summary>
@@ -286,6 +293,7 @@ public sealed class AppSettings
         ShowFullPaths = ShowFullPaths,
         MicaEffect = MicaEffect,
         Animations = Animations,
+        Language = Language,
         MonospacePaths = MonospacePaths,
         ShowStatusBar = ShowStatusBar,
     };

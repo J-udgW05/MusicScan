@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,7 +88,20 @@ public partial class App : Application
 
         ISettingsService settings = _host.Services.GetRequiredService<ISettingsService>();
 
+        // Captured before the language is applied, which overwrites the UI culture.
+        CultureInfo systemCulture = CultureInfo.CurrentUICulture;
+
         bool firstRun = await settings.LoadAsync();
+
+        // Pick the language before anything is shown. Like the effects below,
+        // a first-run choice is written back so the file decides from then on.
+        if (settings.Current.Language is null)
+        {
+            settings.Current.Language = AppLanguage.Resolve(null, systemCulture.TwoLetterISOLanguageName, SystemRegion());
+            await settings.SaveAsync();
+        }
+
+        AppLanguage.Apply(settings.Current.Language);
 
         // Effects the user has not decided on yet are taken from the system and
         // written straight to the settings file. From then on the file decides.
@@ -195,6 +209,18 @@ public partial class App : Application
         current.Animations = VisualEffects.ResolveAnimations(current.Animations, system);
 
         return Task.FromResult(true);
+    }
+
+    private static string? SystemRegion()
+    {
+        try
+        {
+            return RegionInfo.CurrentRegion.TwoLetterISORegionName;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

@@ -17,6 +17,13 @@ namespace MusicScanIntegrity.App.ViewModels;
 public sealed partial class SettingsViewModel : ObservableObject
 {
     /// <summary>Preset large-file thresholds.</summary>
+    /// <summary>Interface languages, each named in its own language.</summary>
+    public static readonly IReadOnlyList<LanguageOption> LanguageOptions =
+    [
+        new(AppLanguage.Russian, "Русский"),
+        new(AppLanguage.English, "English"),
+    ];
+
     public static readonly IReadOnlyList<ThresholdOption> ThresholdOptions =
     [
         new(100, "100 МБ"),
@@ -148,6 +155,9 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private ListDensity _listDensity;
+
+    [ObservableProperty]
+    private LanguageOption _language = LanguageOptions[0];
 
     /// <summary>Results row height for the selected density.</summary>
     /// <remarks>
@@ -343,6 +353,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         _draft = _settingsService.Current.Clone();
 
         Theme = _draft.Theme;
+        Language = LanguageOptions.FirstOrDefault(o => o.Code == (_draft.Language ?? AppLanguage.Current))
+            ?? LanguageOptions[0];
         ListDensity = _draft.ListDensity;
         ShowFullPaths = _draft.ShowFullPaths;
         MonospacePaths = _draft.MonospacePaths;
@@ -412,6 +424,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         AppSettings settings = _settingsService.Current.Clone();
 
         settings.Theme = Theme;
+        settings.Language = Language.Code;
         settings.ListDensity = ListDensity;
         settings.ShowFullPaths = ShowFullPaths;
         settings.MonospacePaths = MonospacePaths;
@@ -478,6 +491,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
 
         _themeService.Apply(settings);
+        AppLanguage.Apply(settings.Language ?? AppLanguage.Current);
 
         _loading = true;
         try
@@ -656,6 +670,13 @@ public sealed partial class SettingsViewModel : ObservableObject
             row.Override = value;
             row.EffectiveHex = value ?? _themeService.DefaultColorHex(row.Status);
         }
+    }
+
+    /// <summary>An interface language option.</summary>
+    public sealed record LanguageOption(string Code, string Label)
+    {
+        /// <inheritdoc />
+        public override string ToString() => Label;
     }
 
     /// <summary>A large-file threshold option.</summary>

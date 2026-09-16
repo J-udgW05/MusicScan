@@ -138,6 +138,13 @@ public sealed class JsonSettingsService : ISettingsService
             .Distinct(StringComparer.OrdinalIgnoreCase)];
 
         settings.StatusColors ??= new StatusColorOverrides();
+
+        // An unknown language code counts as never chosen, so first-run
+        // resolution picks one again.
+        settings.Language = AppLanguage.IsSupported(settings.Language)
+            ? settings.Language!.ToLowerInvariant()
+            : null;
+
         return settings;
     }
 

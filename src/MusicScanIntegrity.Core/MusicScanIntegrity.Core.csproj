@@ -21,4 +21,16 @@
     <InternalsVisibleTo Include="MusicScanIntegrity.Core.Tests" />
   </ItemGroup>
 
+  <!-- User-facing strings. The neutral resources are Russian; English lives in a
+       satellite assembly. A typed accessor class is generated at build time. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>MusicScanIntegrity.Core.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
