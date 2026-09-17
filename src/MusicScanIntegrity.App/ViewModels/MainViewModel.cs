@@ -679,6 +679,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         if (row.ActionDismisses)
         {
             LiveWarnings.Remove(row);
+            LiveWarningTotal--;
             return;
         }
 
@@ -791,14 +792,16 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             // The live list is capped on purpose; it is for attention during the scan,
             // and the full picture is on the results tab. The counter counts every
             // warning, otherwise the header would read "50" with three hundred findings.
-            LiveWarningTotal++;
-
             if (LiveWarnings.Count >= LiveWarningLimit)
             {
                 LiveWarnings.RemoveAt(LiveWarnings.Count - 1);
             }
 
             LiveWarnings.Insert(0, new LiveWarningRow(warning.Title, warning.Path, warning.Code));
+
+            // Counted after the insert: the caption compares the total with the rows
+            // shown and would otherwise claim a hidden warning that is not there.
+            LiveWarningTotal++;
         });
 
     /// <summary>Inspects finished results: albums per folder and duplicates.</summary>
