@@ -2,6 +2,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
+using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.Core.Common;
 using MusicScanIntegrity.Core.Resources;
 
@@ -39,6 +40,7 @@ public partial class ColorPickDialog
     public ColorPickDialog(string label, string currentHex)
     {
         InitializeComponent();
+        UiScale.Apply(this);
 
         TitleText.Text = Strings.Color_Title;
         LabelText.Text = label;

@@ -14,6 +14,7 @@ public partial class ScanFinishedDialog
     public ScanFinishedDialog(ScanSummary summary)
     {
         InitializeComponent();
+        UiScale.Apply(this);
 
         ScanCounters counters = summary.Counters;
 

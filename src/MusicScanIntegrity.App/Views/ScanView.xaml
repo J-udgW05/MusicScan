@@ -76,10 +76,19 @@
                      button acts, and inside the message frame it read as part of the message.
                      Outside it is the window's primary action, hence wider than the others.
                      It is shorter than the banner and vertically centred; full height looked
-                     like a slab next to two lines of text. -->
-                <StackPanel Orientation="Horizontal" Margin="0,16,0,0"
-                            HorizontalAlignment="Left"
-                            Visibility="{Binding IsOfferVisible, Converter={StaticResource BoolToVisibility}}">
+                     like a slab next to two lines of text.
+
+                     A dock panel rather than a horizontal stack: a stack measures the banner
+                     with unlimited width, so the text never wrapped and pushed the button out
+                     of the column. -->
+                <DockPanel Margin="0,16,0,0" HorizontalAlignment="Left" LastChildFill="True"
+                           Visibility="{Binding IsOfferVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource Button.Accent}" Content="{svc:T Scan_Start}"
+                            Margin="12,0,0,0" VerticalAlignment="Center"
+                            Padding="34,12" FontSize="16"
+                            AutomationProperties.Name="{svc:T Ui_StartScan}"
+                            Command="{Binding StartCommand}" />
+
                     <Border CornerRadius="12" Padding="22,16"
                             Background="{DynamicResource Brush.AccSoft}"
                             BorderBrush="{DynamicResource Brush.Acc}" BorderThickness="1">
@@ -91,13 +100,7 @@
                                        TextWrapping="Wrap" Text="{Binding OfferSubtitle}" />
                         </StackPanel>
                     </Border>
-
-                    <Button Style="{StaticResource Button.Accent}" Content="{svc:T Scan_Start}"
-                            Margin="12,0,0,0" VerticalAlignment="Center"
-                            Padding="34,12" FontSize="16"
-                            AutomationProperties.Name="{svc:T Ui_StartScan}"
-                            Command="{Binding StartCommand}" />
-                </StackPanel>
+                </DockPanel>
 
                 <!-- Scan progress -->
                 <Border Style="{StaticResource Card.Padded}" Margin="0,16,0,0"

@@ -12,6 +12,7 @@ public partial class AboutDialog
         ArgumentNullException.ThrowIfNull(info);
 
         InitializeComponent();
+        UiScale.Apply(this);
 
         VersionLine.Text = Core.Common.Format.Text(Strings.About_Version, info.Version);
         BuildLine.Text = $"{info.Version} · {info.BuildDate}";
@@ -21,6 +22,6 @@ public partial class AboutDialog
             ? Core.Common.Format.Text(Strings.About_Plugins, string.Join(", ", info.Plugins))
             : Strings.About_NoPlugins;
 
-        Loaded += (_, _) => Logo.Source = AppMark.ForSize(this, Logo.Width);
+        Loaded += (_, _) => Logo.Source = AppMark.ForSize(this, Logo.Width * UiScale.Factor);
     }
 }

@@ -5,6 +5,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:MusicScanIntegrity.App.Controls"
+                    xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
     <!-- ── Focus ring ────────────────────────────────────────────────────
@@ -297,7 +298,8 @@
                                     BorderThickness="1"
                                     CornerRadius="{StaticResource Radius.Control}"
                                     Padding="4"
-                                    Margin="0,0,8,8">
+                                    Margin="0,0,8,8"
+                                    LayoutTransform="{x:Static svc:UiScale.Transform}">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.22" Color="Black" />
                                 </Border.Effect>

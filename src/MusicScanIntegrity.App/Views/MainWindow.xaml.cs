@@ -20,6 +20,7 @@ public partial class MainWindow
         _dialogs = dialogs;
 
         InitializeComponent();
+        UiScale.Apply(this);
         DataContext = viewModel;
 
         SetUpTaskbarProgress(viewModel);

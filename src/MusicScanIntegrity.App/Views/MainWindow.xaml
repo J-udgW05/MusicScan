@@ -3,7 +3,8 @@
 
     Opens at 880 px, which is also the minimum width: at 880 the results filter
     row already wraps and the table reaches the limit of readability. Nothing
-    larger is needed by default since the layout stretches.
+    larger is needed by default since the layout stretches. Sizes here are design
+    values; UiScale enlarges the window and its content at startup.
 -->
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.MainWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

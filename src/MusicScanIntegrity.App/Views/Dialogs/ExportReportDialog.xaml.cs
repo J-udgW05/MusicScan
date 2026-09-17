@@ -18,6 +18,7 @@ public partial class ExportReportDialog
     public ExportReportDialog(ExportContext context)
     {
         InitializeComponent();
+        UiScale.Apply(this);
 
         _context = context;
         _folder = context.DefaultFolder;

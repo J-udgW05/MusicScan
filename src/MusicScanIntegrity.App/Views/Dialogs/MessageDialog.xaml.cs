@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
@@ -27,6 +28,7 @@ public partial class MessageDialog
         string? copyPath = null)
     {
         InitializeComponent();
+        UiScale.Apply(this);
 
         _copyPath = copyPath;
 

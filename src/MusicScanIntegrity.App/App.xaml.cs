@@ -81,6 +81,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        UiScale.RegisterPopups();
+
         // An unhandled exception must not take the app down silently.
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
