@@ -7,7 +7,7 @@
 ;   iscc /DAppVersion=1.2.3 installer\MusicScanIntegrity.iss
 
 #ifndef AppVersion
-  #error Версия не задана: передайте /DAppVersion=1.2.3
+  #error Version is not set: pass /DAppVersion=1.2.3
 #endif
 
 #define AppName        "Music Scan Integrity"
@@ -46,10 +46,10 @@ DefaultGroupName={#AppName}
 ; makes a silently missing page visible: otherwise the build passes and the
 ; wizard step is simply gone.
 #if FileExists(LicensePath)
-  #pragma message "Лицензия найдена, страница соглашения включена: " + LicensePath
+  #pragma message "Licence found, agreement page enabled: " + LicensePath
 LicenseFile={#LicensePath}
 #else
-  #pragma message "ЛИЦЕНЗИИ НЕТ, страницы соглашения не будет: " + LicensePath
+  #pragma message "NO LICENCE, the agreement page is skipped: " + LicensePath
 #endif
 
 OutputDir={#SourceRoot}artifacts
