@@ -28,6 +28,8 @@
             <conv:HexToBrushConverter x:Key="HexToBrush" />
             <conv:InvertBoolConverter x:Key="InvertBool" />
             <conv:EnumDisplayConverter x:Key="EnumDisplay" />
+            <conv:StatusBarVisibilityConverter x:Key="StatusBarVisibility" />
+            <conv:AllNotEmptyToVisibilityConverter x:Key="AllNotEmptyToVisibility" />
 
             <!-- Display captions for enum values and options in drop-downs. The second
                  binding re-runs the converter when the interface language changes. -->

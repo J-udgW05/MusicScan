@@ -195,10 +195,17 @@
         </Border>
 
         <!-- ── Status bar ────────────────────────────────────────────────── -->
+        <!-- The setting switches the bar on; an enabled bar still hides while empty. -->
         <Border Grid.Row="3" Background="{DynamicResource Brush.Mica}"
                 BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="0,1,0,0"
-                Padding="16,9"
-                Visibility="{Binding Settings.ShowStatusBar, Converter={StaticResource BoolToVisibility}}">
+                Padding="16,9">
+            <Border.Visibility>
+                <MultiBinding Converter="{StaticResource StatusBarVisibility}">
+                    <Binding Path="Settings.ShowStatusBar" />
+                    <Binding Path="StatusCounts" />
+                    <Binding Path="FolderPath" />
+                </MultiBinding>
+            </Border.Visibility>
             <!-- The path goes last and takes the remaining width: it is the longest item
                  and should be trimmed last. -->
             <DockPanel LastChildFill="True">
@@ -206,8 +213,14 @@
                            FontSize="12" Foreground="{DynamicResource Brush.Fg2}" />
 
                 <TextBlock DockPanel.Dock="Left" Text="|" Margin="14,0"
-                           Foreground="{DynamicResource Brush.Bd}" VerticalAlignment="Center"
-                           Visibility="{Binding FolderPath, Converter={StaticResource NotEmptyToVisibility}}" />
+                           Foreground="{DynamicResource Brush.Bd}" VerticalAlignment="Center">
+                    <TextBlock.Visibility>
+                        <MultiBinding Converter="{StaticResource AllNotEmptyToVisibility}">
+                            <Binding Path="StatusCounts" />
+                            <Binding Path="FolderPath" />
+                        </MultiBinding>
+                    </TextBlock.Visibility>
+                </TextBlock>
 
                 <TextBlock Text="{Binding FolderPath}" VerticalAlignment="Center"
                            FontSize="12" Foreground="{DynamicResource Brush.Fg2}"

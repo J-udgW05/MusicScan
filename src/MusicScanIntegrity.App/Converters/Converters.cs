@@ -220,3 +220,41 @@ public sealed class EnumDisplayConverter : IValueConverter, IMultiValueConverter
     public object[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
+
+/// <summary>
+/// Status bar visibility: the setting switches the bar on, and an enabled bar
+/// still hides while it has nothing to show.
+/// </summary>
+/// <remarks>Values: the setting, then every text the bar displays.</remarks>
+public sealed class StatusBarVisibilityConverter : IMultiValueConverter
+{
+    /// <summary>Whether the bar is shown.</summary>
+    public static bool IsVisible(bool enabled, params string?[] texts) =>
+        enabled && texts.Any(t => !string.IsNullOrWhiteSpace(t));
+
+    /// <inheritdoc />
+    public object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture) =>
+        IsVisible(values.Length > 0 && values[0] is true, [.. values.Skip(1).Select(v => v as string)])
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+    /// <inheritdoc />
+    public object[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+/// <summary>Visible only when every bound text is non-empty; used for separators.</summary>
+public sealed class AllNotEmptyToVisibilityConverter : IMultiValueConverter
+{
+    /// <summary>Whether every text has content.</summary>
+    public static bool AllPresent(params string?[] texts) =>
+        texts.Length > 0 && texts.All(t => !string.IsNullOrWhiteSpace(t));
+
+    /// <inheritdoc />
+    public object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture) =>
+        AllPresent([.. values.Select(v => v as string)]) ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <inheritdoc />
+    public object[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
