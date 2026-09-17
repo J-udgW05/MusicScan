@@ -242,6 +242,12 @@ public sealed class ScanEngine : IScanEngine, IDisposable
         ScanSummary summary = BuildSummary(
             discovery, startedAt, stopwatch.Elapsed, parallelism, _statuses, playlistResults, criticalFailure, settings);
 
+        // The summary has what it needs; on a large collection these maps hold
+        // hundreds of thousands of entries that would otherwise live until the
+        // next scan.
+        _statuses.Clear();
+        _durations.Clear();
+
         Finished?.Invoke(this, summary);
     }
 

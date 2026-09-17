@@ -209,7 +209,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _engine.Finished += OnFinished;
 
         _settingsService.Changed += OnSettingsChanged;
-        Settings.Applied += (_, _) => SyncQuickSettings();
+        Settings.Applied += OnSettingsApplied;
         AppLanguage.Changed += OnLanguageChanged;
 
         SyncQuickSettings();
@@ -983,9 +983,12 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _engine.Finished -= OnFinished;
         _settingsService.Changed -= OnSettingsChanged;
         AppLanguage.Changed -= OnLanguageChanged;
+        Settings.Applied -= OnSettingsApplied;
 
         _discoveryCts?.Dispose();
     }
+
+    private void OnSettingsApplied(object? sender, EventArgs e) => SyncQuickSettings();
 
     // ── Language ─────────────────────────────────────────────────────────
 

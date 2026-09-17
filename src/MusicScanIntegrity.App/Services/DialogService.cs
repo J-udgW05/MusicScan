@@ -209,6 +209,12 @@ public sealed class DialogService : IDialogService
         return dialog.DoNotShowAgain;
     }
 
+    /// <summary>Starts a process without keeping its handle open.</summary>
+    private static void Launch(ProcessStartInfo startInfo)
+    {
+        using Process? process = Process.Start(startInfo);
+    }
+
     /// <inheritdoc />
     public void RevealInExplorer(string path)
     {
@@ -216,11 +222,11 @@ public sealed class DialogService : IDialogService
         {
             if (File.Exists(path))
             {
-                Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
+                Launch(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
             }
             else if (Directory.Exists(path))
             {
-                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                Launch(new ProcessStartInfo(path) { UseShellExecute = true });
             }
         }
         catch (Exception)
@@ -234,7 +240,7 @@ public sealed class DialogService : IDialogService
     {
         try
         {
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            Launch(new ProcessStartInfo(path) { UseShellExecute = true });
         }
         catch (Exception)
         {

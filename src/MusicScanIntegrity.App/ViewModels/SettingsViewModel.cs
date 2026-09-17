@@ -15,7 +15,7 @@ namespace MusicScanIntegrity.App.ViewModels;
 /// <summary>
 /// Settings screen. Edits a copy of the settings and applies it as a whole.
 /// </summary>
-public sealed partial class SettingsViewModel : ObservableObject
+public sealed partial class SettingsViewModel : ObservableObject, IDisposable
 {
     /// <summary>Interface languages, each named in its own language.</summary>
     public static readonly IReadOnlyList<LanguageOption> LanguageOptions =
@@ -597,6 +597,9 @@ public sealed partial class SettingsViewModel : ObservableObject
             ? Strings.Settings_HistoryEmpty
             : Core.Common.Format.Count(count, "Plural_Settings_HistoryCount", _history.DatabasePath);
     }
+
+    /// <inheritdoc />
+    public void Dispose() => _settingsService.Changed -= OnSettingsChanged;
 
     /// <summary>Rebuilds captions assembled in code after the interface language changes.</summary>
     public void RefreshLanguage()

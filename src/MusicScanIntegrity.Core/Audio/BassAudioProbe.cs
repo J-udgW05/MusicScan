@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Buffers;
+using System.Runtime.InteropServices;
 using ManagedBass;
 using MusicScanIntegrity.Core.Analysis;
 using MusicScanIntegrity.Core.Resources;
@@ -153,8 +154,19 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         bool isTracker = TrackerExtensions.Contains(Path.GetExtension(filePath));
 
         // Registered before touching the library: shutdown waits for this
-        // counter to reach zero before freeing BASS.
+        // counter to reach zero before freeing BASS. The disposed flag is read
+        // again after registering, or a shutdown that started in between would
+        // free the library under this read.
         Interlocked.Increment(ref _activeProbes);
+
+        if (Volatile.Read(ref _disposed))
+        {
+            Interlocked.Decrement(ref _activeProbes);
+            return new AudioProbeResult(
+                AudioProbeOutcome.EngineFailure,
+                Strings.Bass_NotStarted,
+                Strings.Bass_NotInitialised);
+        }
 
         try
         {
@@ -380,7 +392,24 @@ public sealed class BassAudioProbe : IAudioProbe, IDisposable
         SampleSink sink,
         CancellationToken cancellationToken)
     {
-        byte[] buffer = new byte[ReadChunkBytes];
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(ReadChunkBytes);
+        try
+        {
+            return ReadRun(handle, targetBytes, sink, buffer, cancellationToken);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    private static ReadOutcome ReadRun(
+        int handle,
+        long targetBytes,
+        SampleSink sink,
+        byte[] buffer,
+        CancellationToken cancellationToken)
+    {
         long total = 0;
 
         while (total < targetBytes)
