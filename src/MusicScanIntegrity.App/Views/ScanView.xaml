@@ -295,7 +295,7 @@
                             <!-- MaxWidth, or the caption does not wrap and runs past the card edge. -->
                             <TextBlock Style="{StaticResource Text.Secondary}" TextWrapping="Wrap"
                                        MaxWidth="232"
-                                       Text="{svc:T Scan_Locked_ApplyToAll}" />
+                                       Text="{svc:T Settings_Locked_ApplyAll}" />
                         </CheckBox>
 
                         <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,10,0,0"
@@ -404,7 +404,7 @@
                             <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
                                        Text="{svc:T Ui_Recurse}" VerticalAlignment="Center" />
                             <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
-                                      AutomationProperties.Name="{svc:T Scan_Recurse_Name}"
+                                      AutomationProperties.Name="{svc:T Ui_Recurse}"
                                       IsChecked="{Binding Recursive}" />
                         </DockPanel>
 
@@ -416,25 +416,37 @@
                                       IsChecked="{Binding CheckMetadata}" />
                         </DockPanel>
 
-                        <DockPanel LastChildFill="False" Margin="0,7">
-                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
-                                       Text="{svc:T Scan_LargeFrom}" VerticalAlignment="Center" />
-                            <ComboBox DockPanel.Dock="Right" Style="{StaticResource ComboBox.Pill}"
-                                      MinWidth="94" AutomationProperties.Name="{svc:T Scan_LargeFrom_Name}"
+                        <!-- The label wraps rather than being cut off: the panel is narrow and
+                             these names match the settings screen. -->
+                        <Grid Margin="0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource Text.Base}" Margin="0,0,8,0"
+                                       Text="{svc:T Settings_LargeFrom}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                      MinWidth="80" AutomationProperties.Name="{svc:T Settings_LargeFrom}"
                                       ItemsSource="{x:Static vm:SettingsViewModel.ThresholdOptions}"
                                       ItemTemplate="{StaticResource EnumItemTemplate}"
                                       SelectedItem="{Binding Threshold}" />
-                        </DockPanel>
+                        </Grid>
 
-                        <DockPanel LastChildFill="False" Margin="0,7">
-                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
-                                       Text="{svc:T Scan_WaitAtMost}" VerticalAlignment="Center" />
-                            <ComboBox DockPanel.Dock="Right" Style="{StaticResource ComboBox.Pill}"
-                                      MinWidth="80" AutomationProperties.Name="{svc:T Scan_Timeout_Name}"
+                        <!-- The label wraps rather than being cut off: the panel is narrow and
+                             these names match the settings screen. -->
+                        <Grid Margin="0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource Text.Base}" Margin="0,0,8,0"
+                                       Text="{svc:T Settings_Timeout}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                      MinWidth="80" AutomationProperties.Name="{svc:T Settings_Timeout}"
                                       ItemsSource="{x:Static vm:SettingsViewModel.TimeoutOptions}"
                                       ItemTemplate="{StaticResource EnumItemTemplate}"
                                       SelectedItem="{Binding Timeout}" />
-                        </DockPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
 

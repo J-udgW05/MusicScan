@@ -152,7 +152,7 @@
                     </DockPanel>
 
                     <DockPanel LastChildFill="False" Margin="0,0,0,6">
-                        <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Secondary}" Text="{svc:T Ui_ExportReport}" />
+                        <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Secondary}" Text="{svc:T ReportTab_SaveReport}" />
                         <Border DockPanel.Dock="Right" Background="{DynamicResource Brush.Card}"
                                 BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1"
                                 CornerRadius="4" Padding="7,3">

@@ -147,7 +147,7 @@
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Density}" />
                                 </StackPanel>
                                 <ComboBox DockPanel.Dock="Right" Style="{StaticResource ComboBox.Pill}"
-                                          MinWidth="104" AutomationProperties.Name="{svc:T Settings_Density_Name}"
+                                          MinWidth="104" AutomationProperties.Name="{svc:T Settings_Density}"
                                           SelectedItem="{Binding ListDensity}"
                                           ItemTemplate="{StaticResource EnumItemTemplate}">
                                     <core:ListDensity>Normal</core:ListDensity>
@@ -167,7 +167,7 @@
                                 <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
                                            Text="{svc:T Settings_MonoPaths}" VerticalAlignment="Center" />
                                 <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_MonoPaths_Name}"
+                                          AutomationProperties.Name="{svc:T Settings_MonoPaths}"
                                           IsChecked="{Binding MonospacePaths}" />
                             </DockPanel>
 
@@ -350,7 +350,7 @@
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_DetectOwner}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_Locked_DetectOwner_Name}"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_DetectOwner}"
                                           IsChecked="{Binding DetectOwnerProcess}" />
                             </Grid>
                         </Border>
@@ -384,7 +384,7 @@
                                                Text="{svc:T Settings_Locked_OfferClose_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_Locked_OfferClose_Name}"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_OfferClose}"
                                           IsChecked="{Binding OfferCloseOwner}" />
                             </Grid>
                         </Border>
@@ -495,7 +495,7 @@
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_Recurse}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_Recurse_Name}"
+                                          AutomationProperties.Name="{svc:T Ui_Recurse}"
                                           IsChecked="{Binding Recursive}" />
                             </Grid>
                         </Border>
@@ -510,7 +510,7 @@
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_CheckTags}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_CheckTags_Name}"
+                                          AutomationProperties.Name="{svc:T Ui_CheckTags}"
                                           IsChecked="{Binding CheckMetadata}" />
                             </Grid>
                         </Border>
@@ -654,7 +654,7 @@
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_LargeFrom}" />
                                 </StackPanel>
-                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}" AutomationProperties.Name="{svc:T Settings_LargeFrom}"
                                           ItemsSource="{x:Static vm:SettingsViewModel.ThresholdOptions}"
                                           ItemTemplate="{StaticResource EnumItemTemplate}"
                                           SelectedItem="{Binding Threshold}" />
@@ -673,7 +673,7 @@
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                Text="{svc:T Settings_Timeout_Note}" />
                                 </StackPanel>
-                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}" AutomationProperties.Name="{svc:T Settings_Timeout}"
                                           ItemsSource="{x:Static vm:SettingsViewModel.TimeoutOptions}"
                                           ItemTemplate="{StaticResource EnumItemTemplate}"
                                           SelectedItem="{Binding Timeout}" />
@@ -861,7 +861,7 @@
                                     <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_IncludeOk}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="{svc:T Settings_IncludeOk_Name}"
+                                          AutomationProperties.Name="{svc:T Settings_IncludeOk}"
                                           IsChecked="{Binding IncludeOkFilesInReport}" />
                             </Grid>
                         </Border>

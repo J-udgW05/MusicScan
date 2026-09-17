@@ -400,7 +400,7 @@
     <value>Ask</value>
   </data>
   <data name="Enum_Locked_CloseOwner" xml:space="preserve">
-    <value>Close owner</value>
+    <value>Close the owning program</value>
   </data>
   <data name="Enum_Locked_Skip" xml:space="preserve">
     <value>Skip</value>
@@ -455,9 +455,6 @@
   </data>
   <data name="Export_Include_Corrupted" xml:space="preserve">
     <value>Corrupted files</value>
-  </data>
-  <data name="Export_Include_Ok" xml:space="preserve">
-    <value>Files that are OK</value>
   </data>
   <data name="Export_Include_Playlists" xml:space="preserve">
     <value>Broken playlist links</value>
@@ -754,7 +751,7 @@
     <value>{0} of the collection</value>
   </data>
   <data name="Html_OkExcluded" xml:space="preserve">
-    <value>The table only lists files with findings. {0} healthy files are not included (setting "Include healthy files in report").</value>
+    <value>The table only lists files with findings. {0} healthy files are not included (setting "Include files without findings in reports").</value>
   </data>
   <data name="Html_Search" xml:space="preserve">
     <value>Search by name or path</value>
@@ -844,7 +841,7 @@
     <value>The file seems to be free now; no program holds it.</value>
   </data>
   <data name="Lock_OwnerDetectionOff" xml:space="preserve">
-    <value>Owner detection is turned off in settings</value>
+    <value>The "Find out which process holds the file" setting is off</value>
   </data>
   <data name="Lock_OwnerUnknown" xml:space="preserve">
     <value>Could not determine which program holds the file.</value>
@@ -1426,7 +1423,7 @@
     <value>CORRUPTED</value>
   </data>
   <data name="ReportTab_DefaultFormat" xml:space="preserve">
-    <value>DEFAULT FORMAT</value>
+    <value>DEFAULT REPORT FORMAT</value>
   </data>
   <data name="ReportTab_Distribution" xml:space="preserve">
     <value>Status breakdown</value>
@@ -1438,7 +1435,7 @@
     <value>Showing {0} of {1} findings; the rest go into the report</value>
   </data>
   <data name="ReportTab_Folder" xml:space="preserve">
-    <value>FOLDER</value>
+    <value>REPORTS FOLDER</value>
   </data>
   <data name="ReportTab_Folders" xml:space="preserve">
     <value>Scanned folders</value>
@@ -1599,15 +1596,6 @@
   <data name="Scan_DropZone_Tip" xml:space="preserve">
     <value>Click to choose a folder, or drop it here</value>
   </data>
-  <data name="Scan_LargeFrom" xml:space="preserve">
-    <value>Large file from</value>
-  </data>
-  <data name="Scan_LargeFrom_Name" xml:space="preserve">
-    <value>Large file threshold</value>
-  </data>
-  <data name="Scan_Locked_ApplyToAll" xml:space="preserve">
-    <value>Do the same for all locked files</value>
-  </data>
   <data name="Scan_Locked_CloseOwner" xml:space="preserve">
     <value>Close the owning program</value>
   </data>
@@ -1632,9 +1620,6 @@
   <data name="Scan_Options" xml:space="preserve">
     <value>SCAN OPTIONS</value>
   </data>
-  <data name="Scan_Recurse_Name" xml:space="preserve">
-    <value>Include subfolders</value>
-  </data>
   <data name="Scan_Running" xml:space="preserve">
     <value>Scan in progress</value>
   </data>
@@ -1649,12 +1634,6 @@
   </data>
   <data name="Scan_Summary" xml:space="preserve">
     <value>SUMMARY</value>
-  </data>
-  <data name="Scan_Timeout_Name" xml:space="preserve">
-    <value>File check timeout</value>
-  </data>
-  <data name="Scan_WaitAtMost" xml:space="preserve">
-    <value>Wait for a file at most</value>
   </data>
   <data name="Settings_Albums" xml:space="preserve">
     <value>Check albums and find duplicates</value>
@@ -1680,9 +1659,6 @@
   <data name="Settings_Checksums_Note" xml:space="preserve">
     <value>FLAC and Ogg are verified by their checksums, MP3 and MP4 by structure</value>
   </data>
-  <data name="Settings_CheckTags_Name" xml:space="preserve">
-    <value>Metadata check</value>
-  </data>
   <data name="Settings_ClearHistory" xml:space="preserve">
     <value>Clear history</value>
   </data>
@@ -1703,9 +1679,6 @@
   </data>
   <data name="Settings_Density" xml:space="preserve">
     <value>Results list density</value>
-  </data>
-  <data name="Settings_Density_Name" xml:space="preserve">
-    <value>List density</value>
   </data>
   <data name="Settings_ExtensionMatch" xml:space="preserve">
     <value>Match extension against content</value>
@@ -1752,9 +1725,6 @@
   <data name="Settings_IncludeOk" xml:space="preserve">
     <value>Include files without findings in reports</value>
   </data>
-  <data name="Settings_IncludeOk_Name" xml:space="preserve">
-    <value>Include healthy files in reports</value>
-  </data>
   <data name="Settings_Iso" xml:space="preserve">
     <value>Check ISO disc images (SACD)</value>
   </data>
@@ -1765,7 +1735,7 @@
     <value>Language</value>
   </data>
   <data name="Settings_LargeFrom" xml:space="preserve">
-    <value>A file counts as large from</value>
+    <value>Large file from</value>
   </data>
   <data name="Settings_Locked" xml:space="preserve">
     <value>Locked files (in use by another process)</value>
@@ -1782,14 +1752,8 @@
   <data name="Settings_Locked_DetectOwner" xml:space="preserve">
     <value>Find out which process holds the file</value>
   </data>
-  <data name="Settings_Locked_DetectOwner_Name" xml:space="preserve">
-    <value>Detect the owning program</value>
-  </data>
   <data name="Settings_Locked_OfferClose" xml:space="preserve">
     <value>Offer to close that program</value>
-  </data>
-  <data name="Settings_Locked_OfferClose_Name" xml:space="preserve">
-    <value>Offer to close the owner</value>
   </data>
   <data name="Settings_Locked_OfferClose_Note" xml:space="preserve">
     <value>potentially dangerous</value>
@@ -1814,9 +1778,6 @@
   </data>
   <data name="Settings_MonoPaths" xml:space="preserve">
     <value>Fixed-width font for paths</value>
-  </data>
-  <data name="Settings_MonoPaths_Name" xml:space="preserve">
-    <value>Monospaced font for paths</value>
   </data>
   <data name="Settings_OfferStart" xml:space="preserve">
     <value>Offer to start right after choosing a folder</value>
@@ -1851,9 +1812,6 @@
   <data name="Settings_ReadMode_Note" xml:space="preserve">
     <value>sampled: the end and three points in the middle; full is more reliable but takes longer</value>
   </data>
-  <data name="Settings_Recurse_Name" xml:space="preserve">
-    <value>Recursive subfolder scan</value>
-  </data>
   <data name="Settings_RememberFolder" xml:space="preserve">
     <value>Remember the last folder</value>
   </data>
@@ -1879,7 +1837,7 @@
     <value>Restore the theme color</value>
   </data>
   <data name="Settings_ResetConfirm_Text" xml:space="preserve">
-    <value>All options return to their defaults: subfolders included, tag checking off, large file threshold 500 MB, timeout 60 seconds, theme follows the system.</value>
+    <value>All options return to their defaults, for example: "Include subfolders" on, "Check tags" off, "Large file from" 500 MB, "File timeout" 60 s, "Theme" System.</value>
   </data>
   <data name="Settings_ResetConfirm_Title" xml:space="preserve">
     <value>Reset all settings?</value>
@@ -1921,7 +1879,7 @@
     <value>File timeout</value>
   </data>
   <data name="Settings_Timeout_Note" xml:space="preserve">
-    <value>after that the file is marked suspicious</value>
+    <value>after that the file gets the Warning status</value>
   </data>
   <data name="Settings_Transcodes" xml:space="preserve">
     <value>Find transcoded files</value>
@@ -2012,9 +1970,6 @@
   </data>
   <data name="Ui_Corrupted" xml:space="preserve">
     <value>Corrupted</value>
-  </data>
-  <data name="Ui_ExportReport" xml:space="preserve">
-    <value>Export report</value>
   </data>
   <data name="Ui_GotIt" xml:space="preserve">
     <value>OK</value>

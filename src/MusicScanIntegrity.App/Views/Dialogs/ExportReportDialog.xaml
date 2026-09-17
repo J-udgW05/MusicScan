@@ -7,7 +7,7 @@
                  xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
                  xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="{svc:T Ui_ExportReport}"
+                 Title="{svc:T ReportTab_SaveReport}"
                  Width="420" SizeToContent="Height" ResizeMode="NoResize"
                  MinHeight="0"
                  WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -28,7 +28,7 @@
                 BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
             <ui:TitleBar Height="38" ButtonsForeground="{DynamicResource Brush.Fg2}" ShowMaximize="False" ShowMinimize="False">
                 <ui:TitleBar.Header>
-                    <TextBlock Text="{svc:T Ui_ExportReport}" Margin="14,0,0,0" VerticalAlignment="Center"
+                    <TextBlock Text="{svc:T ReportTab_SaveReport}" Margin="14,0,0,0" VerticalAlignment="Center"
                                FontSize="{StaticResource Size.TitleBar}"
                                Foreground="{DynamicResource Brush.Fg2}" />
                 </ui:TitleBar.Header>
@@ -83,7 +83,7 @@
 
             <CheckBox x:Name="IncludeOk" Style="{StaticResource CheckBox.Square}" Margin="0,9,0,0">
                 <TextBlock>
-                    <Run Text="{svc:T Export_Include_Ok}" Foreground="{DynamicResource Brush.Fg2}" />
+                    <Run Text="{svc:T Settings_IncludeOk}" Foreground="{DynamicResource Brush.Fg2}" />
                     <Run x:Name="OkCount" Foreground="{DynamicResource Brush.Fg3}" />
                 </TextBlock>
             </CheckBox>

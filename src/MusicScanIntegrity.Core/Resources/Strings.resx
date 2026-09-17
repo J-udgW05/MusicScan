@@ -400,7 +400,7 @@
     <value>Спрашивать</value>
   </data>
   <data name="Enum_Locked_CloseOwner" xml:space="preserve">
-    <value>Закрыть владельца</value>
+    <value>Закрыть программу-владельца</value>
   </data>
   <data name="Enum_Locked_Skip" xml:space="preserve">
     <value>Пропускать</value>
@@ -455,9 +455,6 @@
   </data>
   <data name="Export_Include_Corrupted" xml:space="preserve">
     <value>Повреждённые файлы</value>
-  </data>
-  <data name="Export_Include_Ok" xml:space="preserve">
-    <value>Файлы «в порядке»</value>
   </data>
   <data name="Export_Include_Playlists" xml:space="preserve">
     <value>Битые ссылки плейлистов</value>
@@ -754,7 +751,7 @@
     <value>{0} коллекции</value>
   </data>
   <data name="Html_OkExcluded" xml:space="preserve">
-    <value>В таблице только файлы с замечаниями. Исправных {0} — они в отчёт не включены (настройка «Добавлять в отчёт исправные файлы»).</value>
+    <value>В таблице только файлы с замечаниями. Исправных {0} — они в отчёт не включены (настройка «Включать в отчёт файлы без замечаний»).</value>
   </data>
   <data name="Html_Search" xml:space="preserve">
     <value>Поиск по имени или пути</value>
@@ -844,7 +841,7 @@
     <value>Похоже, файл уже освободился — ни одна программа его не держит.</value>
   </data>
   <data name="Lock_OwnerDetectionOff" xml:space="preserve">
-    <value>Определение владельца выключено в настройках</value>
+    <value>Настройка «Узнавать, какой процесс держит файл» выключена</value>
   </data>
   <data name="Lock_OwnerUnknown" xml:space="preserve">
     <value>Определить программу-владельца не удалось.</value>
@@ -1426,7 +1423,7 @@
     <value>ПОВРЕЖДЕНО</value>
   </data>
   <data name="ReportTab_DefaultFormat" xml:space="preserve">
-    <value>ФОРМАТ ПО УМОЛЧАНИЮ</value>
+    <value>ФОРМАТ ОТЧЁТА ПО УМОЛЧАНИЮ</value>
   </data>
   <data name="ReportTab_Distribution" xml:space="preserve">
     <value>Распределение по статусам</value>
@@ -1438,7 +1435,7 @@
     <value>Показаны {0} замечаний из {1} — остальные попадут в отчёт</value>
   </data>
   <data name="ReportTab_Folder" xml:space="preserve">
-    <value>ПАПКА</value>
+    <value>ПАПКА ДЛЯ ОТЧЁТОВ</value>
   </data>
   <data name="ReportTab_Folders" xml:space="preserve">
     <value>Проверенные папки</value>
@@ -1599,15 +1596,6 @@
   <data name="Scan_DropZone_Tip" xml:space="preserve">
     <value>Щёлкните, чтобы выбрать папку, или перетащите её сюда</value>
   </data>
-  <data name="Scan_LargeFrom" xml:space="preserve">
-    <value>Большой файл — от</value>
-  </data>
-  <data name="Scan_LargeFrom_Name" xml:space="preserve">
-    <value>Порог большого файла</value>
-  </data>
-  <data name="Scan_Locked_ApplyToAll" xml:space="preserve">
-    <value>Поступать так же со всеми занятыми файлами</value>
-  </data>
   <data name="Scan_Locked_CloseOwner" xml:space="preserve">
     <value>Закрыть программу-владельца</value>
   </data>
@@ -1632,9 +1620,6 @@
   <data name="Scan_Options" xml:space="preserve">
     <value>ПАРАМЕТРЫ ПРОВЕРКИ</value>
   </data>
-  <data name="Scan_Recurse_Name" xml:space="preserve">
-    <value>Обходить подпапки</value>
-  </data>
   <data name="Scan_Running" xml:space="preserve">
     <value>Проверка выполняется</value>
   </data>
@@ -1649,12 +1634,6 @@
   </data>
   <data name="Scan_Summary" xml:space="preserve">
     <value>СВОДКА</value>
-  </data>
-  <data name="Scan_Timeout_Name" xml:space="preserve">
-    <value>Таймаут проверки файла</value>
-  </data>
-  <data name="Scan_WaitAtMost" xml:space="preserve">
-    <value>Ждать файл не дольше</value>
   </data>
   <data name="Settings_Albums" xml:space="preserve">
     <value>Проверять альбомы и искать копии</value>
@@ -1680,9 +1659,6 @@
   <data name="Settings_Checksums_Note" xml:space="preserve">
     <value>FLAC и Ogg сверяются по своим суммам, MP3 и MP4 - по структуре</value>
   </data>
-  <data name="Settings_CheckTags_Name" xml:space="preserve">
-    <value>Проверка метаданных</value>
-  </data>
   <data name="Settings_ClearHistory" xml:space="preserve">
     <value>Очистить историю</value>
   </data>
@@ -1703,9 +1679,6 @@
   </data>
   <data name="Settings_Density" xml:space="preserve">
     <value>Плотность списка результатов</value>
-  </data>
-  <data name="Settings_Density_Name" xml:space="preserve">
-    <value>Плотность списка</value>
   </data>
   <data name="Settings_ExtensionMatch" xml:space="preserve">
     <value>Сверять расширение с содержимым</value>
@@ -1752,9 +1725,6 @@
   <data name="Settings_IncludeOk" xml:space="preserve">
     <value>Включать в отчёт файлы без замечаний</value>
   </data>
-  <data name="Settings_IncludeOk_Name" xml:space="preserve">
-    <value>Включать в отчёт целые файлы</value>
-  </data>
   <data name="Settings_Iso" xml:space="preserve">
     <value>Проверять образы дисков ISO (SACD)</value>
   </data>
@@ -1782,14 +1752,8 @@
   <data name="Settings_Locked_DetectOwner" xml:space="preserve">
     <value>Узнавать, какой процесс держит файл</value>
   </data>
-  <data name="Settings_Locked_DetectOwner_Name" xml:space="preserve">
-    <value>Определять программу-владельца</value>
-  </data>
   <data name="Settings_Locked_OfferClose" xml:space="preserve">
     <value>Предлагать закрыть эту программу</value>
-  </data>
-  <data name="Settings_Locked_OfferClose_Name" xml:space="preserve">
-    <value>Предлагать закрыть владельца</value>
   </data>
   <data name="Settings_Locked_OfferClose_Note" xml:space="preserve">
     <value>потенциально опасно</value>
@@ -1814,9 +1778,6 @@
   </data>
   <data name="Settings_MonoPaths" xml:space="preserve">
     <value>Одинаковая ширина букв в путях</value>
-  </data>
-  <data name="Settings_MonoPaths_Name" xml:space="preserve">
-    <value>Моноширинный шрифт для путей</value>
   </data>
   <data name="Settings_OfferStart" xml:space="preserve">
     <value>Предлагать начать сразу после выбора папки</value>
@@ -1851,9 +1812,6 @@
   <data name="Settings_ReadMode_Note" xml:space="preserve">
     <value>выборочно - конец и три места в середине; целиком надёжнее, но занимает больше времени</value>
   </data>
-  <data name="Settings_Recurse_Name" xml:space="preserve">
-    <value>Рекурсивный обход подпапок</value>
-  </data>
   <data name="Settings_RememberFolder" xml:space="preserve">
     <value>Запоминать последнюю папку</value>
   </data>
@@ -1879,7 +1837,7 @@
     <value>Вернуть цвет темы</value>
   </data>
   <data name="Settings_ResetConfirm_Text" xml:space="preserve">
-    <value>Все параметры вернутся к значениям по умолчанию: рекурсия включена, проверка тегов выключена, порог большого файла 500 МБ, таймаут 60 секунд, тема — как в системе.</value>
+    <value>Все параметры вернутся к значениям по умолчанию, например: «Заходить в подпапки» — включено, «Проверять теги» — выключено, «Большим считается файл от» — 500 МБ, «Время ожидания файла» — 60 с, «Тема оформления» — как в системе.</value>
   </data>
   <data name="Settings_ResetConfirm_Title" xml:space="preserve">
     <value>Сбросить все настройки?</value>
@@ -1921,7 +1879,7 @@
     <value>Время ожидания файла</value>
   </data>
   <data name="Settings_Timeout_Note" xml:space="preserve">
-    <value>дальше - статус «подозрительный»</value>
+    <value>дальше файл получает статус «Предупреждение»</value>
   </data>
   <data name="Settings_Transcodes" xml:space="preserve">
     <value>Искать перекодированные файлы</value>
@@ -2012,9 +1970,6 @@
   </data>
   <data name="Ui_Corrupted" xml:space="preserve">
     <value>Повреждено</value>
-  </data>
-  <data name="Ui_ExportReport" xml:space="preserve">
-    <value>Экспорт отчёта</value>
   </data>
   <data name="Ui_GotIt" xml:space="preserve">
     <value>Понятно</value>
