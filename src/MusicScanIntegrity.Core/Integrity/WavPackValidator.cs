@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Integrity;
 
@@ -37,8 +38,8 @@ internal sealed class WavPackValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл обрывается внутри тега в начале.",
-                $"Тег занимает {bounds.AudioStart} Б, а файл короче",
+                Strings.Valid_TruncatedInLeadingTag,
+                Common.Format.Text(Strings.Valid_TagLongerThanFile, bounds.AudioStart),
                 truncated: true);
         }
 
@@ -55,8 +56,8 @@ internal sealed class WavPackValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается на заголовке блока.",
-                    $"Смещение {blockPosition} Б, осталось {remaining} Б",
+                    Strings.Mp4_TruncatedBoxHeader,
+                    Common.Format.Text(Strings.Mp4_TruncatedBoxHeader_Detail, blockPosition, remaining),
                     blocks,
                     blockPosition,
                     truncated: true);
@@ -69,9 +70,9 @@ internal sealed class WavPackValidator : IContainerValidator
                 return ContainerValidation.Damaged(
                     Format,
                     blocks == 0
-                        ? "Файл не начинается блоком WavPack — заголовок разрушен."
-                        : $"После блока {blocks} идут данные, которые блоком не являются.",
-                    $"Смещение {blockPosition} Б, ожидалась подпись «wvpk»",
+                        ? Strings.WavPack_BadStart
+                        : Common.Format.Text(Strings.WavPack_NotABlock, blocks),
+                    Common.Format.Text(Strings.WavPack_NotABlock_Detail, blockPosition),
                     blocks,
                     blockPosition);
             }
@@ -83,8 +84,8 @@ internal sealed class WavPackValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Структура файла разрушена: блок объявляет невозможную длину.",
-                    $"Смещение {blockPosition} Б, объявлено {size} Б",
+                    Strings.Mp4_ImpossibleLength,
+                    Common.Format.Text(Strings.WavPack_ImpossibleLength_Detail, blockPosition, size),
                     blocks,
                     blockPosition);
             }
@@ -93,8 +94,8 @@ internal sealed class WavPackValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    $"Файл обрывается на блоке {blocks + 1}: он начат, но не дописан.",
-                    $"Смещение {blockPosition} Б, обещано {size} Б, осталось {remaining} Б",
+                    Common.Format.Text(Strings.WavPack_BlockUnfinished, blocks + 1),
+                    Common.Format.Text(Strings.Mp4_BoxShort_Detail, blockPosition, size, remaining),
                     blocks,
                     blockPosition,
                     truncated: true);
@@ -108,14 +109,14 @@ internal sealed class WavPackValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет ни одного блока WavPack.",
-                "Файл пуст или это не WavPack",
+                Strings.WavPack_NoBlocks,
+                Strings.WavPack_NoBlocks_Detail,
                 truncated: true);
         }
 
         return ContainerValidation.StructureOnly(
             Format,
             blocks,
-            $"Блоков {blocks}; суммы WavPack считаются по распакованному звуку и здесь не сверяются");
+            Common.Format.Text(Strings.WavPack_StructureOnly, blocks));
     }
 }

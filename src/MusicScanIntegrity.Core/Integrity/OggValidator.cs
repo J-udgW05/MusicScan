@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Integrity;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
 /// Validates the Ogg container (Vorbis, Opus, FLAC-in-Ogg) by page checksums.
@@ -36,8 +38,8 @@ internal sealed class OggValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл обрывается внутри тега в начале.",
-                $"Тег занимает {bounds.AudioStart} Б, а файл короче",
+                Strings.Valid_TruncatedInLeadingTag,
+                Common.Format.Text(Strings.Valid_TagLongerThanFile, bounds.AudioStart),
                 truncated: true);
         }
 
@@ -54,8 +56,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается на середине страницы.",
-                    $"Смещение {pagePosition} Б, страниц проверено: {pages}",
+                    Strings.Ogg_TruncatedPage,
+                    Common.Format.Text(Strings.Ogg_TruncatedPage_Detail, pagePosition, pages),
                     pages,
                     pagePosition,
                     truncated: true);
@@ -68,9 +70,9 @@ internal sealed class OggValidator : IContainerValidator
                 return ContainerValidation.Damaged(
                     Format,
                     pages == 0
-                        ? "Файл не начинается страницей Ogg — заголовок разрушен."
-                        : $"После страницы {pages} идут данные, которые страницей не являются.",
-                    $"Смещение {pagePosition} Б, ожидалась подпись «OggS»",
+                        ? Strings.Ogg_BadStart
+                        : Common.Format.Text(Strings.Ogg_NotAPage, pages),
+                    Common.Format.Text(Strings.Ogg_NotAPage_Detail, pagePosition),
                     pages,
                     pagePosition);
             }
@@ -79,8 +81,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Неизвестная версия формата Ogg — файл повреждён или собран неверно.",
-                    $"Версия страницы {header[4]}, смещение {pagePosition} Б",
+                    Strings.Ogg_UnknownVersion,
+                    Common.Format.Text(Strings.Ogg_UnknownVersion_Detail, header[4], pagePosition),
                     pages,
                     pagePosition);
             }
@@ -91,8 +93,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается на таблице отрезков страницы.",
-                    $"Смещение {pagePosition} Б",
+                    Strings.Ogg_TruncatedSegments,
+                    Common.Format.Text(Strings.Valid_Offset, pagePosition),
                     pages,
                     pagePosition,
                     truncated: true);
@@ -111,8 +113,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается внутри страницы: данных меньше, чем обещано заголовком.",
-                    $"Смещение {pagePosition} Б, нужно {pageSize} Б",
+                    Strings.Ogg_TruncatedInsidePage,
+                    Common.Format.Text(Strings.Ogg_TruncatedInsidePage_Detail, pagePosition, pageSize),
                     pages,
                     pagePosition,
                     truncated: true);
@@ -126,8 +128,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    $"Контрольная сумма страницы {pages + 1} не сошлась — файл повреждён.",
-                    $"Смещение {pagePosition} Б, записано {stored:X8}, получилось {actual:X8}",
+                    Common.Format.Text(Strings.Ogg_PageChecksum, pages + 1),
+                    Common.Format.Text(Strings.Ogg_PageChecksum_Detail, pagePosition, stored, actual),
                     pages,
                     pagePosition,
                     damage: ContainerDamage.Checksum);
@@ -150,8 +152,8 @@ internal sealed class OggValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет ни одной страницы Ogg.",
-                "Файл пуст или это не Ogg",
+                Strings.Ogg_NoPages,
+                Strings.Ogg_NoPages_Detail,
                 truncated: true);
         }
 
@@ -163,8 +165,8 @@ internal sealed class OggValidator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается: у потока нет страницы с признаком конца.",
-                    $"Поток {serial:X8}, страниц {state.Pages}",
+                    Strings.Ogg_NoEndOfStream,
+                    Common.Format.Text(Strings.Ogg_NoEndOfStream_Detail, serial, state.Pages),
                     pages,
                     truncated: true);
             }
@@ -194,8 +196,8 @@ internal sealed class OggValidator : IContainerValidator
                 // The stream does not start at page one; the beginning is lost.
                 return ContainerValidation.Damaged(
                     Format,
-                    "Начало файла потеряно: поток начинается не с первой страницы.",
-                    $"Поток {serial:X8}, номер страницы {sequence}, смещение {position} Б",
+                    Strings.Ogg_StartLost,
+                    Common.Format.Text(Strings.Ogg_StartLost_Detail, serial, sequence, position),
                     offset: position);
             }
         }
@@ -203,8 +205,8 @@ internal sealed class OggValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Страницы идут не подряд — часть файла потеряна.",
-                $"Поток {serial:X8}, ожидалась страница {state.Expected}, встретилась {sequence}",
+                Strings.Ogg_SequenceGap,
+                Common.Format.Text(Strings.Ogg_SequenceGap_Detail, serial, state.Expected, sequence),
                 offset: position);
         }
 

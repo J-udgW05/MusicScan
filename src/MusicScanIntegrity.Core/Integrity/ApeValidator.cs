@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Integrity;
 
@@ -41,8 +42,8 @@ internal sealed class ApeValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл слишком короткий: в нём нет даже описания.",
-                $"Размер {bounds.FileLength} Б",
+                Strings.Ape_TooShort,
+                Common.Format.Text(Strings.Valid_Size, bounds.FileLength),
                 truncated: true);
         }
 
@@ -52,8 +53,8 @@ internal sealed class ApeValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл не начинается подписью Monkey's Audio — заголовок разрушен.",
-                "Первые байты не равны «MAC »");
+                Strings.Ape_BadSignature,
+                Strings.Ape_BadSignature_Detail);
         }
 
         int version = BinaryPrimitives.ReadUInt16LittleEndian(descriptor[4..6]);
@@ -64,7 +65,7 @@ internal sealed class ApeValidator : IContainerValidator
             return ContainerValidation.StructureOnly(
                 Format,
                 1,
-                $"Версия {version / 1000.0:0.00}: у старого формата нет описания длин, проверена только подпись");
+                Common.Format.Text(Strings.Ape_OldVersion, version / 1000.0));
         }
 
         long descriptorBytes = BinaryPrimitives.ReadUInt32LittleEndian(descriptor[8..12]);
@@ -86,8 +87,8 @@ internal sealed class ApeValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл обрывается: данных меньше, чем обещано его описанием.",
-                $"Обещано {declared} Б, на диске {audioEnd} Б без тегов",
+                Strings.Ape_ShorterThanDeclared,
+                Common.Format.Text(Strings.Ape_ShorterThanDeclared_Detail, declared, audioEnd),
                 1,
                 truncated: true);
         }
@@ -96,8 +97,8 @@ internal sealed class ApeValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет сжатого звука — только заголовок.",
-                "Длина звуковых данных равна нулю",
+                Strings.Ape_NoAudio,
+                Strings.Ape_NoAudio_Detail,
                 1,
                 truncated: true);
         }
@@ -105,6 +106,6 @@ internal sealed class ApeValidator : IContainerValidator
         return ContainerValidation.StructureOnly(
             Format,
             1,
-            $"Версия {version / 1000.0:0.00}; MD5 в описании считается по распакованному звуку и здесь не сверяется");
+            Common.Format.Text(Strings.Ape_StructureOnly, version / 1000.0));
     }
 }

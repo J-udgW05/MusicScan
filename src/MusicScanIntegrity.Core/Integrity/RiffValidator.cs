@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Integrity;
 
@@ -33,8 +34,8 @@ internal sealed class RiffValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл слишком короткий: в нём нет даже заголовка.",
-                $"Размер {bounds.FileLength} Б",
+                Strings.Riff_TooShort,
+                Common.Format.Text(Strings.Valid_Size, bounds.FileLength),
                 truncated: true);
         }
 
@@ -60,8 +61,8 @@ internal sealed class RiffValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 format,
-                "Файл обрывается: он короче, чем объявлено в его же заголовке.",
-                $"Объявлено {declaredEnd} Б, на диске {bounds.FileLength} Б",
+                Strings.Riff_ShorterThanDeclared,
+                Common.Format.Text(Strings.Riff_ShorterThanDeclared_Detail, declaredEnd, bounds.FileLength),
                 truncated: true);
         }
 
@@ -98,9 +99,9 @@ internal sealed class RiffValidator : IContainerValidator
                 return ContainerValidation.Damaged(
                     format,
                     isData
-                        ? "Файл обрывается: звуковых данных меньше, чем обещано заголовком."
-                        : $"Файл обрывается внутри части «{id}».",
-                    $"Смещение {chunkPosition} Б, обещано {size} Б, осталось {bounds.FileLength - chunkPosition - 8} Б",
+                        ? Strings.Riff_DataShort
+                        : Common.Format.Text(Strings.Riff_TruncatedInChunk, id),
+                    Common.Format.Text(Strings.Riff_TruncatedInChunk_Detail, chunkPosition, size, bounds.FileLength - chunkPosition - 8),
                     chunks,
                     chunkPosition,
                     truncated: true);
@@ -120,8 +121,8 @@ internal sealed class RiffValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 format,
-                "В файле нет описания формата звука — заголовок разрушен.",
-                "Часть «fmt » не найдена",
+                Strings.Riff_NoFmt,
+                Strings.Riff_NoFmt_Detail,
                 chunks);
         }
 
@@ -129,8 +130,8 @@ internal sealed class RiffValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 format,
-                "В файле нет самих звуковых данных.",
-                "Часть «data» не найдена",
+                Strings.Riff_NoData,
+                Strings.Riff_NoData_Detail,
                 chunks,
                 truncated: true);
         }
@@ -138,6 +139,6 @@ internal sealed class RiffValidator : IContainerValidator
         return ContainerValidation.StructureOnly(
             format,
             chunks,
-            $"Частей {chunks}; контрольных сумм в этом формате нет — проверены объявленные длины");
+            Common.Format.Text(Strings.Riff_StructureOnly, chunks));
     }
 }

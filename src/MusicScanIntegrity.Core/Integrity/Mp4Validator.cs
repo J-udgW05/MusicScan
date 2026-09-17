@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.Integrity;
 
@@ -32,8 +33,8 @@ internal sealed class Mp4Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл обрывается внутри тега в начале.",
-                $"Тег занимает {bounds.AudioStart} Б, а файл короче",
+                Strings.Valid_TruncatedInLeadingTag,
+                Common.Format.Text(Strings.Valid_TagLongerThanFile, bounds.AudioStart),
                 truncated: true);
         }
 
@@ -53,8 +54,8 @@ internal sealed class Mp4Validator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Файл обрывается на заголовке блока.",
-                    $"Смещение {boxPosition} Б, осталось {remaining} Б",
+                    Strings.Mp4_TruncatedBoxHeader,
+                    Common.Format.Text(Strings.Mp4_TruncatedBoxHeader_Detail, boxPosition, remaining),
                     boxes,
                     boxPosition,
                     truncated: true);
@@ -83,8 +84,8 @@ internal sealed class Mp4Validator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    "Структура файла разрушена: блок объявляет невозможную длину.",
-                    $"Блок «{type}» на {boxPosition} Б объявляет {size} Б",
+                    Strings.Mp4_ImpossibleLength,
+                    Common.Format.Text(Strings.Mp4_ImpossibleLength_Detail, type, boxPosition, size),
                     boxes,
                     boxPosition);
             }
@@ -93,8 +94,8 @@ internal sealed class Mp4Validator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    $"Файл обрывается: блок «{type}» короче обещанного.",
-                    $"Смещение {boxPosition} Б, обещано {size} Б, осталось {remaining} Б",
+                    Common.Format.Text(Strings.Mp4_BoxShort, type),
+                    Common.Format.Text(Strings.Mp4_BoxShort_Detail, boxPosition, size, remaining),
                     boxes,
                     boxPosition,
                     truncated: true);
@@ -108,8 +109,8 @@ internal sealed class Mp4Validator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    $"Файл обрывается внутри блока «{type}».",
-                    $"Смещение {boxPosition} Б",
+                    Common.Format.Text(Strings.Mp4_TruncatedInBox, type),
+                    Common.Format.Text(Strings.Valid_Offset, boxPosition),
                     boxes,
                     boxPosition,
                     truncated: true);
@@ -122,8 +123,8 @@ internal sealed class Mp4Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет блока с описанием формата — начало разрушено.",
-                "Блок «ftyp» не найден",
+                Strings.Mp4_NoFtyp,
+                Strings.Mp4_NoFtyp_Detail,
                 boxes);
         }
 
@@ -131,8 +132,8 @@ internal sealed class Mp4Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет описания дорожек — без него он не проиграется.",
-                "Блок «moov» не найден",
+                Strings.Mp4_NoMoov,
+                Strings.Mp4_NoMoov_Detail,
                 boxes);
         }
 
@@ -140,8 +141,8 @@ internal sealed class Mp4Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет самих аудиоданных.",
-                "Блок «mdat» не найден",
+                Strings.Mp4_NoMdat,
+                Strings.Mp4_NoMdat_Detail,
                 boxes,
                 truncated: true);
         }
@@ -149,6 +150,6 @@ internal sealed class Mp4Validator : IContainerValidator
         return ContainerValidation.StructureOnly(
             Format,
             boxes,
-            $"Блоков {boxes}; контрольных сумм в MP4 нет — проверена только структура");
+            Common.Format.Text(Strings.Mp4_StructureOnly, boxes));
     }
 }

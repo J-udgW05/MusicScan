@@ -33,6 +33,33 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Ape_BadSignature" xml:space="preserve">
+    <value>Файл не начинается подписью Monkey's Audio — заголовок разрушен.</value>
+  </data>
+  <data name="Ape_BadSignature_Detail" xml:space="preserve">
+    <value>Первые байты не равны «MAC »</value>
+  </data>
+  <data name="Ape_NoAudio" xml:space="preserve">
+    <value>В файле нет сжатого звука — только заголовок.</value>
+  </data>
+  <data name="Ape_NoAudio_Detail" xml:space="preserve">
+    <value>Длина звуковых данных равна нулю</value>
+  </data>
+  <data name="Ape_OldVersion" xml:space="preserve">
+    <value>Версия {0:0.00}: у старого формата нет описания длин, проверена только подпись</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared" xml:space="preserve">
+    <value>Файл обрывается: данных меньше, чем обещано его описанием.</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>Обещано {0} Б, на диске {1} Б без тегов</value>
+  </data>
+  <data name="Ape_StructureOnly" xml:space="preserve">
+    <value>Версия {0:0.00}; MD5 в описании считается по распакованному звуку и здесь не сверяется</value>
+  </data>
+  <data name="Ape_TooShort" xml:space="preserve">
+    <value>Файл слишком короткий: в нём нет даже описания.</value>
+  </data>
   <data name="Bass_CannotOpen" xml:space="preserve">
     <value>Файл не удалось открыть для чтения.</value>
   </data>
@@ -318,6 +345,69 @@
   <data name="Finding_Other" xml:space="preserve">
     <value>Замечание</value>
   </data>
+  <data name="Flac_BadSignature" xml:space="preserve">
+    <value>Файл не начинается подписью FLAC — заголовок разрушен.</value>
+  </data>
+  <data name="Flac_BadSignature_Detail" xml:space="preserve">
+    <value>Первые байты не равны «fLaC»</value>
+  </data>
+  <data name="Flac_EndlessMetadata" xml:space="preserve">
+    <value>Описание потока повреждено: блоки не заканчиваются.</value>
+  </data>
+  <data name="Flac_EndlessMetadata_Detail" xml:space="preserve">
+    <value>Более 1024 блоков метаданных подряд</value>
+  </data>
+  <data name="Flac_FirstFrameBroken" xml:space="preserve">
+    <value>Первый кадр со звуком разрушен — файл не проиграется.</value>
+  </data>
+  <data name="Flac_FrameBroken" xml:space="preserve">
+    <value>Кадр {0} разрушен: на его месте не заголовок кадра.</value>
+  </data>
+  <data name="Flac_FrameBroken_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидался заголовок кадра FLAC</value>
+  </data>
+  <data name="Flac_FrameChecksum" xml:space="preserve">
+    <value>Контрольная сумма кадра {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Flac_FrameChecksum_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, проверено кадров: {1}, осталось {2} Б</value>
+  </data>
+  <data name="Flac_FrameUnfinished" xml:space="preserve">
+    <value>Файл повреждён: кадр {0} не дописан до конца или в хвосте лишние данные.</value>
+  </data>
+  <data name="Flac_InvalidBlock" xml:space="preserve">
+    <value>Описание потока повреждено: встретился недопустимый блок.</value>
+  </data>
+  <data name="Flac_InvalidBlock_Detail" xml:space="preserve">
+    <value>Тип блока метаданных 127</value>
+  </data>
+  <data name="Flac_MetadataTruncated" xml:space="preserve">
+    <value>Описание потока обрывается.</value>
+  </data>
+  <data name="Flac_MissingAudio" xml:space="preserve">
+    <value>Файл обрывается: не хватает {0} звука от заявленного.</value>
+  </data>
+  <data name="Flac_MissingAudio_Detail" xml:space="preserve">
+    <value>Заявлено {0} отсчётов, найдено {1}</value>
+  </data>
+  <data name="Flac_NoFrames" xml:space="preserve">
+    <value>В файле есть заголовок, но нет ни одного кадра со звуком.</value>
+  </data>
+  <data name="Flac_NoFrames_Detail" xml:space="preserve">
+    <value>Аудиоданные заканчиваются на {0} Б</value>
+  </data>
+  <data name="Flac_NoStreamInfo" xml:space="preserve">
+    <value>В файле нет обязательного блока с описанием потока.</value>
+  </data>
+  <data name="Flac_NoStreamInfo_Detail" xml:space="preserve">
+    <value>Блок STREAMINFO не найден</value>
+  </data>
+  <data name="Flac_TruncatedInMetadata" xml:space="preserve">
+    <value>Файл обрывается внутри метаданных.</value>
+  </data>
+  <data name="Flac_TruncatedStreamInfo" xml:space="preserve">
+    <value>Файл обрывается на описании потока.</value>
+  </data>
   <data name="Folder_AccessDenied" xml:space="preserve">
     <value>Windows отказал в доступе к папке.</value>
   </data>
@@ -417,6 +507,141 @@
   <data name="Mojibake_WesternTable" xml:space="preserve">
     <value>похоже на кириллицу, прочитанную западноевропейской таблицей</value>
   </data>
+  <data name="Mp3_FrameChecksum" xml:space="preserve">
+    <value>Контрольная сумма кадра {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished" xml:space="preserve">
+    <value>Файл обрывается на кадре {0}: он начат, но не дописан.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, нужно {1} Б, осталось {2} Б</value>
+  </data>
+  <data name="Mp3_Junk" xml:space="preserve">
+    <value>Между кадрами найден мусор — файл повреждён или склеен из кусков.</value>
+  </data>
+  <data name="Mp3_Junk_Detail" xml:space="preserve">
+    <value>Лишних байт: {0}, кадров: {1}</value>
+  </data>
+  <data name="Mp3_MissingFrames" xml:space="preserve">
+    <value>Файл обрывается: обещано кадров {0}, найдено {1}.</value>
+  </data>
+  <data name="Mp3_MissingFrames_Detail" xml:space="preserve">
+    <value>Заголовок Xing/Info объявляет {0} кадров</value>
+  </data>
+  <data name="Mp3_NoFrames" xml:space="preserve">
+    <value>В файле нет ни одного кадра MP3.</value>
+  </data>
+  <data name="Mp3_NoFrames_Detail" xml:space="preserve">
+    <value>Просмотрено {0} Б без единого заголовка кадра</value>
+  </data>
+  <data name="Mp3_StructureOnly" xml:space="preserve">
+    <value>Кадров {0}; контрольных сумм в файле нет — проверена только цепочка кадров</value>
+  </data>
+  <data name="Mp3_Verified_Detail" xml:space="preserve">
+    <value>Кадров {0}, с проверенной суммой {1}</value>
+  </data>
+  <data name="Mp4_BoxShort" xml:space="preserve">
+    <value>Файл обрывается: блок «{0}» короче обещанного.</value>
+  </data>
+  <data name="Mp4_BoxShort_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, обещано {1} Б, осталось {2} Б</value>
+  </data>
+  <data name="Mp4_ImpossibleLength" xml:space="preserve">
+    <value>Структура файла разрушена: блок объявляет невозможную длину.</value>
+  </data>
+  <data name="Mp4_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Блок «{0}» на {1} Б объявляет {2} Б</value>
+  </data>
+  <data name="Mp4_NoFtyp" xml:space="preserve">
+    <value>В файле нет блока с описанием формата — начало разрушено.</value>
+  </data>
+  <data name="Mp4_NoFtyp_Detail" xml:space="preserve">
+    <value>Блок «ftyp» не найден</value>
+  </data>
+  <data name="Mp4_NoMdat" xml:space="preserve">
+    <value>В файле нет самих аудиоданных.</value>
+  </data>
+  <data name="Mp4_NoMdat_Detail" xml:space="preserve">
+    <value>Блок «mdat» не найден</value>
+  </data>
+  <data name="Mp4_NoMoov" xml:space="preserve">
+    <value>В файле нет описания дорожек — без него он не проиграется.</value>
+  </data>
+  <data name="Mp4_NoMoov_Detail" xml:space="preserve">
+    <value>Блок «moov» не найден</value>
+  </data>
+  <data name="Mp4_StructureOnly" xml:space="preserve">
+    <value>Блоков {0}; контрольных сумм в MP4 нет — проверена только структура</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader" xml:space="preserve">
+    <value>Файл обрывается на заголовке блока.</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, осталось {1} Б</value>
+  </data>
+  <data name="Mp4_TruncatedInBox" xml:space="preserve">
+    <value>Файл обрывается внутри блока «{0}».</value>
+  </data>
+  <data name="Ogg_BadStart" xml:space="preserve">
+    <value>Файл не начинается страницей Ogg — заголовок разрушен.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream" xml:space="preserve">
+    <value>Файл обрывается: у потока нет страницы с признаком конца.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, страниц {1}</value>
+  </data>
+  <data name="Ogg_NoPages" xml:space="preserve">
+    <value>В файле нет ни одной страницы Ogg.</value>
+  </data>
+  <data name="Ogg_NoPages_Detail" xml:space="preserve">
+    <value>Файл пуст или это не Ogg</value>
+  </data>
+  <data name="Ogg_NotAPage" xml:space="preserve">
+    <value>После страницы {0} идут данные, которые страницей не являются.</value>
+  </data>
+  <data name="Ogg_NotAPage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидалась подпись «OggS»</value>
+  </data>
+  <data name="Ogg_PageChecksum" xml:space="preserve">
+    <value>Контрольная сумма страницы {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Ogg_PageChecksum_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, записано {1:X8}, получилось {2:X8}</value>
+  </data>
+  <data name="Ogg_SequenceGap" xml:space="preserve">
+    <value>Страницы идут не подряд — часть файла потеряна.</value>
+  </data>
+  <data name="Ogg_SequenceGap_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, ожидалась страница {1}, встретилась {2}</value>
+  </data>
+  <data name="Ogg_StartLost" xml:space="preserve">
+    <value>Начало файла потеряно: поток начинается не с первой страницы.</value>
+  </data>
+  <data name="Ogg_StartLost_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, номер страницы {1}, смещение {2} Б</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage" xml:space="preserve">
+    <value>Файл обрывается внутри страницы: данных меньше, чем обещано заголовком.</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, нужно {1} Б</value>
+  </data>
+  <data name="Ogg_TruncatedPage" xml:space="preserve">
+    <value>Файл обрывается на середине страницы.</value>
+  </data>
+  <data name="Ogg_TruncatedPage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, страниц проверено: {1}</value>
+  </data>
+  <data name="Ogg_TruncatedSegments" xml:space="preserve">
+    <value>Файл обрывается на таблице отрезков страницы.</value>
+  </data>
+  <data name="Ogg_UnknownVersion" xml:space="preserve">
+    <value>Неизвестная версия формата Ogg — файл повреждён или собран неверно.</value>
+  </data>
+  <data name="Ogg_UnknownVersion_Detail" xml:space="preserve">
+    <value>Версия страницы {0}, смещение {1} Б</value>
+  </data>
   <data name="Playlist_CueBeyondFile" xml:space="preserve">
     <value>Разметка не подходит к файлу: дорожка {0} начинается позже, чем он заканчивается.</value>
   </data>
@@ -507,6 +732,39 @@
   <data name="Result_Verified" xml:space="preserve">
     <value>Файл прочитан, контрольные суммы формата сошлись (проверено единиц: {0}).</value>
   </data>
+  <data name="Riff_DataShort" xml:space="preserve">
+    <value>Файл обрывается: звуковых данных меньше, чем обещано заголовком.</value>
+  </data>
+  <data name="Riff_NoData" xml:space="preserve">
+    <value>В файле нет самих звуковых данных.</value>
+  </data>
+  <data name="Riff_NoData_Detail" xml:space="preserve">
+    <value>Часть «data» не найдена</value>
+  </data>
+  <data name="Riff_NoFmt" xml:space="preserve">
+    <value>В файле нет описания формата звука — заголовок разрушен.</value>
+  </data>
+  <data name="Riff_NoFmt_Detail" xml:space="preserve">
+    <value>Часть «fmt » не найдена</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared" xml:space="preserve">
+    <value>Файл обрывается: он короче, чем объявлено в его же заголовке.</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>Объявлено {0} Б, на диске {1} Б</value>
+  </data>
+  <data name="Riff_StructureOnly" xml:space="preserve">
+    <value>Частей {0}; контрольных сумм в этом формате нет — проверены объявленные длины</value>
+  </data>
+  <data name="Riff_TooShort" xml:space="preserve">
+    <value>Файл слишком короткий: в нём нет даже заголовка.</value>
+  </data>
+  <data name="Riff_TruncatedInChunk" xml:space="preserve">
+    <value>Файл обрывается внутри части «{0}».</value>
+  </data>
+  <data name="Riff_TruncatedInChunk_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, обещано {1} Б, осталось {2} Б</value>
+  </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Язык</value>
   </data>
@@ -566,5 +824,41 @@
   </data>
   <data name="Unit_TB" xml:space="preserve">
     <value>ТБ</value>
+  </data>
+  <data name="Valid_Offset" xml:space="preserve">
+    <value>Смещение {0} Б</value>
+  </data>
+  <data name="Valid_Size" xml:space="preserve">
+    <value>Размер {0} Б</value>
+  </data>
+  <data name="Valid_TagLongerThanFile" xml:space="preserve">
+    <value>Тег занимает {0} Б, а файл короче</value>
+  </data>
+  <data name="Valid_TruncatedInLeadingTag" xml:space="preserve">
+    <value>Файл обрывается внутри тега в начале.</value>
+  </data>
+  <data name="WavPack_BadStart" xml:space="preserve">
+    <value>Файл не начинается блоком WavPack — заголовок разрушен.</value>
+  </data>
+  <data name="WavPack_BlockUnfinished" xml:space="preserve">
+    <value>Файл обрывается на блоке {0}: он начат, но не дописан.</value>
+  </data>
+  <data name="WavPack_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, объявлено {1} Б</value>
+  </data>
+  <data name="WavPack_NoBlocks" xml:space="preserve">
+    <value>В файле нет ни одного блока WavPack.</value>
+  </data>
+  <data name="WavPack_NoBlocks_Detail" xml:space="preserve">
+    <value>Файл пуст или это не WavPack</value>
+  </data>
+  <data name="WavPack_NotABlock" xml:space="preserve">
+    <value>После блока {0} идут данные, которые блоком не являются.</value>
+  </data>
+  <data name="WavPack_NotABlock_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидалась подпись «wvpk»</value>
+  </data>
+  <data name="WavPack_StructureOnly" xml:space="preserve">
+    <value>Блоков {0}; суммы WavPack считаются по распакованному звуку и здесь не сверяются</value>
   </data>
 </root>

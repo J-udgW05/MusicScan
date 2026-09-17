@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Integrity;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
 /// Validates FLAC against its own checksums.
@@ -44,15 +46,15 @@ internal sealed class FlacValidator : IContainerValidator
 
         if (!window.Skip(bounds.AudioStart))
         {
-            return Truncated("Файл обрывается внутри тега в начале.", window.Position);
+            return Truncated(Strings.Valid_TruncatedInLeadingTag, window.Position);
         }
 
         if (!window.Ensure(4) || !window.Peek(4).SequenceEqual("fLaC"u8))
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл не начинается подписью FLAC — заголовок разрушен.",
-                "Первые байты не равны «fLaC»",
+                Strings.Flac_BadSignature,
+                Strings.Flac_BadSignature_Detail,
                 offset: window.Position);
         }
 
@@ -68,8 +70,8 @@ internal sealed class FlacValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет обязательного блока с описанием потока.",
-                "Блок STREAMINFO не найден",
+                Strings.Flac_NoStreamInfo,
+                Strings.Flac_NoStreamInfo_Detail,
                 offset: window.Position);
         }
 
@@ -87,7 +89,7 @@ internal sealed class FlacValidator : IContainerValidator
         {
             if (!window.Ensure(4))
             {
-                failure = Truncated("Файл обрывается на описании потока.", window.Position);
+                failure = Truncated(Strings.Flac_TruncatedStreamInfo, window.Position);
                 return null;
             }
 
@@ -102,8 +104,8 @@ internal sealed class FlacValidator : IContainerValidator
             {
                 failure = ContainerValidation.Damaged(
                     Format,
-                    "Описание потока повреждено: встретился недопустимый блок.",
-                    "Тип блока метаданных 127",
+                    Strings.Flac_InvalidBlock,
+                    Strings.Flac_InvalidBlock_Detail,
                     offset: window.Position - 4);
                 return null;
             }
@@ -112,7 +114,7 @@ internal sealed class FlacValidator : IContainerValidator
             {
                 if (length < 34 || !window.Ensure(34))
                 {
-                    failure = Truncated("Описание потока обрывается.", window.Position);
+                    failure = Truncated(Strings.Flac_MetadataTruncated, window.Position);
                     return null;
                 }
 
@@ -121,13 +123,13 @@ internal sealed class FlacValidator : IContainerValidator
 
                 if (!window.Skip(length - 34))
                 {
-                    failure = Truncated("Описание потока обрывается.", window.Position);
+                    failure = Truncated(Strings.Flac_MetadataTruncated, window.Position);
                     return null;
                 }
             }
             else if (!window.Skip(length))
             {
-                failure = Truncated("Файл обрывается внутри метаданных.", window.Position);
+                failure = Truncated(Strings.Flac_TruncatedInMetadata, window.Position);
                 return null;
             }
 
@@ -144,8 +146,8 @@ internal sealed class FlacValidator : IContainerValidator
             {
                 failure = ContainerValidation.Damaged(
                     Format,
-                    "Описание потока повреждено: блоки не заканчиваются.",
-                    "Более 1024 блоков метаданных подряд",
+                    Strings.Flac_EndlessMetadata,
+                    Strings.Flac_EndlessMetadata_Detail,
                     offset: window.Position);
                 return null;
             }
@@ -163,8 +165,8 @@ internal sealed class FlacValidator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле есть заголовок, но нет ни одного кадра со звуком.",
-                $"Аудиоданные заканчиваются на {window.Position} Б",
+                Strings.Flac_NoFrames,
+                Common.Format.Text(Strings.Flac_NoFrames_Detail, window.Position),
                 offset: window.Position,
                 truncated: true);
         }
@@ -193,9 +195,9 @@ internal sealed class FlacValidator : IContainerValidator
                 return ContainerValidation.Damaged(
                     Format,
                     frames == 0
-                        ? "Первый кадр со звуком разрушен — файл не проиграется."
-                        : $"Кадр {frames + 1} разрушен: на его месте не заголовок кадра.",
-                    $"Смещение {framePosition} Б, ожидался заголовок кадра FLAC",
+                        ? Strings.Flac_FirstFrameBroken
+                        : Common.Format.Text(Strings.Flac_FrameBroken, frames + 1),
+                    Common.Format.Text(Strings.Flac_FrameBroken_Detail, framePosition),
                     frames,
                     framePosition);
             }
@@ -210,9 +212,9 @@ internal sealed class FlacValidator : IContainerValidator
                 return ContainerValidation.Damaged(
                     Format,
                     reachesEnd
-                        ? $"Файл повреждён: кадр {frames + 1} не дописан до конца или в хвосте лишние данные."
-                        : $"Контрольная сумма кадра {frames + 1} не сошлась — файл повреждён.",
-                    $"Смещение {framePosition} Б, проверено кадров: {frames}, осталось {remaining} Б",
+                        ? Common.Format.Text(Strings.Flac_FrameUnfinished, frames + 1)
+                        : Common.Format.Text(Strings.Flac_FrameChecksum, frames + 1),
+                    Common.Format.Text(Strings.Flac_FrameChecksum_Detail, framePosition, frames, remaining),
                     frames,
                     framePosition,
                     truncated: reachesEnd,
@@ -233,8 +235,8 @@ internal sealed class FlacValidator : IContainerValidator
 
             return ContainerValidation.Damaged(
                 Format,
-                $"Файл обрывается: не хватает {Common.Format.Seconds(Math.Max(1, lost))} звука от заявленного.",
-                $"Заявлено {info.TotalSamples} отсчётов, найдено {samples}",
+                Common.Format.Text(Strings.Flac_MissingAudio, Common.Format.Seconds(Math.Max(1, lost))),
+                Common.Format.Text(Strings.Flac_MissingAudio_Detail, info.TotalSamples, samples),
                 frames,
                 truncated: true);
         }
@@ -488,7 +490,7 @@ internal sealed class FlacValidator : IContainerValidator
     }
 
     private ContainerValidation Truncated(string message, long offset) =>
-        ContainerValidation.Damaged(Format, message, $"Смещение {offset} Б", offset: offset, truncated: true);
+        ContainerValidation.Damaged(Format, message, Common.Format.Text(Strings.Valid_Offset, offset), offset: offset, truncated: true);
 
     /// <summary>Parses the STREAMINFO block.</summary>
     private sealed record StreamInfo(

@@ -33,6 +33,33 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Ape_BadSignature" xml:space="preserve">
+    <value>The file does not start with the Monkey's Audio signature; the header is broken.</value>
+  </data>
+  <data name="Ape_BadSignature_Detail" xml:space="preserve">
+    <value>The first bytes are not "MAC "</value>
+  </data>
+  <data name="Ape_NoAudio" xml:space="preserve">
+    <value>The file holds no compressed audio, only a header.</value>
+  </data>
+  <data name="Ape_NoAudio_Detail" xml:space="preserve">
+    <value>Audio data length is zero</value>
+  </data>
+  <data name="Ape_OldVersion" xml:space="preserve">
+    <value>Version {0:0.00}: the old format has no length descriptor, only the signature was checked</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared" xml:space="preserve">
+    <value>The file is truncated: less data than its descriptor promises.</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>{0} B declared, {1} B on disk excluding tags</value>
+  </data>
+  <data name="Ape_StructureOnly" xml:space="preserve">
+    <value>Version {0:0.00}; the descriptor MD5 covers decompressed audio and is not verified here</value>
+  </data>
+  <data name="Ape_TooShort" xml:space="preserve">
+    <value>The file is too short to even hold a descriptor.</value>
+  </data>
   <data name="Bass_CannotOpen" xml:space="preserve">
     <value>The file could not be opened for reading.</value>
   </data>
@@ -318,6 +345,69 @@
   <data name="Finding_Other" xml:space="preserve">
     <value>Finding</value>
   </data>
+  <data name="Flac_BadSignature" xml:space="preserve">
+    <value>The file does not start with the FLAC signature; the header is broken.</value>
+  </data>
+  <data name="Flac_BadSignature_Detail" xml:space="preserve">
+    <value>The first bytes are not "fLaC"</value>
+  </data>
+  <data name="Flac_EndlessMetadata" xml:space="preserve">
+    <value>The stream description is damaged: the blocks never end.</value>
+  </data>
+  <data name="Flac_EndlessMetadata_Detail" xml:space="preserve">
+    <value>More than 1024 consecutive metadata blocks</value>
+  </data>
+  <data name="Flac_FirstFrameBroken" xml:space="preserve">
+    <value>The first audio frame is broken; the file will not play.</value>
+  </data>
+  <data name="Flac_FrameBroken" xml:space="preserve">
+    <value>Frame {0} is broken: no frame header where it should be.</value>
+  </data>
+  <data name="Flac_FrameBroken_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected a FLAC frame header</value>
+  </data>
+  <data name="Flac_FrameChecksum" xml:space="preserve">
+    <value>The checksum of frame {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Flac_FrameChecksum_Detail" xml:space="preserve">
+    <value>Offset {0} B, frames checked: {1}, {2} B remaining</value>
+  </data>
+  <data name="Flac_FrameUnfinished" xml:space="preserve">
+    <value>The file is damaged: frame {0} is incomplete or there is extra data at the end.</value>
+  </data>
+  <data name="Flac_InvalidBlock" xml:space="preserve">
+    <value>The stream description is damaged: an invalid block was found.</value>
+  </data>
+  <data name="Flac_InvalidBlock_Detail" xml:space="preserve">
+    <value>Metadata block type 127</value>
+  </data>
+  <data name="Flac_MetadataTruncated" xml:space="preserve">
+    <value>The stream description is cut short.</value>
+  </data>
+  <data name="Flac_MissingAudio" xml:space="preserve">
+    <value>The file is truncated: {0} of the declared audio is missing.</value>
+  </data>
+  <data name="Flac_MissingAudio_Detail" xml:space="preserve">
+    <value>{0} samples declared, {1} found</value>
+  </data>
+  <data name="Flac_NoFrames" xml:space="preserve">
+    <value>The file has a header but no audio frames.</value>
+  </data>
+  <data name="Flac_NoFrames_Detail" xml:space="preserve">
+    <value>Audio data ends at {0} B</value>
+  </data>
+  <data name="Flac_NoStreamInfo" xml:space="preserve">
+    <value>The mandatory stream description block is missing.</value>
+  </data>
+  <data name="Flac_NoStreamInfo_Detail" xml:space="preserve">
+    <value>STREAMINFO block not found</value>
+  </data>
+  <data name="Flac_TruncatedInMetadata" xml:space="preserve">
+    <value>The file ends inside the metadata.</value>
+  </data>
+  <data name="Flac_TruncatedStreamInfo" xml:space="preserve">
+    <value>The file ends inside the stream description.</value>
+  </data>
   <data name="Folder_AccessDenied" xml:space="preserve">
     <value>Windows denied access to the folder.</value>
   </data>
@@ -417,6 +507,141 @@
   <data name="Mojibake_WesternTable" xml:space="preserve">
     <value>looks like Cyrillic read with a Western European code page</value>
   </data>
+  <data name="Mp3_FrameChecksum" xml:space="preserve">
+    <value>The checksum of frame {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished" xml:space="preserve">
+    <value>The file ends at frame {0}: it was started but not finished.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B needed, {2} B remaining</value>
+  </data>
+  <data name="Mp3_Junk" xml:space="preserve">
+    <value>Junk found between frames; the file is damaged or spliced together.</value>
+  </data>
+  <data name="Mp3_Junk_Detail" xml:space="preserve">
+    <value>Extra bytes: {0}, frames: {1}</value>
+  </data>
+  <data name="Mp3_MissingFrames" xml:space="preserve">
+    <value>The file is truncated: {0} frames declared, {1} found.</value>
+  </data>
+  <data name="Mp3_MissingFrames_Detail" xml:space="preserve">
+    <value>The Xing/Info header declares {0} frames</value>
+  </data>
+  <data name="Mp3_NoFrames" xml:space="preserve">
+    <value>The file contains no MP3 frames.</value>
+  </data>
+  <data name="Mp3_NoFrames_Detail" xml:space="preserve">
+    <value>Scanned {0} B without a single frame header</value>
+  </data>
+  <data name="Mp3_StructureOnly" xml:space="preserve">
+    <value>{0} frames; the file has no checksums, so only the frame chain was checked</value>
+  </data>
+  <data name="Mp3_Verified_Detail" xml:space="preserve">
+    <value>{0} frames, {1} with verified checksums</value>
+  </data>
+  <data name="Mp4_BoxShort" xml:space="preserve">
+    <value>The file is truncated: box "{0}" is shorter than declared.</value>
+  </data>
+  <data name="Mp4_BoxShort_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared, {2} B remaining</value>
+  </data>
+  <data name="Mp4_ImpossibleLength" xml:space="preserve">
+    <value>The file structure is broken: a box declares an impossible length.</value>
+  </data>
+  <data name="Mp4_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Box "{0}" at {1} B declares {2} B</value>
+  </data>
+  <data name="Mp4_NoFtyp" xml:space="preserve">
+    <value>The file has no format description box; its start is broken.</value>
+  </data>
+  <data name="Mp4_NoFtyp_Detail" xml:space="preserve">
+    <value>Box "ftyp" not found</value>
+  </data>
+  <data name="Mp4_NoMdat" xml:space="preserve">
+    <value>The file contains no audio data.</value>
+  </data>
+  <data name="Mp4_NoMdat_Detail" xml:space="preserve">
+    <value>Box "mdat" not found</value>
+  </data>
+  <data name="Mp4_NoMoov" xml:space="preserve">
+    <value>The file has no track description and will not play without it.</value>
+  </data>
+  <data name="Mp4_NoMoov_Detail" xml:space="preserve">
+    <value>Box "moov" not found</value>
+  </data>
+  <data name="Mp4_StructureOnly" xml:space="preserve">
+    <value>{0} boxes; MP4 has no checksums, so only the structure was checked</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader" xml:space="preserve">
+    <value>The file ends inside a box header.</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B remaining</value>
+  </data>
+  <data name="Mp4_TruncatedInBox" xml:space="preserve">
+    <value>The file ends inside box "{0}".</value>
+  </data>
+  <data name="Ogg_BadStart" xml:space="preserve">
+    <value>The file does not start with an Ogg page; the header is broken.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream" xml:space="preserve">
+    <value>The file is truncated: the stream has no end-of-stream page.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, {1} pages</value>
+  </data>
+  <data name="Ogg_NoPages" xml:space="preserve">
+    <value>The file contains no Ogg pages.</value>
+  </data>
+  <data name="Ogg_NoPages_Detail" xml:space="preserve">
+    <value>The file is empty or not Ogg</value>
+  </data>
+  <data name="Ogg_NotAPage" xml:space="preserve">
+    <value>The data after page {0} is not a page.</value>
+  </data>
+  <data name="Ogg_NotAPage_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected the "OggS" signature</value>
+  </data>
+  <data name="Ogg_PageChecksum" xml:space="preserve">
+    <value>The checksum of page {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Ogg_PageChecksum_Detail" xml:space="preserve">
+    <value>Offset {0} B, stored {1:X8}, computed {2:X8}</value>
+  </data>
+  <data name="Ogg_SequenceGap" xml:space="preserve">
+    <value>Pages are out of sequence; part of the file is lost.</value>
+  </data>
+  <data name="Ogg_SequenceGap_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, expected page {1}, found {2}</value>
+  </data>
+  <data name="Ogg_StartLost" xml:space="preserve">
+    <value>The start of the file is lost: the stream does not begin at page one.</value>
+  </data>
+  <data name="Ogg_StartLost_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, page number {1}, offset {2} B</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage" xml:space="preserve">
+    <value>The file ends inside a page: less data than its header promises.</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B needed</value>
+  </data>
+  <data name="Ogg_TruncatedPage" xml:space="preserve">
+    <value>The file ends in the middle of a page.</value>
+  </data>
+  <data name="Ogg_TruncatedPage_Detail" xml:space="preserve">
+    <value>Offset {0} B, pages checked: {1}</value>
+  </data>
+  <data name="Ogg_TruncatedSegments" xml:space="preserve">
+    <value>The file ends inside a page segment table.</value>
+  </data>
+  <data name="Ogg_UnknownVersion" xml:space="preserve">
+    <value>Unknown Ogg version; the file is damaged or badly built.</value>
+  </data>
+  <data name="Ogg_UnknownVersion_Detail" xml:space="preserve">
+    <value>Page version {0}, offset {1} B</value>
+  </data>
   <data name="Playlist_CueBeyondFile" xml:space="preserve">
     <value>The cue sheet does not fit the file: track {0} starts after the file ends.</value>
   </data>
@@ -507,6 +732,39 @@
   <data name="Result_Verified" xml:space="preserve">
     <value>Read successfully; container checksums matched ({0} units checked).</value>
   </data>
+  <data name="Riff_DataShort" xml:space="preserve">
+    <value>The file is truncated: less audio data than the header promises.</value>
+  </data>
+  <data name="Riff_NoData" xml:space="preserve">
+    <value>The file contains no audio data.</value>
+  </data>
+  <data name="Riff_NoData_Detail" xml:space="preserve">
+    <value>Chunk "data" not found</value>
+  </data>
+  <data name="Riff_NoFmt" xml:space="preserve">
+    <value>The file has no audio format description; the header is broken.</value>
+  </data>
+  <data name="Riff_NoFmt_Detail" xml:space="preserve">
+    <value>Chunk "fmt " not found</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared" xml:space="preserve">
+    <value>The file is truncated: it is shorter than its own header declares.</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>{0} B declared, {1} B on disk</value>
+  </data>
+  <data name="Riff_StructureOnly" xml:space="preserve">
+    <value>{0} chunks; this format has no checksums, so declared lengths were checked</value>
+  </data>
+  <data name="Riff_TooShort" xml:space="preserve">
+    <value>The file is too short to even hold a header.</value>
+  </data>
+  <data name="Riff_TruncatedInChunk" xml:space="preserve">
+    <value>The file ends inside chunk "{0}".</value>
+  </data>
+  <data name="Riff_TruncatedInChunk_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared, {2} B remaining</value>
+  </data>
   <data name="Settings_Language" xml:space="preserve">
     <value>Language</value>
   </data>
@@ -566,5 +824,41 @@
   </data>
   <data name="Unit_TB" xml:space="preserve">
     <value>TB</value>
+  </data>
+  <data name="Valid_Offset" xml:space="preserve">
+    <value>Offset {0} B</value>
+  </data>
+  <data name="Valid_Size" xml:space="preserve">
+    <value>Size {0} B</value>
+  </data>
+  <data name="Valid_TagLongerThanFile" xml:space="preserve">
+    <value>The tag takes {0} B, but the file is shorter</value>
+  </data>
+  <data name="Valid_TruncatedInLeadingTag" xml:space="preserve">
+    <value>The file ends inside the leading tag.</value>
+  </data>
+  <data name="WavPack_BadStart" xml:space="preserve">
+    <value>The file does not start with a WavPack block; the header is broken.</value>
+  </data>
+  <data name="WavPack_BlockUnfinished" xml:space="preserve">
+    <value>The file ends at block {0}: it was started but not finished.</value>
+  </data>
+  <data name="WavPack_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared</value>
+  </data>
+  <data name="WavPack_NoBlocks" xml:space="preserve">
+    <value>The file contains no WavPack blocks.</value>
+  </data>
+  <data name="WavPack_NoBlocks_Detail" xml:space="preserve">
+    <value>The file is empty or not WavPack</value>
+  </data>
+  <data name="WavPack_NotABlock" xml:space="preserve">
+    <value>The data after block {0} is not a block.</value>
+  </data>
+  <data name="WavPack_NotABlock_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected the "wvpk" signature</value>
+  </data>
+  <data name="WavPack_StructureOnly" xml:space="preserve">
+    <value>{0} blocks; WavPack checksums cover decompressed audio and are not verified here</value>
   </data>
 </root>

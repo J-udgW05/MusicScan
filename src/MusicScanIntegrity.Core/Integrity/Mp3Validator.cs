@@ -1,4 +1,6 @@
-﻿namespace MusicScanIntegrity.Core.Integrity;
+﻿using MusicScanIntegrity.Core.Resources;
+
+namespace MusicScanIntegrity.Core.Integrity;
 
 /// <summary>
 /// Validates MP3 by walking frames, checking their lengths and any checksums.
@@ -46,7 +48,7 @@ internal sealed class Mp3Validator : IContainerValidator
     private static readonly int[][] SampleRates =
     [
         [11025, 12000, 8000, 0],   // MPEG 2.5
-        [0, 0, 0, 0],              // зарезервировано
+        [0, 0, 0, 0],              // reserved
         [22050, 24000, 16000, 0],  // MPEG 2
         [44100, 48000, 32000, 0],  // MPEG 1
     ];
@@ -71,8 +73,8 @@ internal sealed class Mp3Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Файл обрывается внутри тега в начале.",
-                $"Тег занимает {bounds.AudioStart} Б, а файл короче",
+                Strings.Valid_TruncatedInLeadingTag,
+                Common.Format.Text(Strings.Valid_TagLongerThanFile, bounds.AudioStart),
                 truncated: true);
         }
 
@@ -112,8 +114,8 @@ internal sealed class Mp3Validator : IContainerValidator
             {
                 return ContainerValidation.Damaged(
                     Format,
-                    $"Файл обрывается на кадре {frames + 1}: он начат, но не дописан.",
-                    $"Смещение {framePosition} Б, нужно {header.Length} Б, осталось {remaining} Б",
+                    Common.Format.Text(Strings.Mp3_FrameUnfinished, frames + 1),
+                    Common.Format.Text(Strings.Mp3_FrameUnfinished_Detail, framePosition, header.Length, remaining),
                     frames,
                     framePosition,
                     truncated: true);
@@ -130,8 +132,8 @@ internal sealed class Mp3Validator : IContainerValidator
                 {
                     return ContainerValidation.Damaged(
                         Format,
-                        $"Контрольная сумма кадра {frames + 1} не сошлась — файл повреждён.",
-                        $"Смещение {framePosition} Б",
+                        Common.Format.Text(Strings.Mp3_FrameChecksum, frames + 1),
+                        Common.Format.Text(Strings.Valid_Offset, framePosition),
                         frames,
                         framePosition,
                         damage: ContainerDamage.Checksum);
@@ -148,8 +150,8 @@ internal sealed class Mp3Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "В файле нет ни одного кадра MP3.",
-                $"Просмотрено {junkBytes} Б без единого заголовка кадра",
+                Strings.Mp3_NoFrames,
+                Common.Format.Text(Strings.Mp3_NoFrames_Detail, junkBytes),
                 truncated: true);
         }
 
@@ -157,8 +159,8 @@ internal sealed class Mp3Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                "Между кадрами найден мусор — файл повреждён или склеен из кусков.",
-                $"Лишних байт: {junkBytes}, кадров: {frames}",
+                Strings.Mp3_Junk,
+                Common.Format.Text(Strings.Mp3_Junk_Detail, junkBytes, frames),
                 frames,
                 firstErrorOffset < 0 ? null : firstErrorOffset);
         }
@@ -169,8 +171,8 @@ internal sealed class Mp3Validator : IContainerValidator
         {
             return ContainerValidation.Damaged(
                 Format,
-                $"Файл обрывается: обещано кадров {declaredFrames}, найдено {frames}.",
-                $"Заголовок Xing/Info объявляет {declaredFrames} кадров",
+                Common.Format.Text(Strings.Mp3_MissingFrames, declaredFrames, frames),
+                Common.Format.Text(Strings.Mp3_MissingFrames_Detail, declaredFrames),
                 frames,
                 truncated: true);
         }
@@ -178,12 +180,12 @@ internal sealed class Mp3Validator : IContainerValidator
         return checkedSums > 0
             ? ContainerValidation.Verified(Format, frames) with
             {
-                TechnicalDetail = $"Кадров {frames}, с проверенной суммой {checkedSums}",
+                TechnicalDetail = Common.Format.Text(Strings.Mp3_Verified_Detail, frames, checkedSums),
             }
             : ContainerValidation.StructureOnly(
                 Format,
                 frames,
-                $"Кадров {frames}; контрольных сумм в файле нет — проверена только цепочка кадров");
+                Common.Format.Text(Strings.Mp3_StructureOnly, frames));
     }
 
     /// <summary>Reads the frame count from the Xing/Info header when present.</summary>
