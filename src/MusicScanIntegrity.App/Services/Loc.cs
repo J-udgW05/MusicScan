@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 using System.Windows.Markup;
 using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
@@ -64,5 +66,21 @@ public sealed class T : MarkupExtension
         };
 
         return binding.ProvideValue(serviceProvider);
+    }
+}
+
+/// <summary>Switches the interface language of the running application.</summary>
+public static class UiLanguage
+{
+    /// <summary>Applies the language now and pins it to the UI thread.</summary>
+    /// <remarks>
+    /// A culture set inside an async method is rolled back when the method yields,
+    /// so later dispatcher callbacks would see the old language again. WPF keeps a
+    /// culture set by a dispatcher operation, hence the second, queued apply.
+    /// </remarks>
+    public static void Apply(string language)
+    {
+        AppLanguage.Apply(language);
+        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.Send, () => AppLanguage.Apply(language));
     }
 }

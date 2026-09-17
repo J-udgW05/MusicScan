@@ -116,6 +116,15 @@ public sealed partial class ReportViewModel : ObservableObject
     {
         UpdateFindingsNote();
 
+        // Kind labels are read from the catalogue on display; re-adding the rows
+        // re-templates them. The finding text itself stays as the scan wrote it.
+        CollectionFinding[] shown = [.. Findings];
+        Findings.Clear();
+        foreach (CollectionFinding finding in shown)
+        {
+            Findings.Add(finding);
+        }
+
         if (_summary is { } summary)
         {
             Update(summary);

@@ -479,7 +479,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
 
         _themeService.Apply(settings);
-        AppLanguage.Apply(settings.Language ?? AppLanguage.Current);
+        UiLanguage.Apply(settings.Language ?? AppLanguage.Current);
 
         _loading = true;
         try

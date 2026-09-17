@@ -102,7 +102,7 @@ public partial class App : Application
             await settings.SaveAsync();
         }
 
-        AppLanguage.Apply(settings.Current.Language);
+        UiLanguage.Apply(settings.Current.Language);
 
         // Effects the user has not decided on yet are taken from the system and
         // written straight to the settings file. From then on the file decides.
