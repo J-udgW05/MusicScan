@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
-using System.Windows;
 using System.Windows.Threading;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MusicScanIntegrity.App.Services;
@@ -14,6 +14,7 @@ using MusicScanIntegrity.Core.Integrity;
 using MusicScanIntegrity.Core.Locking;
 using MusicScanIntegrity.Core.Playlists;
 using MusicScanIntegrity.Core.Reporting;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Scanning;
 using MusicScanIntegrity.Core.Settings;
 
@@ -130,8 +131,8 @@ public partial class App : Application
         if (audioError is not null)
         {
             await _host.Services.GetRequiredService<IDialogService>().ShowMessageAsync(
-                "Проверять файлы пока нельзя",
-                "Не запустился механизм декодирования аудио. Программа откроется, но проверка работать не будет.",
+                Strings.App_NoAudio_Title,
+                Strings.App_NoAudio_Text,
                 audioError,
                 isError: true);
         }
@@ -228,8 +229,7 @@ public partial class App : Application
         try
         {
             MessageBox.Show(
-                "Произошла непредвиденная ошибка. Программа продолжит работу, " +
-                "но что-то могло не сработать.\n\n" + e.Exception.Message,
+                Strings.App_UnexpectedError + "\n\n" + e.Exception.Message,
                 "Music Scan Integrity",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -251,10 +251,10 @@ public partial class App : Application
     {
         try
         {
-            string message = (e.ExceptionObject as Exception)?.Message ?? "Неизвестная ошибка";
+            string message = (e.ExceptionObject as Exception)?.Message ?? Strings.App_UnknownError;
 
             MessageBox.Show(
-                "Произошла ошибка, из-за которой программа закрывается." +
+                Strings.App_FatalError +
                 Environment.NewLine + Environment.NewLine + message,
                 "Music Scan Integrity",
                 MessageBoxButton.OK,

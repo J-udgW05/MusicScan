@@ -4,8 +4,9 @@
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.ColorPickDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="Цвет статуса"
+                 Title="{svc:T Color_Title}"
                  Width="380" SizeToContent="Height" ResizeMode="NoResize"
                  MinHeight="0"
                  WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -40,7 +41,7 @@
                 <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
                     <TextBlock x:Name="LabelText" Style="{StaticResource Text.CardTitle}" />
                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                               Text="Ведите мышью по полю или введите код цвета" />
+                               Text="{svc:T Color_Hint}" />
                 </StackPanel>
             </StackPanel>
 
@@ -111,7 +112,7 @@
                 </Canvas>
             </Grid>
 
-            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ГОТОВЫЕ ОТТЕНКИ" Margin="0,16,0,6" />
+            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Color_Presets}" Margin="0,16,0,6" />
             <ItemsControl x:Name="Swatches">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -134,15 +135,15 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="КОД ЦВЕТА (#RRGGBB)" Margin="0,8,0,6" />
+            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Color_CodeHeader}" Margin="0,8,0,6" />
             <TextBox x:Name="HexBox" Style="{StaticResource TextBox.Field}"
                      FontFamily="{StaticResource Font.Mono}"
-                     AutomationProperties.Name="Код цвета"
+                     AutomationProperties.Name="{svc:T Color_Code}"
                      TextChanged="OnHexChanged" />
 
             <TextBlock x:Name="ErrorText" Style="{StaticResource Text.Tertiary}" Margin="0,6,0,0"
                        Foreground="{DynamicResource Brush.Err}" Visibility="Collapsed"
-                       Text="Не похоже на цвет. Нужен вид #RRGGBB, например #0F7B3F." />
+                       Text="{svc:T Color_Invalid}" />
         </StackPanel>
 
         <Border Grid.Row="2" Background="{DynamicResource Brush.Mica}"
@@ -150,9 +151,9 @@
                 Padding="18,13">
             <DockPanel LastChildFill="False">
                 <Button x:Name="ApplyButton" DockPanel.Dock="Right" Style="{StaticResource Button.Accent}"
-                        Padding="18,8" Content="Применить" IsDefault="True" Click="OnApply" />
+                        Padding="18,8" Content="{svc:T Ui_Apply}" IsDefault="True" Click="OnApply" />
                 <Button DockPanel.Dock="Right" Style="{StaticResource Button.Outline}"
-                        Margin="0,0,10,0" Padding="16,8" Content="Отмена" IsCancel="True" Click="OnCancel" />
+                        Margin="0,0,10,0" Padding="16,8" Content="{svc:T Ui_Cancel}" IsCancel="True" Click="OnCancel" />
             </DockPanel>
         </Border>
     </Grid>

@@ -574,15 +574,15 @@ public sealed class FormatTests
     }
 
     [Theory]
-    [InlineData(1, "файл")]
-    [InlineData(2, "файла")]
-    [InlineData(5, "файлов")]
-    [InlineData(11, "файлов")]
-    [InlineData(21, "файл")]
-    [InlineData(102, "файла")]
+    [InlineData(1, "1 файл")]
+    [InlineData(2, "2 файла")]
+    [InlineData(5, "5 файлов")]
+    [InlineData(11, "11 файлов")]
+    [InlineData(21, "21 файл")]
+    [InlineData(102, "102 файла")]
     public void Plural_forms_are_correct(int count, string expected)
     {
-        Assert.Equal(expected, Format.Plural(count, "файл", "файла", "файлов"));
+        Assert.Equal(expected, Format.Files(count));
     }
 
     [Fact]

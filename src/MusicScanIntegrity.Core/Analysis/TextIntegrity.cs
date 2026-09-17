@@ -127,7 +127,7 @@ public static class TextIntegrity
         {
             if (LooksBroken(value))
             {
-                broken.Add(name.ToLower(CultureInfo.CurrentCulture));
+                broken.Add(name.ToLower(CultureInfo.CurrentUICulture));
             }
         }
 

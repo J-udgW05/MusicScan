@@ -4,9 +4,10 @@
 <ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.ExportReportDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
                  xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="Экспорт отчёта"
+                 Title="{svc:T Ui_ExportReport}"
                  Width="420" SizeToContent="Height" ResizeMode="NoResize"
                  MinHeight="0"
                  WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -27,7 +28,7 @@
                 BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
             <ui:TitleBar Height="38" ButtonsForeground="{DynamicResource Brush.Fg2}" ShowMaximize="False" ShowMinimize="False">
                 <ui:TitleBar.Header>
-                    <TextBlock Text="Экспорт отчёта" Margin="14,0,0,0" VerticalAlignment="Center"
+                    <TextBlock Text="{svc:T Ui_ExportReport}" Margin="14,0,0,0" VerticalAlignment="Center"
                                FontSize="{StaticResource Size.TitleBar}"
                                Foreground="{DynamicResource Brush.Fg2}" />
                 </ui:TitleBar.Header>
@@ -35,61 +36,61 @@
         </Border>
 
         <StackPanel Grid.Row="1" Margin="18">
-            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ФОРМАТ" />
+            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Results_Col_Format}" />
 
             <RadioButton x:Name="HtmlOption" Style="{StaticResource Radio.Dot}" GroupName="Fmt" Margin="0,9,0,0"
                          Checked="OnFormatChanged">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="HTML-страница" />
+                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Export_Html}" />
                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                               Text="С той же цветовой маркировкой, открывается в браузере" />
+                               Text="{svc:T Export_Html_Note}" />
                 </StackPanel>
             </RadioButton>
 
             <RadioButton x:Name="CsvOption" Style="{StaticResource Radio.Dot}" GroupName="Fmt" Margin="0,7,0,0"
                          Checked="OnFormatChanged">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Таблица CSV" />
+                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Export_Csv}" />
                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                               Text="Для Excel и дальнейшей обработки" />
+                               Text="{svc:T Export_Csv_Note}" />
                 </StackPanel>
             </RadioButton>
 
             <RadioButton x:Name="TextOption" Style="{StaticResource Radio.Dot}" GroupName="Fmt" Margin="0,7,0,0"
                          Checked="OnFormatChanged">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Текстовый список" />
+                    <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Export_Text}" />
                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                               Text="Читать глазами, только проблемные файлы" />
+                               Text="{svc:T Export_Text_Note}" />
                 </StackPanel>
             </RadioButton>
 
-            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ЧТО ВКЛЮЧИТЬ" Margin="0,18,0,0" />
+            <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Export_Include}" Margin="0,18,0,0" />
 
             <CheckBox x:Name="IncludeCorrupted" Style="{StaticResource CheckBox.Square}" Margin="0,10,0,0" IsChecked="True">
                 <TextBlock>
-                    <Run Text="Повреждённые файлы" Foreground="{DynamicResource Brush.Fg}" />
+                    <Run Text="{svc:T Export_Include_Corrupted}" Foreground="{DynamicResource Brush.Fg}" />
                     <Run x:Name="CorruptedCount" Foreground="{DynamicResource Brush.Fg3}" />
                 </TextBlock>
             </CheckBox>
 
             <CheckBox x:Name="IncludeWarnings" Style="{StaticResource CheckBox.Square}" Margin="0,9,0,0" IsChecked="True">
                 <TextBlock>
-                    <Run Text="Предупреждения и пропущенные" Foreground="{DynamicResource Brush.Fg}" />
+                    <Run Text="{svc:T Export_Include_Warnings}" Foreground="{DynamicResource Brush.Fg}" />
                     <Run x:Name="WarningCount" Foreground="{DynamicResource Brush.Fg3}" />
                 </TextBlock>
             </CheckBox>
 
             <CheckBox x:Name="IncludeOk" Style="{StaticResource CheckBox.Square}" Margin="0,9,0,0">
                 <TextBlock>
-                    <Run Text="Файлы «в порядке»" Foreground="{DynamicResource Brush.Fg2}" />
+                    <Run Text="{svc:T Export_Include_Ok}" Foreground="{DynamicResource Brush.Fg2}" />
                     <Run x:Name="OkCount" Foreground="{DynamicResource Brush.Fg3}" />
                 </TextBlock>
             </CheckBox>
 
             <CheckBox x:Name="IncludePlaylists" Style="{StaticResource CheckBox.Square}" Margin="0,9,0,0" IsChecked="True">
                 <TextBlock>
-                    <Run Text="Битые ссылки плейлистов" Foreground="{DynamicResource Brush.Fg}" />
+                    <Run Text="{svc:T Export_Include_Playlists}" Foreground="{DynamicResource Brush.Fg}" />
                     <Run x:Name="PlaylistCount" Foreground="{DynamicResource Brush.Fg3}" />
                 </TextBlock>
             </CheckBox>
@@ -99,12 +100,12 @@
                     BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1">
                 <DockPanel LastChildFill="False">
                     <StackPanel DockPanel.Dock="Left" MaxWidth="280">
-                        <TextBlock Style="{StaticResource Text.Tertiary}" Text="Сохранить в" />
+                        <TextBlock Style="{StaticResource Text.Tertiary}" Text="{svc:T Export_SaveTo}" />
                         <TextBlock x:Name="TargetPath" Style="{StaticResource Text.Mono}" Margin="0,4,0,0"
                                    TextWrapping="Wrap" Foreground="{DynamicResource Brush.Fg}" />
                     </StackPanel>
                     <Button DockPanel.Dock="Right" Style="{StaticResource Button.Link}"
-                            VerticalAlignment="Center" Content="Изменить…" Click="OnChangePath" />
+                            VerticalAlignment="Center" Content="{svc:T Ui_ChangeEllipsis}" Click="OnChangePath" />
                 </DockPanel>
             </Border>
         </StackPanel>
@@ -114,9 +115,9 @@
                 Padding="18,13">
             <DockPanel LastChildFill="False">
                 <Button DockPanel.Dock="Right" Style="{StaticResource Button.Accent}" Padding="18,8"
-                        Content="Сохранить" IsDefault="True" Click="OnSave" />
+                        Content="{svc:T Ui_Save}" IsDefault="True" Click="OnSave" />
                 <Button DockPanel.Dock="Right" Style="{StaticResource Button.Outline}"
-                        Margin="0,0,10,0" Padding="16,8" Content="Отмена" IsCancel="True" Click="OnCancel" />
+                        Margin="0,0,10,0" Padding="16,8" Content="{svc:T Ui_Cancel}" IsCancel="True" Click="OnCancel" />
             </DockPanel>
         </Border>
     </Grid>

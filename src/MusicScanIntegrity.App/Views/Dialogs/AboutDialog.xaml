@@ -1,9 +1,10 @@
 ﻿<ui:FluentWindow x:Class="MusicScanIntegrity.App.Views.Dialogs.AboutDialog"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
                  xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 Title="О программе"
+                 Title="{svc:T Ui_About}"
                  Width="400" SizeToContent="Height" ResizeMode="NoResize"
                  MinHeight="0"
                  WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -23,7 +24,7 @@
                 BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
             <ui:TitleBar Height="38" ButtonsForeground="{DynamicResource Brush.Fg2}" ShowMaximize="False" ShowMinimize="False">
                 <ui:TitleBar.Header>
-                    <TextBlock Text="О программе" Margin="14,0,0,0" VerticalAlignment="Center"
+                    <TextBlock Text="{svc:T Ui_About}" Margin="14,0,0,0" VerticalAlignment="Center"
                                FontSize="{StaticResource Size.TitleBar}"
                                Foreground="{DynamicResource Brush.Fg2}" />
                 </ui:TitleBar.Header>
@@ -44,21 +45,21 @@
             </StackPanel>
 
             <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,14,0,0" TextWrapping="Wrap"
-                       Text="Проверка музыкальной коллекции на повреждённые файлы." />
+                       Text="{svc:T About_Tagline}" />
 
             <Border BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,1,0,0"
                     Margin="0,14,0,0" Padding="0,12,0,0">
                 <StackPanel>
                     <DockPanel LastChildFill="False" Margin="0,0,0,7">
                         <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Secondary}"
-                                   Foreground="{DynamicResource Brush.Fg3}" Text="Сборка" />
+                                   Foreground="{DynamicResource Brush.Fg3}" Text="{svc:T About_Build}" />
                         <TextBlock x:Name="BuildLine" DockPanel.Dock="Right" Style="{StaticResource Text.Mono}"
                                    Foreground="{DynamicResource Brush.Fg}" />
                     </DockPanel>
 
                     <DockPanel LastChildFill="False">
                         <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Secondary}"
-                                   Foreground="{DynamicResource Brush.Fg3}" Text="Декодирование" />
+                                   Foreground="{DynamicResource Brush.Fg3}" Text="{svc:T About_Decoding}" />
                         <TextBlock x:Name="AudioLine" DockPanel.Dock="Right" Style="{StaticResource Text.Secondary}"
                                    Foreground="{DynamicResource Brush.Fg}" />
                     </DockPanel>
@@ -72,7 +73,7 @@
                     Background="{DynamicResource Brush.Card2}"
                     BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1">
                 <TextBlock Style="{StaticResource Text.Tertiary}" TextWrapping="Wrap"
-                           Text="Компоненты: BASS - декодирование аудио; TagLib# - чтение тегов; WPF-UI - оформление окна." />
+                           Text="{svc:T About_Components}" />
             </Border>
         </StackPanel>
     </Grid>

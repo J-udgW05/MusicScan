@@ -1,21 +1,22 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Shell;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 using MusicScanIntegrity.App.Services;
+using MusicScanIntegrity.Core.Analysis;
 using MusicScanIntegrity.Core.Audio;
 using MusicScanIntegrity.Core.Discovery;
-using MusicScanIntegrity.Core.Locking;
-using MusicScanIntegrity.Core.Analysis;
 using MusicScanIntegrity.Core.History;
+using MusicScanIntegrity.Core.Locking;
 using MusicScanIntegrity.Core.Models;
 using MusicScanIntegrity.Core.Reporting;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Scanning;
 using MusicScanIntegrity.Core.Settings;
-using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
@@ -39,6 +40,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private readonly IScanHistory _history;
 
     private DiscoveryResult? _lastDiscovery;
+    private ScanCounters? _lastCounters;
+    private LockedFileQuestion? _lastQuestion;
     private ScanSummary? _lastSummary;
 
     /// <summary>Collection findings from the last scan.</summary>
@@ -73,7 +76,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private string _offerTitle = string.Empty;
 
     [ObservableProperty]
-    private string _offerSubtitle = "Можно начинать — параметры проверки справа.";
+    private string _offerSubtitle = Strings.Main_OfferReady;
 
     [ObservableProperty]
     private bool _isScanning;
@@ -153,7 +156,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
     /// <summary>Caption under the list when not every warning is shown.</summary>
     public string LiveWarningNote => LiveWarningTotal > LiveWarnings.Count
-        ? $"Показаны последние {LiveWarnings.Count} — полный список на вкладке «Результаты»"
+        ? CoreFormat.Text(Strings.Main_LiveWarningNote, LiveWarnings.Count)
         : string.Empty;
 
     partial void OnLiveWarningTotalChanged(int value) => OnPropertyChanged(nameof(LiveWarningNote));
@@ -207,6 +210,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
         _settingsService.Changed += OnSettingsChanged;
         Settings.Applied += (_, _) => SyncQuickSettings();
+        AppLanguage.Changed += OnLanguageChanged;
 
         SyncQuickSettings();
     }
@@ -224,7 +228,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     public ObservableCollection<LiveWarningRow> LiveWarnings { get; } = [];
 
     /// <summary>Pause button caption; reads "Resume" while paused.</summary>
-    public string PauseButtonText => IsPaused ? "Продолжить" : "Пауза";
+    public string PauseButtonText => IsPaused ? Strings.Main_Resume : Strings.Main_Pause;
 
     /// <summary>Pause button icon.</summary>
     public string PauseButtonIcon => IsPaused ? "play" : "pause";
@@ -256,7 +260,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     [RelayCommand]
     private async Task PickFolderAsync()
     {
-        string? folder = _dialogs.PickFolder("Папка с музыкой", FolderPath);
+        string? folder = _dialogs.PickFolder(Strings.Main_PickFolderTitle, FolderPath);
         if (folder is not null)
         {
             await SetFolderAsync(folder);
@@ -308,21 +312,11 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             DiscoveryResult result = await _discovery.DiscoverAsync(folder, settings, progress: null, _discoveryCts.Token);
             _lastDiscovery = result;
 
+            _lastCounters = null;
+
             TotalFiles = CoreFormat.Number(result.AudioItems.Count);
-            StatusCounts = $"{CoreFormat.Files(result.AudioItems.Count)} · 0 проверено";
-
-            OfferTitle = result.AudioItems.Count == 0
-                ? "Подходящих файлов не нашлось"
-                : $"Найдено {CoreFormat.Number(result.AudioItems.Count)} подходящих " +
-                  CoreFormat.Plural(result.AudioItems.Count, "файла", "файлов", "файлов");
-
-            // No longer suggests "check the settings": there is no settings button next
-            // to Start, and the scan options are on the right.
-            OfferSubtitle = result.Playlists.Count > 0
-                ? $"Ещё {CoreFormat.Number(result.Playlists.Count)} " +
-                  $"{CoreFormat.Plural(result.Playlists.Count, "плейлист", "плейлиста", "плейлистов")}. " +
-                  "Можно начинать — параметры проверки справа."
-                : "Можно начинать — параметры проверки справа.";
+            UpdateCounterTexts();
+            UpdateOfferTexts();
 
             IsOfferVisible = settings.OfferStartAfterFolderSelected && result.AudioItems.Count > 0;
 
@@ -347,10 +341,10 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             // Three actions: copy path, retry and close. Retry makes sense because the
             // folder may have been temporarily busy or not mounted.
             bool retry = await _dialogs.ConfirmAsync(
-                "Папку не удалось прочитать",
-                "Обойти эту папку не получилось. Проверьте, что она существует и доступна.",
-                "Повторить",
-                "Понятно",
+                Strings.Main_FolderUnreadable_Title,
+                Strings.Main_FolderUnreadable_Text,
+                Strings.Ui_Retry,
+                Strings.Ui_GotIt,
                 destructive: false,
                 copyPath: folder,
                 technicalDetail: $"{ex.GetType().Name} · {ex.Message}",
@@ -394,9 +388,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         if (!_audioProbe.IsAvailable)
         {
             await _dialogs.ShowMessageAsync(
-                "Механизм декодирования не запущен",
-                "Проверить файлы нельзя: библиотеки BASS не найдены или не загрузились. " +
-                "Проверьте, что рядом с программой есть папка bass с bass.dll и плагинами формата.",
+                Strings.Main_NoDecoder_Title,
+                Strings.Main_NoDecoder_Text,
                 isError: true);
             return;
         }
@@ -421,9 +414,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         catch (Exception ex)
         {
             await _dialogs.ShowMessageAsync(
-                "Проверка прервана",
-                "Во время проверки произошла ошибка, из-за которой продолжать нельзя. " +
-                "Всё, что успели проверить, осталось в результатах.",
+                Strings.Main_ScanAborted_Title,
+                Strings.Main_ScanAborted_Text,
                 $"{ex.GetType().Name} · {ex.Message}",
                 isError: true);
         }
@@ -494,11 +486,10 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     private async Task StopAsync()
     {
         bool confirmed = await _dialogs.ConfirmAsync(
-            "Остановить проверку?",
-            $"Проверено {CheckedFiles} из {TotalFiles} файлов. Результаты уже найденных файлов сохранятся — " +
-            "отчёт можно будет выгрузить по неполной проверке. Продолжить с этого места позже не получится.",
-            "Остановить",
-            "Продолжить проверку",
+            Strings.Main_StopConfirm_Title,
+            CoreFormat.Text(Strings.Main_StopConfirm_Text, CheckedFiles, TotalFiles),
+            Strings.Scan_Stop,
+            Strings.Main_ContinueScan,
             destructive: true);
 
         if (confirmed)
@@ -526,25 +517,10 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         {
             LockedFilePath = question.FilePath;
             LockedOwnerText = question.Owner.DisplayText;
-            LockedQueueText = question.QueuedAfterThis > 0
-                ? $"Вопросы задаются по одному — ещё {question.QueuedAfterThis} в очереди"
-                : "Вопросы задаются по одному";
+            _lastQuestion = question;
+            UpdateQuestionTexts();
 
             AppSettings current = _settingsService.Current;
-
-            LockedWaitNote = $"{CoreFormat.Seconds(current.LockedWaitSeconds)}, " +
-                             $"до {current.LockedRetryCount} " +
-                             CoreFormat.Plural(current.LockedRetryCount, "попытки", "попыток", "попыток");
-
-            LockedCopyNote = $"{CoreFormat.Size(question.SizeBytes)} будет скопировано " +
-                             "в %TEMP% и удалено после";
-
-            // DisplayName explicitly: the LockOwner record has no custom ToString(), and
-            // the caption used to dump the whole record.
-            LockedOwnerNote = question.Owner.Owners.Count > 0
-                ? "Запрос на закрытие получит: " +
-                  string.Join(", ", question.Owner.Owners.Select(o => o.DisplayName))
-                : string.Empty;
 
             LockedApplyToAll = false;
             CanCloseOwner = current.OfferCloseOwner && question.Owner.IsReliable && question.Owner.Owners.Count > 0;
@@ -647,8 +623,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             // Async command errors are otherwise swallowed: the MVVM toolkit stores them
             // in the task and shows nobody. A silently failed export is the worst outcome.
             await _dialogs.ShowMessageAsync(
-                "Отчёт не сохранён",
-                "Сохранить отчёт не получилось. Проверьте, что папка доступна на запись и на диске есть место.",
+                Strings.Main_ReportNotSaved_Title,
+                Strings.Main_ReportNotSaved_Text,
                 $"{ex.GetType().Name} · {ex.Message}",
                 isError: true);
         }
@@ -726,7 +702,7 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _dialogs.ShowAbout(new AboutInfo(
             version,
             buildDate,
-            _audioProbe.IsAvailable ? "BASS запущена" : "BASS не запущена",
+            _audioProbe.IsAvailable ? Strings.Main_BassRunning : Strings.Main_BassNotRunning,
             plugins));
     }
 
@@ -803,10 +779,10 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             WarningFiles = CoreFormat.Number(counters.Warnings);
             SkippedFiles = CoreFormat.Number(counters.Skipped);
 
-            ProgressText = $"{CoreFormat.Number(counters.Checked)} из {CoreFormat.Number(counters.Total)}";
+            _lastCounters = counters;
+            UpdateCounterTexts();
 
             CurrentFile = progress.CurrentFile is { } file ? Shorten(file) : string.Empty;
-            StatusCounts = $"{CoreFormat.Files(counters.Total)} · {CoreFormat.Number(counters.Checked)} проверено";
         });
 
     private void OnWarningRaised(object? sender, LiveWarning warning) =>
@@ -867,8 +843,8 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
             if (summary.CriticalFailure is { } failure)
             {
                 await _dialogs.ShowMessageAsync(
-                    "Проверка остановлена",
-                    failure + " Всё, что успели проверить, сохранено и доступно на вкладке «Результаты».",
+                    Strings.Main_ScanStopped_Title,
+                    CoreFormat.Text(Strings.Main_ScanStopped_Text, failure),
                     isError: true);
                 return;
             }
@@ -897,12 +873,12 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
     {
         InaccessibleFolder first = result.InaccessibleFolders[0];
         string extra = result.InaccessibleFolders.Count > 1
-            ? $" Всего таких папок: {result.InaccessibleFolders.Count}."
+            ? CoreFormat.Text(Strings.Main_InaccessibleMore, result.InaccessibleFolders.Count)
             : string.Empty;
 
         await _dialogs.ShowMessageAsync(
-            "Часть папок недоступна",
-            $"{first.Reason} Файлы внутри останутся непроверенными.{extra}",
+            Strings.Main_Inaccessible_Title,
+            CoreFormat.Text(Strings.Main_Inaccessible_Text, first.Reason, extra),
             $"{first.Path}\n{first.TechnicalDetail}",
             isError: false,
             copyPath: first.Path);
@@ -1006,8 +982,87 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
         _engine.WarningRaised -= OnWarningRaised;
         _engine.Finished -= OnFinished;
         _settingsService.Changed -= OnSettingsChanged;
+        AppLanguage.Changed -= OnLanguageChanged;
 
         _discoveryCts?.Dispose();
+    }
+
+    // ── Language ─────────────────────────────────────────────────────────
+
+    /// <summary>Rebuilds captions assembled in code; XAML strings refresh by themselves.</summary>
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateOfferTexts();
+        UpdateCounterTexts();
+
+        if (HasLockedQuestion)
+        {
+            UpdateQuestionTexts();
+        }
+
+        OnPropertyChanged(nameof(PauseButtonText));
+        OnPropertyChanged(nameof(LiveWarningNote));
+
+        Report.RefreshLanguage();
+        Settings.RefreshLanguage();
+
+        // Rows are records; replacing each one re-templates it with the new captions.
+        for (int i = 0; i < LiveWarnings.Count; i++)
+        {
+            LiveWarnings[i] = LiveWarnings[i] with { };
+        }
+    }
+
+    private void UpdateOfferTexts()
+    {
+        if (_lastDiscovery is not { } result)
+        {
+            return;
+        }
+
+        OfferTitle = result.AudioItems.Count == 0
+            ? Strings.Main_NoFilesFound
+            : CoreFormat.Count(result.AudioItems.Count, "Plural_Main_FilesFound");
+
+        OfferSubtitle = result.Playlists.Count > 0
+            ? CoreFormat.Count(result.Playlists.Count, "Plural_Main_MorePlaylists") + " " + Strings.Main_OfferReady
+            : Strings.Main_OfferReady;
+    }
+
+    private void UpdateCounterTexts()
+    {
+        if (_lastCounters is { } counters)
+        {
+            ProgressText = CoreFormat.Text(Strings.Main_ProgressText, CoreFormat.Number(counters.Checked), CoreFormat.Number(counters.Total));
+            StatusCounts = CoreFormat.Text(Strings.Main_StatusCounts, CoreFormat.Files(counters.Total), CoreFormat.Number(counters.Checked));
+        }
+        else if (_lastDiscovery is { } result)
+        {
+            StatusCounts = CoreFormat.Text(Strings.Main_StatusCounts, CoreFormat.Files(result.AudioItems.Count), CoreFormat.Number(0));
+        }
+    }
+
+    private void UpdateQuestionTexts()
+    {
+        if (_lastQuestion is not { } question)
+        {
+            return;
+        }
+
+        LockedQueueText = question.QueuedAfterThis > 0
+            ? CoreFormat.Text(Strings.Main_QuestionsQueued, question.QueuedAfterThis)
+            : Strings.Main_QuestionsOneByOne;
+
+        AppSettings current = _settingsService.Current;
+
+        LockedWaitNote = CoreFormat.Count(current.LockedRetryCount, "Plural_Main_WaitAttempts", CoreFormat.Seconds(current.LockedWaitSeconds));
+        LockedCopyNote = CoreFormat.Text(Strings.Main_CopyNote, CoreFormat.Size(question.SizeBytes));
+
+        // DisplayName explicitly: the LockOwner record has no custom ToString(), and
+        // the caption used to dump the whole record.
+        LockedOwnerNote = question.Owner.Owners.Count > 0
+            ? CoreFormat.Text(Strings.Main_CloseRequestTo, string.Join(", ", question.Owner.Owners.Select(o => o.DisplayName)))
+            : string.Empty;
     }
 }
 
@@ -1020,7 +1075,7 @@ public sealed record LiveWarningRow(string Title, string Path, IssueCode Code)
     /// look at, so the row is dismissed; other findings belong to a file that can
     /// be opened on the results tab.
     /// </summary>
-    public string ActionLabel => Code is IssueCode.LargeFile ? "Понятно" : "Показать";
+    public string ActionLabel => Code is IssueCode.LargeFile ? Strings.Ui_GotIt : Strings.Main_Show;
 
     /// <summary>Whether the action dismisses the row.</summary>
     public bool ActionDismisses => Code is IssueCode.LargeFile;

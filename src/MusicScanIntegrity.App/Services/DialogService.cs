@@ -4,6 +4,7 @@ using System.Windows;
 using Microsoft.Win32;
 using MusicScanIntegrity.App.Views.Dialogs;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.Services;
@@ -160,7 +161,7 @@ public sealed class DialogService : IDialogService
     /// <inheritdoc />
     public Task ShowMessageAsync(string title, string message, string? technicalDetail = null, bool isError = false, string? copyPath = null)
     {
-        MessageDialog dialog = new(title, message, "Понятно", cancelText: null, destructive: false, technicalDetail, isError, copyPath: copyPath)
+        MessageDialog dialog = new(title, message, Strings.Ui_GotIt, cancelText: null, destructive: false, technicalDetail, isError, copyPath: copyPath)
         {
             Owner = Owner(),
         };

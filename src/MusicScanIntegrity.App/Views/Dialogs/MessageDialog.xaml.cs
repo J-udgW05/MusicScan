@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
@@ -30,7 +31,7 @@ public partial class MessageDialog
         _copyPath = copyPath;
 
         // Short caption in the title bar, full wording inside.
-        Title = windowTitle ?? (isError ? "Ошибка" : cancelText is null ? "Сообщение" : "Подтверждение");
+        Title = windowTitle ?? (isError ? Strings.Message_Error : cancelText is null ? Strings.Message_Message : Strings.Message_Confirm);
         TitleText.Text = Title;
         HeadlineText.Text = title;
         MessageText.Text = message;

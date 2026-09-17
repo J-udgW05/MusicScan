@@ -176,15 +176,6 @@ public static class Format
         };
     }
 
-    /// <summary>Russian plural agreement: 1 файл / 2 файла / 5 файлов.</summary>
-    /// <remarks>Kept for callers not yet moved to <see cref="Count"/>.</remarks>
-    public static string Plural(long count, string one, string few, string many) => PluralForm(count) switch
-    {
-        "One" => one,
-        "Few" => few,
-        _ => many,
-    };
-
     private static string UnitName(int unit) => unit switch
     {
         0 => Strings.Unit_B,

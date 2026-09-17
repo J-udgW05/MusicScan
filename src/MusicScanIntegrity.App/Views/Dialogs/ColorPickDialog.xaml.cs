@@ -1,8 +1,9 @@
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
 using MusicScanIntegrity.Core.Common;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
@@ -39,7 +40,7 @@ public partial class ColorPickDialog
     {
         InitializeComponent();
 
-        TitleText.Text = "Цвет статуса";
+        TitleText.Text = Strings.Color_Title;
         LabelText.Text = label;
         Swatches.ItemsSource = Palette;
 

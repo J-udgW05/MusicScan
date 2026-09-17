@@ -57,21 +57,21 @@
                 <Border Style="{StaticResource Card}" ClipToBounds="True">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
-                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Внешний вид" />
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Appearance}" />
                         </Border>
 
                         <StackPanel Margin="18,16">
-                            <TextBlock Style="{StaticResource Text.Base}" Text="Тема оформления" Margin="0,0,0,10" />
+                            <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Theme}" Margin="0,0,0,10" />
 
                             <UniformGrid Rows="1" Columns="3">
                                 <RadioButton GroupName="Theme" Margin="0,0,4,0"
-                                             Style="{StaticResource ThemeChoice}" Content="Как в системе"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_System}"
                                              IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.System}}" />
                                 <RadioButton GroupName="Theme" Margin="4,0"
-                                             Style="{StaticResource ThemeChoice}" Content="Светлая"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_Light}"
                                              IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.Light}}" />
                                 <RadioButton GroupName="Theme" Margin="4,0,0,0"
-                                             Style="{StaticResource ThemeChoice}" Content="Тёмная"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_Dark}"
                                              IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.Dark}}" />
                             </UniformGrid>
 
@@ -88,7 +88,7 @@
                                           SelectedItem="{Binding Language}" />
                             </Grid>
 
-                            <TextBlock Style="{StaticResource Text.Base}" Text="Цвета статусов" Margin="0,18,0,2" />
+                            <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_StatusColors}" Margin="0,18,0,2" />
 
                             <ItemsControl ItemsSource="{Binding StatusColors}">
                                 <ItemsControl.ItemTemplate>
@@ -97,8 +97,8 @@
                                             <!-- The whole row is clickable: the swatch is where the hand goes, and it used
                                                  to be a plain image. -->
                                             <Button Style="{StaticResource Row.Navigate}"
-                                                    AutomationProperties.Name="{Binding Label, StringFormat=Цвет статуса {0}}"
-                                                    ToolTip="Выбрать цвет"
+                                                    AutomationProperties.Name="{Binding PickName}"
+                                                    ToolTip="{svc:T Settings_PickColor}"
                                                     Command="{Binding DataContext.PickStatusColorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     CommandParameter="{Binding}">
                                                 <DockPanel LastChildFill="False">
@@ -124,9 +124,9 @@
 
                                                     <Button DockPanel.Dock="Right" Style="{StaticResource Button.Link}"
                                                             Margin="12,0,0,0" VerticalAlignment="Center"
-                                                            Content="Сбросить"
-                                                            ToolTip="Вернуть цвет темы"
-                                                            AutomationProperties.Name="{Binding Label, StringFormat=Вернуть цвет темы: {0}}"
+                                                            Content="{svc:T Ui_Reset}"
+                                                            ToolTip="{svc:T Settings_ResetColor_Tip}"
+                                                            AutomationProperties.Name="{Binding ResetName}"
                                                             Visibility="{Binding IsCustom, Converter={StaticResource BoolToVisibility}}"
                                                             Command="{Binding DataContext.ResetStatusColorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                             CommandParameter="{Binding}" />
@@ -144,10 +144,10 @@
 
                             <DockPanel LastChildFill="False" Margin="0,14,0,0">
                                 <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Плотность списка результатов" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Density}" />
                                 </StackPanel>
                                 <ComboBox DockPanel.Dock="Right" Style="{StaticResource ComboBox.Pill}"
-                                          MinWidth="104" AutomationProperties.Name="Плотность списка"
+                                          MinWidth="104" AutomationProperties.Name="{svc:T Settings_Density_Name}"
                                           SelectedItem="{Binding ListDensity}"
                                           ItemTemplate="{StaticResource EnumItemTemplate}">
                                     <core:ListDensity>Normal</core:ListDensity>
@@ -157,25 +157,25 @@
 
                             <DockPanel LastChildFill="False" Margin="0,14,0,0">
                                 <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
-                                           Text="Отображать полные пути к файлам" VerticalAlignment="Center" />
+                                           Text="{svc:T Settings_FullPaths}" VerticalAlignment="Center" />
                                 <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Отображать полные пути к файлам"
+                                          AutomationProperties.Name="{svc:T Settings_FullPaths}"
                                           IsChecked="{Binding ShowFullPaths}" />
                             </DockPanel>
 
                             <DockPanel LastChildFill="False" Margin="0,10,0,0">
                                 <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
-                                           Text="Одинаковая ширина букв в путях" VerticalAlignment="Center" />
+                                           Text="{svc:T Settings_MonoPaths}" VerticalAlignment="Center" />
                                 <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Моноширинный шрифт для путей"
+                                          AutomationProperties.Name="{svc:T Settings_MonoPaths_Name}"
                                           IsChecked="{Binding MonospacePaths}" />
                             </DockPanel>
 
                             <DockPanel LastChildFill="False" Margin="0,10,0,0">
                                 <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
-                                           Text="Строка состояния" VerticalAlignment="Center" />
+                                           Text="{svc:T Settings_StatusBar}" VerticalAlignment="Center" />
                                 <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Строка состояния"
+                                          AutomationProperties.Name="{svc:T Settings_StatusBar}"
                                           IsChecked="{Binding ShowStatusBar}" />
                             </DockPanel>
 
@@ -185,7 +185,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Эффект Mica" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Mica}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap" Text="{Binding MicaNote}"
                                                Visibility="{Binding MicaNote, Converter={StaticResource NotEmptyToVisibility}}" />
@@ -193,7 +193,7 @@
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
                                           IsEnabled="{Binding IsMicaSupported}"
-                                          AutomationProperties.Name="Эффект Mica"
+                                          AutomationProperties.Name="{svc:T Settings_Mica}"
                                           IsChecked="{Binding MicaEffect}" />
                             </Grid>
 
@@ -203,11 +203,11 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Анимации" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Animations}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Анимации"
+                                          AutomationProperties.Name="{svc:T Settings_Animations}"
                                           IsChecked="{Binding Animations}" />
                             </Grid>
                         </StackPanel>
@@ -223,7 +223,7 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Style="{StaticResource Text.BlockTitle}" Text="Форматы" />
+                                <TextBlock Grid.Column="0" Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Formats}" />
                                 <TextBlock Grid.Column="1" Style="{StaticResource Text.Tertiary}"
                                            VerticalAlignment="Center" Text="{Binding FormatsSummary}" />
                             </Grid>
@@ -241,7 +241,7 @@
                                         <ToggleButton Style="{StaticResource Chip.Format}" Margin="0,0,6,6"
                                                       IsChecked="{Binding Enabled}"
                                                       AutomationProperties.Name="{Binding Extension}"
-                                                      ToolTip="Нажмите, чтобы включить или выключить формат"
+                                                      ToolTip="{svc:T Settings_Formats_Tip}"
                                                       Content="{Binding Extension}" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -255,20 +255,20 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                        <TextBlock Style="{StaticResource Text.Base}" Text="Проверять образы дисков ISO (SACD)" />
+                                        <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Iso}" />
                                         <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                                   Text="Экспериментально, работает не всегда" />
+                                                   Text="{svc:T Settings_Iso_Note}" />
                                     </StackPanel>
                                     <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                              AutomationProperties.Name="Проверять образы дисков ISO (SACD)"
+                                              AutomationProperties.Name="{svc:T Settings_Iso}"
                                               IsChecked="{Binding EnableIsoSacd}" />
                                 </Grid>
                             </Border>
 
                             <StackPanel Margin="0,14,0,0">
-                                <TextBlock Style="{StaticResource Text.Base}" Text="Дополнительные расширения файлов" />
+                                <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ExtraExtensions}" />
                                 <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,6"
-                                           Text="Через запятую, например: .mpc, .tta" />
+                                           Text="{svc:T Settings_ExtraExtensions_Note}" />
                                 <TextBox Style="{StaticResource TextBox.Field}"
                                          Text="{Binding CustomExtensions, UpdateSourceTrigger=LostFocus}" />
                             </StackPanel>
@@ -280,7 +280,7 @@
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
-                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Занятые файлы (другим процессом)" />
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Locked}" />
                         </Border>
 
                         <Border Style="{StaticResource SettingRow}">
@@ -291,7 +291,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Что делать с занятым файлом" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Action}" />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
                                           MinWidth="140" SelectedItem="{Binding LockedFileAction}"
@@ -312,9 +312,9 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Сколько ждать освобождения файла, секунд" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Wait}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="перед повторной попыткой" />
+                                               Text="{svc:T Settings_Locked_Wait_Note}" />
                                 </StackPanel>
                                 <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
                                          Width="68" Padding="10,5" TextAlignment="Center"
@@ -330,9 +330,9 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Сколько раз повторить попытку" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Retries}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="затем файл помечается пропущенным" />
+                                               Text="{svc:T Settings_Locked_Retries_Note}" />
                                 </StackPanel>
                                 <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
                                          Width="68" Padding="10,5" TextAlignment="Center"
@@ -347,10 +347,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Узнавать, какой процесс держит файл" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_DetectOwner}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Определять программу-владельца"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_DetectOwner_Name}"
                                           IsChecked="{Binding DetectOwnerProcess}" />
                             </Grid>
                         </Border>
@@ -362,12 +362,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Применять ответ ко всем занятым файлам" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_ApplyAll}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="флажок в самом вопросе" />
+                                               Text="{svc:T Settings_Locked_ApplyAll_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Применять ответ ко всем занятым файлам"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_ApplyAll}"
                                           IsChecked="{Binding AllowApplyToAllLocked}" />
                             </Grid>
                         </Border>
@@ -379,12 +379,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Предлагать закрыть эту программу" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_OfferClose}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="потенциально опасно" />
+                                               Text="{svc:T Settings_Locked_OfferClose_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Предлагать закрыть владельца"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_OfferClose_Name}"
                                           IsChecked="{Binding OfferCloseOwner}" />
                             </Grid>
                         </Border>
@@ -397,7 +397,7 @@
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
-                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Что ещё искать" />
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Extra}" />
                         </Border>
 
                         <Border Style="{StaticResource SettingRow}">
@@ -407,14 +407,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Проверять альбомы и искать копии" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Albums}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="пропуски в нумерации, разнобой форматов в папке, отсутствие обложки, один и тот же трек в разных местах - попадают на вкладку «Отчёт»" />
+                                               Text="{svc:T Settings_Albums_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Проверять альбомы и искать копии"
+                                          AutomationProperties.Name="{svc:T Settings_Albums}"
                                           IsChecked="{Binding InspectCollection}" />
                             </Grid>
                         </Border>
@@ -426,14 +426,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Замечать тишину и провалы звука" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Silence}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="файл читается, но звучит тишиной" />
+                                               Text="{svc:T Settings_Silence_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Замечать тишину и провалы звука"
+                                          AutomationProperties.Name="{svc:T Settings_Silence}"
                                           IsChecked="{Binding DetectSilence}" />
                             </Grid>
                         </Border>
@@ -445,11 +445,11 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Искать перекодированные файлы" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Transcodes}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Искать перекодированные файлы"
+                                          AutomationProperties.Name="{svc:T Settings_Transcodes}"
                                           IsChecked="{Binding DetectTranscode}" />
                             </Grid>
                         </Border>
@@ -461,14 +461,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Замечать перегрузку громкости и смещение нуля" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Clipping}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="выключено намеренно: у современных мастерингов звук упирается в предел шкалы сплошь и рядом" />
+                                               Text="{svc:T Settings_Clipping_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Замечать перегрузку громкости и смещение нуля"
+                                          AutomationProperties.Name="{svc:T Settings_Clipping}"
                                           IsChecked="{Binding DetectClipping}" />
                             </Grid>
                         </Border>
@@ -482,7 +482,7 @@
                 <Border Style="{StaticResource Card}" ClipToBounds="True">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
-                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Проверка" />
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Ui_Scan}" />
                         </Border>
 
                         <Border Style="{StaticResource SettingRow}">
@@ -492,10 +492,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Заходить в подпапки" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_Recurse}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Рекурсивный обход подпапок"
+                                          AutomationProperties.Name="{svc:T Settings_Recurse_Name}"
                                           IsChecked="{Binding Recursive}" />
                             </Grid>
                         </Border>
@@ -507,10 +507,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Проверять теги" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_CheckTags}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Проверка метаданных"
+                                          AutomationProperties.Name="{svc:T Settings_CheckTags_Name}"
                                           IsChecked="{Binding CheckMetadata}" />
                             </Grid>
                         </Border>
@@ -522,12 +522,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Проверять плейлисты" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Playlists}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="ищет отсутствующие пути внутри M3U, PLS, CUE" />
+                                               Text="{svc:T Settings_Playlists_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Проверять плейлисты"
+                                          AutomationProperties.Name="{svc:T Settings_Playlists}"
                                           IsChecked="{Binding CheckPlaylists}" />
                             </Grid>
                         </Border>
@@ -540,14 +540,14 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Способ чтения файлов" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ReadMode}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="выборочно - конец и три места в середине; целиком надёжнее, но занимает больше времени" />
+                                               Text="{svc:T Settings_ReadMode_Note}" />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
                                           MinWidth="128" VerticalAlignment="Center"
-                                          AutomationProperties.Name="Способ чтения файлов"
+                                          AutomationProperties.Name="{svc:T Settings_ReadMode}"
                                           SelectedItem="{Binding CheckDepth}"
                                           ItemTemplate="{StaticResource EnumItemTemplate}">
                                     <core:CheckDepth>Quick</core:CheckDepth>
@@ -564,14 +564,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Проверять контрольные суммы в файле" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Checksums}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="FLAC и Ogg сверяются по своим суммам, MP3 и MP4 - по структуре" />
+                                               Text="{svc:T Settings_Checksums_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Проверять контрольные суммы в файле"
+                                          AutomationProperties.Name="{svc:T Settings_Checksums}"
                                           IsChecked="{Binding VerifyContainerIntegrity}" />
                             </Grid>
                         </Border>
@@ -583,14 +583,14 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Оптимизация для жёстких дисков" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Hdd}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                TextWrapping="Wrap"
-                                               Text="жёсткий диск читает быстрее, когда его не дёргают: восемь файлов разом заставляют головку метаться, и проверка идёт медленнее, чем в два" />
+                                               Text="{svc:T Settings_Hdd_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                           VerticalAlignment="Center"
-                                          AutomationProperties.Name="Оптимизация для жёстких дисков"
+                                          AutomationProperties.Name="{svc:T Settings_Hdd}"
                                           IsChecked="{Binding RespectDriveType}" />
                             </Grid>
                         </Border>
@@ -603,22 +603,22 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                        <TextBlock Style="{StaticResource Text.Base}" Text="Следить за порчей файлов" />
+                                        <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Watch}" />
                                         <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
                                                    TextWrapping="Wrap"
-                                                   Text="запоминает отпечаток каждого файла и находит тихую порчу: содержимое изменилось, а размер и дата прежние. Первая проверка при этом читает каждый файл целиком" />
+                                                   Text="{svc:T Settings_Watch_Note}" />
                                     </StackPanel>
                                     <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
                                               VerticalAlignment="Center"
-                                              AutomationProperties.Name="Следить за порчей файлов"
+                                              AutomationProperties.Name="{svc:T Settings_Watch}"
                                               IsChecked="{Binding TrackChanges}" />
                                 </Grid>
 
                                 <DockPanel LastChildFill="False" Margin="0,10,0,0"
                                            Visibility="{Binding TrackChanges, Converter={StaticResource BoolToVisibility}}">
                                     <Button DockPanel.Dock="Right" Style="{StaticResource Button.Outline}"
-                                            Padding="12,6" Content="Очистить историю"
-                                            AutomationProperties.Name="Очистить историю"
+                                            Padding="12,6" Content="{svc:T Settings_ClearHistory}"
+                                            AutomationProperties.Name="{svc:T Settings_ClearHistory}"
                                             Command="{Binding ClearHistoryCommand}" />
                                     <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Tertiary}"
                                                VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
@@ -634,12 +634,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Сверять расширение с содержимым" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ExtensionMatch}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="MP3, который на деле FLAC, помечается предупреждением" />
+                                               Text="{svc:T Settings_ExtensionMatch_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Сверять расширение с содержимым"
+                                          AutomationProperties.Name="{svc:T Settings_ExtensionMatch}"
                                           IsChecked="{Binding VerifyExtension}" />
                             </Grid>
                         </Border>
@@ -652,10 +652,11 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Большим считается файл от" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_LargeFrom}" />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
                                           ItemsSource="{x:Static vm:SettingsViewModel.ThresholdOptions}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}"
                                           SelectedItem="{Binding Threshold}" />
                             </Grid>
                         </Border>
@@ -668,12 +669,13 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Время ожидания файла" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Timeout}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="дальше - статус «подозрительный»" />
+                                               Text="{svc:T Settings_Timeout_Note}" />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
                                           ItemsSource="{x:Static vm:SettingsViewModel.TimeoutOptions}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}"
                                           SelectedItem="{Binding Timeout}" />
                             </Grid>
                         </Border>
@@ -685,12 +687,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Подбирать нагрузку автоматически" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_AutoThreads}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="по числу ядер, не больше 8" />
+                                               Text="{svc:T Settings_AutoThreads_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Подбирать нагрузку автоматически"
+                                          AutomationProperties.Name="{svc:T Settings_AutoThreads}"
                                           IsChecked="{Binding AutoParallelism}" />
                             </Grid>
                         </Border>
@@ -703,9 +705,9 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Сколько файлов проверять разом" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Threads}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="работает, когда подбор выключен" />
+                                               Text="{svc:T Settings_Threads_Note}" />
                                 </StackPanel>
                                 <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
                                          Width="68" Padding="10,5" TextAlignment="Center"
@@ -721,12 +723,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Предупреждать о больших файлах" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_WarnLarge}" />
                                     <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
-                                               Text="до начала их проверки" />
+                                               Text="{svc:T Settings_WarnLarge_Note}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Предупреждать о больших файлах"
+                                          AutomationProperties.Name="{svc:T Settings_WarnLarge}"
                                           IsChecked="{Binding WarnAboutLargeFiles}" />
                             </Grid>
                         </Border>
@@ -737,7 +739,7 @@
                 <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
                     <StackPanel>
                         <Border Style="{StaticResource SectionHeader}">
-                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="Отчёты и другое" />
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Other}" />
                         </Border>
 
                         <Border Style="{StaticResource SettingRow}">
@@ -747,10 +749,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Запоминать последнюю папку" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_RememberFolder}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Запоминать последнюю папку"
+                                          AutomationProperties.Name="{svc:T Settings_RememberFolder}"
                                           IsChecked="{Binding RememberLastFolder}" />
                             </Grid>
                         </Border>
@@ -762,10 +764,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Предлагать начать сразу после выбора папки" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_OfferStart}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Предлагать начать сразу после выбора папки"
+                                          AutomationProperties.Name="{svc:T Settings_OfferStart}"
                                           IsChecked="{Binding OfferStartAfterFolderSelected}" />
                             </Grid>
                         </Border>
@@ -777,10 +779,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Показывать подсказку при первом запуске" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_FirstRunHint}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Показывать подсказку при первом запуске"
+                                          AutomationProperties.Name="{svc:T Settings_FirstRunHint}"
                                           IsChecked="{Binding ShowFirstRunTip}" />
                             </Grid>
                         </Border>
@@ -792,10 +794,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Звук по завершении проверки" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Sound}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Звук по завершении проверки"
+                                          AutomationProperties.Name="{svc:T Settings_Sound}"
                                           IsChecked="{Binding SoundOnFinish}" />
                             </Grid>
                         </Border>
@@ -808,7 +810,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Формат отчёта по умолчанию" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_DefaultReportFormat}" />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
                                           SelectedItem="{Binding DefaultReportFormat}"
@@ -827,13 +829,22 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Папка для отчётов" />
-                                    <TextBlock Style="{StaticResource Text.Mono}" Margin="0,2,0,0"
-                                               TextTrimming="CharacterEllipsis"
-                                               Text="{Binding ReportsFolder, TargetNullValue='Документы'}" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ReportsFolder}" />
+                                    <TextBlock Margin="0,2,0,0" TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Mono}">
+                                                <Setter Property="Text" Value="{Binding ReportsFolder}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ReportsFolder}" Value="{x:Null}">
+                                                        <Setter Property="Text" Value="{svc:T Settings_ReportsFolder_Default}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                                 <Button Grid.Column="1" Style="{StaticResource Button.Outline}"
-                                        MinWidth="104" Padding="10,5" Content="Изменить"
+                                        MinWidth="104" Padding="10,5" Content="{svc:T Ui_Change}"
                                         FontSize="{StaticResource Size.Secondary}"
                                         Background="{DynamicResource Brush.Card2}"
                                         Command="{Binding PickReportsFolderCommand}" />
@@ -847,10 +858,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Включать в отчёт файлы без замечаний" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_IncludeOk}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Включать в отчёт целые файлы"
+                                          AutomationProperties.Name="{svc:T Settings_IncludeOk_Name}"
                                           IsChecked="{Binding IncludeOkFilesInReport}" />
                             </Grid>
                         </Border>
@@ -862,10 +873,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
-                                    <TextBlock Style="{StaticResource Text.Base}" Text="Открывать отчёт после сохранения" />
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_OpenReport}" />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
-                                          AutomationProperties.Name="Открывать отчёт после сохранения"
+                                          AutomationProperties.Name="{svc:T Settings_OpenReport}"
                                           IsChecked="{Binding OpenReportAfterSave}" />
                             </Grid>
                         </Border>
@@ -887,13 +898,13 @@
                             BorderBrush="{DynamicResource Brush.Err}"
                             Foreground="{DynamicResource Brush.Err}"
                             FontWeight="{StaticResource Weight.Semi}"
-                            Content="Сбросить всё"
-                            ToolTip="Вернуть все настройки к значениям по умолчанию"
-                            AutomationProperties.Name="Сбросить все настройки"
+                            Content="{svc:T Settings_ResetAll}"
+                            ToolTip="{svc:T Settings_ResetAll_Tip}"
+                            AutomationProperties.Name="{svc:T Settings_ResetAll_Name}"
                             Command="{Binding ResetAllCommand}" />
 
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="ФАЙЛ НАСТРОЕК" />
+                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Settings_File}" />
 
                         <!-- The path is the link; a separate "Open folder" line next to the same path
                              would repeat it. -->
@@ -902,8 +913,8 @@
                              unbounded, no ellipsis appeared, and a long path ran under the card edge. -->
                         <Button Style="{StaticResource Button.Link}" Margin="0,7,0,0"
                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                ToolTip="Открыть папку с файлом настроек"
-                                AutomationProperties.Name="Открыть папку с файлом настроек"
+                                ToolTip="{svc:T Settings_OpenFileFolder}"
+                                AutomationProperties.Name="{svc:T Settings_OpenFileFolder}"
                                 Command="{Binding OpenSettingsFolderCommand}">
                             <Grid>
                                 <Grid.ColumnDefinitions>

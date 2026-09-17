@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Threading;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.Core.Discovery;
 using MusicScanIntegrity.Core.History;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.ViewModels;
@@ -16,7 +17,6 @@ namespace MusicScanIntegrity.App.ViewModels;
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
-    /// <summary>Preset large-file thresholds.</summary>
     /// <summary>Interface languages, each named in its own language.</summary>
     public static readonly IReadOnlyList<LanguageOption> LanguageOptions =
     [
@@ -24,25 +24,13 @@ public sealed partial class SettingsViewModel : ObservableObject
         new(AppLanguage.English, "English"),
     ];
 
+    /// <summary>Preset large-file thresholds.</summary>
     public static readonly IReadOnlyList<ThresholdOption> ThresholdOptions =
-    [
-        new(100, "100 МБ"),
-        new(500, "500 МБ"),
-        new(1024, "1 ГБ"),
-        new(2048, "2 ГБ"),
-        new(5120, "5 ГБ"),
-        new(0, "Без ограничений"),
-    ];
+        [new(100), new(500), new(1024), new(2048), new(5120), new(0)];
 
     /// <summary>Preset per-file timeouts.</summary>
     public static readonly IReadOnlyList<TimeoutOption> TimeoutOptions =
-    [
-        new(15, "15 с"),
-        new(30, "30 с"),
-        new(60, "60 с"),
-        new(120, "2 мин"),
-        new(300, "5 мин"),
-    ];
+        [new(15), new(30), new(60), new(120), new(300)];
 
     private readonly ISettingsService _settingsService;
     private readonly IThemeService _themeService;
@@ -79,10 +67,10 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         StatusColors =
         [
-            new StatusColorRow(CheckStatus.Ok, "В порядке"),
-            new StatusColorRow(CheckStatus.Corrupted, "Повреждён"),
-            new StatusColorRow(CheckStatus.Warning, "Предупреждение"),
-            new StatusColorRow(CheckStatus.Skipped, "Пропущен"),
+            new StatusColorRow(CheckStatus.Ok),
+            new StatusColorRow(CheckStatus.Corrupted),
+            new StatusColorRow(CheckStatus.Warning),
+            new StatusColorRow(CheckStatus.Skipped),
         ];
 
         Reload();
@@ -129,7 +117,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     /// <summary>Chip summary, e.g. "12 of 14".</summary>
     public string FormatsSummary =>
-        $"{Formats.Count(f => f.Enabled)} из {Formats.Count}";
+        Core.Common.Format.Text(Strings.Settings_FormatsSummary, Formats.Count(f => f.Enabled), Formats.Count);
 
     private void OnFormatToggled()
     {
@@ -198,7 +186,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// </summary>
     public string MicaNote => IsMicaSupported
         ? string.Empty
-        : "недоступно: подложку умеет рисовать только Windows 11";
+        : Strings.Settings_MicaUnavailable;
 
     // ── Scanning ─────────────────────────────────────────────────────────
 
@@ -513,11 +501,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     private async Task ResetAllAsync()
     {
         bool confirmed = await _dialogService.ConfirmAsync(
-            "Сбросить все настройки?",
-            "Все параметры вернутся к значениям по умолчанию: рекурсия включена, проверка тегов выключена, " +
-            "порог большого файла 500 МБ, таймаут 60 секунд, тема — как в системе.",
-            "Сбросить",
-            "Отмена",
+            Strings.Settings_ResetConfirm_Title,
+            Strings.Settings_ResetConfirm_Text,
+            Strings.Ui_Reset,
+            Strings.Ui_Cancel,
             destructive: true);
 
         if (!confirmed)
@@ -536,7 +523,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private void PickReportsFolder()
     {
         string? folder = _dialogService.PickFolder(
-            "Куда сохранять отчёты",
+            Strings.Settings_PickReportsFolder,
             string.IsNullOrWhiteSpace(ReportsFolder) ? null : ReportsFolder);
 
         if (folder is not null)
@@ -569,11 +556,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     private async Task ClearHistoryAsync()
     {
         bool confirmed = await _dialogService.ConfirmAsync(
-            "Очистить историю проверок?",
-            "Отпечатки всех файлов будут забыты. Следующая проверка прочитает коллекцию заново, " +
-            "а порча, случившаяся до этого момента, останется незамеченной — сравнивать будет не с чем.",
-            "Очистить",
-            "Отмена",
+            Strings.Settings_ClearHistory_Title,
+            Strings.Settings_ClearHistory_Text,
+            Strings.Ui_Clear,
+            Strings.Ui_Cancel,
             destructive: true);
 
         if (!confirmed)
@@ -608,9 +594,21 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         int count = _history.Count();
         HistoryNote = count == 0
-            ? "История пока пуста — она заполнится при первой проверке."
-            : $"В истории {Core.Common.Format.Number(count)} " +
-              $"{Core.Common.Format.Plural(count, "файл", "файла", "файлов")}; база лежит в {_history.DatabasePath}";
+            ? Strings.Settings_HistoryEmpty
+            : Core.Common.Format.Count(count, "Plural_Settings_HistoryCount", _history.DatabasePath);
+    }
+
+    /// <summary>Rebuilds captions assembled in code after the interface language changes.</summary>
+    public void RefreshLanguage()
+    {
+        foreach (StatusColorRow row in StatusColors)
+        {
+            row.RefreshLanguage();
+        }
+
+        OnPropertyChanged(nameof(FormatsSummary));
+        OnPropertyChanged(nameof(MicaNote));
+        RefreshHistoryNote();
     }
 
     /// <summary>Reveals the settings file in Explorer.</summary>
@@ -681,10 +679,15 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     /// <summary>A large-file threshold option.</summary>
     /// <param name="Megabytes">Size in megabytes; 0 means no limit.</param>
-    public sealed record ThresholdOption(int Megabytes, string Label)
+    public sealed record ThresholdOption(int Megabytes)
     {
         /// <inheritdoc />
-        public override string ToString() => Label;
+        public override string ToString() => Megabytes switch
+        {
+            0 => Strings.Option_NoLimit,
+            >= 1024 => Core.Common.Format.Text(Strings.Option_Gigabytes, Megabytes / 1024),
+            _ => Core.Common.Format.Text(Strings.Option_Megabytes, Megabytes),
+        };
     }
 
     /// <summary>A number with its display caption.</summary>
@@ -695,10 +698,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     /// <summary>A per-file timeout option.</summary>
-    public sealed record TimeoutOption(int Seconds, string Label)
+    public sealed record TimeoutOption(int Seconds)
     {
         /// <inheritdoc />
-        public override string ToString() => Label;
+        public override string ToString() => Seconds >= 120
+            ? Core.Common.Format.Text(Strings.Option_Minutes, Seconds / 60)
+            : Core.Common.Format.Text(Strings.Option_Seconds, Seconds);
     }
 }
 
@@ -733,11 +738,18 @@ public sealed partial class FormatChip(string extension, Action onToggled) : Obs
 }
 
 /// <summary>Status colour row.</summary>
-public sealed partial class StatusColorRow(CheckStatus status, string label) : ObservableObject
+public sealed partial class StatusColorRow(CheckStatus status) : ObservableObject
 {
     public CheckStatus Status { get; } = status;
 
-    public string Label { get; } = label;
+    public string Label => Status.DisplayName();
+
+    public string PickName => Core.Common.Format.Text(Strings.Settings_PickColor_Name, Label);
+
+    public string ResetName => Core.Common.Format.Text(Strings.Settings_ResetColor_Name, Label);
+
+    /// <summary>Re-reads the captions after the interface language changes.</summary>
+    public void RefreshLanguage() => OnPropertyChanged(string.Empty);
 
     /// <summary>User colour; <see langword="null"/> means the theme colour.</summary>
     [ObservableProperty]

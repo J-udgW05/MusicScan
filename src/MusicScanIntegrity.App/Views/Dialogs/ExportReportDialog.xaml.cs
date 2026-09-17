@@ -1,9 +1,10 @@
 ﻿using System.IO;
 using System.Windows;
+using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 using Microsoft.Win32;
 using MusicScanIntegrity.App.Services;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
-using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
@@ -28,7 +29,7 @@ public partial class ExportReportDialog
 
         // Warn up front that a full report will be large.
         OkCount.Text = context.OkCount > 5000
-            ? $"{CoreFormat.Number(context.OkCount)} — отчёт станет тяжёлым"
+            ? CoreFormat.Text(Strings.Export_OkHeavy, CoreFormat.Number(context.OkCount))
             : CoreFormat.Number(context.OkCount);
 
         IncludeOk.IsChecked = context.Settings.IncludeOkFilesInReport;
@@ -77,15 +78,15 @@ public partial class ExportReportDialog
     {
         SaveFileDialog dialog = new()
         {
-            Title = "Куда сохранить отчёт",
+            Title = Strings.Export_SaveTitle,
             FileName = _fileName,
             AddExtension = true,
             OverwritePrompt = true,
             Filter = SelectedFormat switch
             {
-                ReportFormat.Csv => "Таблица CSV (*.csv)|*.csv",
-                ReportFormat.Text => "Текстовый файл (*.txt)|*.txt",
-                _ => "HTML-страница (*.html)|*.html",
+                ReportFormat.Csv => Strings.Export_Filter_Csv,
+                ReportFormat.Text => Strings.Export_Filter_Text,
+                _ => Strings.Export_Filter_Html,
             },
         };
 

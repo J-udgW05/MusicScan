@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Collections;
 using System.ComponentModel;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MusicScanIntegrity.Core.Models;
 using CoreFormat = MusicScanIntegrity.Core.Common.Format;
+using MusicScanIntegrity.Core.Models;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
@@ -48,8 +48,8 @@ public sealed partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private int _playlistMissingCount;
 
-    /// <summary>Filter value meaning "all formats".</summary>
-    public const string AllFormats = "Формат: все";
+    /// <summary>Filter value meaning "all formats"; displayed through the string catalogue.</summary>
+    public const string AllFormats = "*";
 
     public ResultsViewModel()
     {

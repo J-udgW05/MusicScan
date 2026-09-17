@@ -1,8 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using System.Windows;
+using CoreFormat = MusicScanIntegrity.Core.Common.Format;
 using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.Core.Models;
-using CoreFormat = MusicScanIntegrity.Core.Common.Format;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.App.Views.Dialogs;
 
@@ -16,13 +17,12 @@ public partial class ScanFinishedDialog
 
         ScanCounters counters = summary.Counters;
 
-        Title = summary.WasStopped ? "Проверка остановлена" : "Проверка завершена";
+        Title = summary.WasStopped ? Strings.Finished_StoppedTitle : Strings.Finished_Title;
         TitleText.Text = Title;
 
-        HeadlineText.Text = $"{CoreFormat.Number(counters.Checked)} " +
-                            $"{CoreFormat.Plural(counters.Checked, "файл проверен", "файла проверено", "файлов проверено")}";
+        HeadlineText.Text = CoreFormat.Count(counters.Checked, "Plural_Html_FilesChecked");
 
-        ElapsedText.Text = $"За {CoreFormat.DurationWords(summary.Duration)}";
+        ElapsedText.Text = CoreFormat.Text(Strings.Finished_In, CoreFormat.DurationWords(summary.Duration));
 
         CorruptedValue.Text = CoreFormat.Number(counters.Corrupted);
         WarningValue.Text = CoreFormat.Number(counters.Warnings);
@@ -43,9 +43,8 @@ public partial class ScanFinishedDialog
         {
             PlaylistNote.Visibility = Visibility.Visible;
             PlaylistNote.Text = summary.PlaylistMissingLinks > 0
-                ? $"Плейлистов проверено: {CoreFormat.Number(summary.PlaylistCount)}, " +
-                  $"путей не найдено: {CoreFormat.Number(summary.PlaylistMissingLinks)}."
-                : $"Плейлистов проверено: {CoreFormat.Number(summary.PlaylistCount)}, все пути на месте.";
+                ? CoreFormat.Text(Strings.Finished_PlaylistsMissing, CoreFormat.Number(summary.PlaylistCount), CoreFormat.Number(summary.PlaylistMissingLinks))
+                : CoreFormat.Text(Strings.Finished_PlaylistsOk, CoreFormat.Number(summary.PlaylistCount));
         }
     }
 

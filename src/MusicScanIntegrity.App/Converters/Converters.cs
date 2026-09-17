@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows;
+using MusicScanIntegrity.App.ViewModels;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.Converters;
@@ -166,40 +168,55 @@ public sealed class InvertBoolConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => value is not true;
 }
 
-/// <summary>Display caption for an enum value.</summary>
+/// <summary>Display caption for an enum value or option.</summary>
 /// <remarks>
-/// Without it combo boxes would show code names such as "Html" or "Ask".
+/// Without it combo boxes would show code names such as "Html" or "Ask". Used as a
+/// multi-binding, the second value is a localized string that only serves to
+/// re-run the conversion when the interface language changes.
 /// </remarks>
-public sealed class EnumDisplayConverter : IValueConverter
+public sealed class EnumDisplayConverter : IValueConverter, IMultiValueConverter
 {
-    /// <inheritdoc />
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value switch
+    /// <summary>Caption in the current interface language.</summary>
+    public static string Display(object? value) => value switch
     {
-        AppTheme.System => "Как в системе",
-        AppTheme.Light => "Светлая",
-        AppTheme.Dark => "Тёмная",
+        AppTheme.System => Strings.Enum_Theme_System,
+        AppTheme.Light => Strings.Enum_Theme_Light,
+        AppTheme.Dark => Strings.Enum_Theme_Dark,
 
-        LockedFileAction.Ask => "Спрашивать",
-        LockedFileAction.Skip => "Пропускать",
-        LockedFileAction.Wait => "Подождать",
-        LockedFileAction.TempCopy => "Временная копия",
-        LockedFileAction.CloseOwner => "Закрыть владельца",
+        LockedFileAction.Ask => Strings.Enum_Locked_Ask,
+        LockedFileAction.Skip => Strings.Enum_Locked_Skip,
+        LockedFileAction.Wait => Strings.Enum_Locked_Wait,
+        LockedFileAction.TempCopy => Strings.Enum_Locked_TempCopy,
+        LockedFileAction.CloseOwner => Strings.Enum_Locked_CloseOwner,
 
-        ReportFormat.Html => "HTML-страница",
-        ReportFormat.Csv => "Таблица CSV",
-        ReportFormat.Text => "Текстовый список",
+        ReportFormat.Html => Strings.Enum_Report_Html,
+        ReportFormat.Csv => Strings.Enum_Report_Csv,
+        ReportFormat.Text => Strings.Enum_Report_Text,
 
-        CheckDepth.Quick => "Только начало",
-        CheckDepth.Sampled => "Выборочно",
-        CheckDepth.Full => "Файл целиком",
+        CheckDepth.Quick => Strings.Enum_Depth_Quick,
+        CheckDepth.Sampled => Strings.Enum_Depth_Sampled,
+        CheckDepth.Full => Strings.Enum_Depth_Full,
 
-        ListDensity.Normal => "Обычная",
-        ListDensity.Compact => "Компактная",
+        ListDensity.Normal => Strings.Enum_Density_Normal,
+        ListDensity.Compact => Strings.Enum_Density_Compact,
+
+        ResultsViewModel.AllFormats => Strings.Html_AllFormats,
 
         _ => value?.ToString() ?? string.Empty,
     };
 
     /// <inheritdoc />
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => Display(value);
+
+    /// <inheritdoc />
+    public object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture) =>
+        Display(values.Length > 0 ? values[0] : null);
+
+    /// <inheritdoc />
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+
+    /// <inheritdoc />
+    public object[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }

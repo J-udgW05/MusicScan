@@ -1,9 +1,10 @@
 ﻿using System.IO;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Shell;
+using System.Windows;
 using MusicScanIntegrity.App.Services;
 using MusicScanIntegrity.App.ViewModels;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.App.Views;
 
@@ -94,12 +95,10 @@ public partial class MainWindow
         e.Cancel = true;
 
         bool confirmed = await _dialogs.ConfirmAsync(
-            "Прервать проверку и выйти?",
-            "Проверка ещё идёт. Если закрыть программу сейчас, она остановится, " +
-            "а результаты останутся непрочитанными: отчёт по неполной проверке " +
-            "можно выгрузить, только если сначала остановить её и не закрывать окно.",
-            "Выйти",
-            "Остаться",
+            Strings.Main_ExitConfirm_Title,
+            Strings.Main_ExitConfirm_Text,
+            Strings.Main_Exit,
+            Strings.Main_Stay,
             destructive: true);
 
         if (confirmed)

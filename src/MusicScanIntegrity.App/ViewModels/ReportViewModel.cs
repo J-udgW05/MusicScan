@@ -1,8 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MusicScanIntegrity.Core.Models;
-using MusicScanIntegrity.Core.Settings;
 using CoreFormat = MusicScanIntegrity.Core.Common.Format;
+using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
+using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.App.ViewModels;
 
@@ -13,13 +14,13 @@ public sealed partial class ReportViewModel : ObservableObject
     private string _totalFiles = "0";
 
     [ObservableProperty]
-    private string _totalFilesNote = "в 0 папках";
+    private string _totalFilesNote = CoreFormat.Count(0, "Plural_Html_InFolders");
 
     [ObservableProperty]
     private string _corruptedCount = "0";
 
     [ObservableProperty]
-    private string _corruptedNote = "0 % коллекции";
+    private string _corruptedNote = CoreFormat.Text(Strings.Html_OfCollection, CoreFormat.Percent(0));
 
     [ObservableProperty]
     private string _warningCount = "0";
@@ -28,7 +29,7 @@ public sealed partial class ReportViewModel : ObservableObject
     private string _elapsed = "0:00";
 
     [ObservableProperty]
-    private string _elapsedNote = "проверка не запускалась";
+    private string _elapsedNote = Strings.ReportTab_NotRunYet;
 
     [ObservableProperty]
     private ReportFormat _selectedFormat = ReportFormat.Html;
@@ -88,18 +89,43 @@ public sealed partial class ReportViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(findings);
 
-        const int limit = 200;
-
         Findings.Clear();
-        foreach (CollectionFinding finding in findings.Take(limit))
+        foreach (CollectionFinding finding in findings.Take(FindingsLimit))
         {
             Findings.Add(finding);
         }
 
         HasFindings = findings.Count > 0;
-        FindingsNote = findings.Count > limit
-            ? $"Показаны {limit} замечаний из {findings.Count} — остальные попадут в отчёт"
+        _findingsTotal = findings.Count;
+        UpdateFindingsNote();
+    }
+
+    private const int FindingsLimit = 200;
+
+    private int _findingsTotal;
+
+    private ScanSummary? _summary;
+
+    private void UpdateFindingsNote() =>
+        FindingsNote = _findingsTotal > FindingsLimit
+            ? CoreFormat.Text(Strings.ReportTab_FindingsCapped, FindingsLimit, _findingsTotal)
             : string.Empty;
+
+    /// <summary>Rebuilds captions after the interface language changes.</summary>
+    public void RefreshLanguage()
+    {
+        UpdateFindingsNote();
+
+        if (_summary is { } summary)
+        {
+            Update(summary);
+        }
+        else
+        {
+            TotalFilesNote = CoreFormat.Count(0, "Plural_Html_InFolders");
+            CorruptedNote = CoreFormat.Text(Strings.Html_OfCollection, CoreFormat.Percent(0));
+            ElapsedNote = Strings.ReportTab_NotRunYet;
+        }
     }
 
     /// <summary>Caption under the folder list when not every folder is shown.</summary>
@@ -111,22 +137,21 @@ public sealed partial class ReportViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(summary);
 
+        _summary = summary;
         ScanCounters counters = summary.Counters;
 
         TotalFiles = CoreFormat.Number(counters.Total);
-        TotalFilesNote = $"в {CoreFormat.Number(summary.Folders.Count)} " +
-                         CoreFormat.Plural(summary.Folders.Count, "папке", "папках", "папках");
+        TotalFilesNote = CoreFormat.Count(summary.Folders.Count, "Plural_Html_InFolders");
 
         CorruptedCount = CoreFormat.Number(counters.Corrupted);
         CorruptedNote = counters.Total > 0
-            ? $"{CoreFormat.Percent((double)counters.Corrupted / counters.Total)} коллекции"
-            : "коллекция пуста";
+            ? CoreFormat.Text(Strings.Html_OfCollection, CoreFormat.Percent((double)counters.Corrupted / counters.Total))
+            : Strings.ReportTab_CollectionEmpty;
 
         WarningCount = CoreFormat.Number(counters.Warnings);
 
         Elapsed = CoreFormat.Duration(summary.Duration);
-        ElapsedNote = $"{summary.Parallelism} " +
-                      CoreFormat.Plural(summary.Parallelism, "поток", "потока", "потоков");
+        ElapsedNote = CoreFormat.Count(summary.Parallelism, "Plural_ReportTab_Threads");
 
         // Shares go to the markup as star weights of the bar columns.
         OkShare = counters.Ok;
@@ -145,7 +170,7 @@ public sealed partial class ReportViewModel : ObservableObject
         const int folderLimit = 200;
 
         FoldersNote = summary.Folders.Count > folderLimit
-            ? $"Показаны {folderLimit} папок с наибольшим числом файлов из {CoreFormat.Number(summary.Folders.Count)}"
+            ? CoreFormat.Text(Strings.ReportTab_FoldersCapped, folderLimit, CoreFormat.Number(summary.Folders.Count))
             : string.Empty;
 
         Folders.Clear();
@@ -168,10 +193,11 @@ public sealed partial class ReportViewModel : ObservableObject
         Folders.Clear();
         FoldersNote = string.Empty;
         HasSummary = false;
+        _summary = null;
         OkShare = CorruptedShare = WarningShare = SkippedShare = 0;
         TotalFiles = CorruptedCount = WarningCount = "0";
         Elapsed = "0:00";
-        ElapsedNote = "проверка не запускалась";
+        ElapsedNote = Strings.ReportTab_NotRunYet;
     }
 
     /// <summary>
@@ -187,7 +213,7 @@ public sealed partial class ReportViewModel : ObservableObject
         }
 
         string tail = path[root.Length..].TrimStart(System.IO.Path.DirectorySeparatorChar);
-        return tail.Length == 0 ? "· корень выбранной папки" : @"\" + tail;
+        return tail.Length == 0 ? Strings.ReportTab_RootFolder : @"\" + tail;
     }
 
     /// <summary>A row in the checked folders list.</summary>

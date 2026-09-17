@@ -73,7 +73,7 @@ dotnet_diagnostic.CA2000.severity = warning
 dotnet_diagnostic.CA2016.severity = warning
 dotnet_diagnostic.CA1816.severity = warning
 
-# User-facing strings are currently written inline.
+# User-facing strings live in Resources/Strings.resx; the analyzer cannot see that.
 dotnet_diagnostic.CA1303.severity = none
 
 [*.{cs,vb}]
