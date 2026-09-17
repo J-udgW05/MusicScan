@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
@@ -26,20 +27,25 @@ public sealed class TextReportExporter : IReportExporter
         ScanSummary summary = data.Summary;
 
         await writer.WriteLineAsync(new string('=', RuleWidth)).ConfigureAwait(false);
-        await writer.WriteLineAsync($"{ReportData.ProductName} — отчёт о проверке коллекции").ConfigureAwait(false);
+        await writer.WriteLineAsync(Common.Format.Text(Strings.Report_TextTitle, ReportData.ProductName)).ConfigureAwait(false);
         await writer.WriteLineAsync(new string('=', RuleWidth)).ConfigureAwait(false);
         await writer.WriteLineAsync().ConfigureAwait(false);
 
-        await writer.WriteLineAsync($"Папка:            {summary.RootPath}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"Сформирован:      {data.GeneratedAt:dd.MM.yyyy HH:mm}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"Время проверки:   {Common.Format.Duration(summary.Duration)} ({Common.Format.DurationWords(summary.Duration)})").ConfigureAwait(false);
-        await writer.WriteLineAsync($"Потоков:          {summary.Parallelism}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"Как проверяли:    {summary.DepthLabel}").ConfigureAwait(false);
+        // Label width follows the longest label, so both languages line up.
+        (string Label, string Value)[] header =
+        [
+            (Strings.Report_Folder, summary.RootPath),
+            (Strings.Report_Generated, Common.Format.Text(Strings.Report_DateTime, data.GeneratedAt)),
+            (Strings.Report_ScanDuration, $"{Common.Format.Duration(summary.Duration)} ({Common.Format.DurationWords(summary.Duration)})"),
+            (Strings.Report_Threads, summary.Parallelism.ToString(CultureInfo.InvariantCulture)),
+            (Strings.Report_Method, summary.DepthLabel),
+        ];
+        await WriteAlignedAsync(writer, header).ConfigureAwait(false);
         await writer.WriteLineAsync().ConfigureAwait(false);
 
         if (data.Findings is { Count: > 0 } findings)
         {
-            await writer.WriteLineAsync("ЗАМЕЧАНИЯ ПО КОЛЛЕКЦИИ").ConfigureAwait(false);
+            await writer.WriteLineAsync(Heading(Strings.Report_Title_CollectionFindings)).ConfigureAwait(false);
             await writer.WriteLineAsync(new string('-', RuleWidth)).ConfigureAwait(false);
 
             foreach (CollectionFinding finding in findings)
@@ -56,31 +62,39 @@ public sealed class TextReportExporter : IReportExporter
             await writer.WriteLineAsync().ConfigureAwait(false);
         }
 
-        await writer.WriteLineAsync("СВОДКА").ConfigureAwait(false);
+        await writer.WriteLineAsync(Heading(Strings.Report_Title_Summary)).ConfigureAwait(false);
         await writer.WriteLineAsync(new string('-', RuleWidth)).ConfigureAwait(false);
-        await writer.WriteLineAsync($"  Всего файлов:     {Common.Format.Number(summary.Counters.Total)}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"  Проверено:        {Common.Format.Number(summary.Counters.Checked)}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"  ✓ В порядке:      {Common.Format.Number(summary.Counters.Ok)}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"  ✕ Повреждено:     {Common.Format.Number(summary.Counters.Corrupted)}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"  ! Предупреждений: {Common.Format.Number(summary.Counters.Warnings)}").ConfigureAwait(false);
-        await writer.WriteLineAsync($"  – Пропущено:      {Common.Format.Number(summary.Counters.Skipped)}").ConfigureAwait(false);
+
+        List<(string Label, string Value)> counts =
+        [
+            ("  " + Strings.Report_TotalFiles, Common.Format.Number(summary.Counters.Total)),
+            ("  " + Strings.Report_Checked, Common.Format.Number(summary.Counters.Checked)),
+            ("  ✓ " + Strings.Report_Ok, Common.Format.Number(summary.Counters.Ok)),
+            ("  ✕ " + Strings.Report_Corrupted, Common.Format.Number(summary.Counters.Corrupted)),
+            ("  ! " + Strings.Report_Warnings, Common.Format.Number(summary.Counters.Warnings)),
+            ("  – " + Strings.Report_Skipped, Common.Format.Number(summary.Counters.Skipped)),
+        ];
 
         if (summary.PlaylistCount > 0)
         {
-            await writer.WriteLineAsync($"  Плейлистов:       {Common.Format.Number(summary.PlaylistCount)} (битых ссылок: {Common.Format.Number(summary.PlaylistMissingLinks)})").ConfigureAwait(false);
+            counts.Add(("  " + Strings.Report_Playlists,
+                Common.Format.Number(summary.PlaylistCount) + " " +
+                Common.Format.Text(Strings.Report_BrokenLinksNote, Common.Format.Number(summary.PlaylistMissingLinks))));
         }
+
+        await WriteAlignedAsync(writer, counts).ConfigureAwait(false);
 
         await writer.WriteLineAsync().ConfigureAwait(false);
 
         if (summary.WasStopped)
         {
-            await writer.WriteLineAsync("ВНИМАНИЕ: проверка была остановлена — отчёт неполный.").ConfigureAwait(false);
+            await writer.WriteLineAsync(Heading(Strings.Report_Attention) + ": " + Strings.Report_StoppedIncomplete).ConfigureAwait(false);
             await writer.WriteLineAsync().ConfigureAwait(false);
         }
 
         if (summary.CriticalFailure is { } failure)
         {
-            await writer.WriteLineAsync($"КРИТИЧЕСКИЙ СБОЙ: {failure}").ConfigureAwait(false);
+            await writer.WriteLineAsync(Heading(Strings.Report_CriticalFailure) + ": " + failure).ConfigureAwait(false);
             await writer.WriteLineAsync().ConfigureAwait(false);
         }
 
@@ -122,7 +136,7 @@ public sealed class TextReportExporter : IReportExporter
         IReadOnlyList<PlaylistCheckResult> brokenPlaylists = [.. data.Playlists.Where(p => p.MissingCount > 0 || p.ParseIssue is not null)];
         if (brokenPlaylists.Count > 0)
         {
-            await writer.WriteLineAsync("ПЛЕЙЛИСТЫ С ПРОБЛЕМАМИ").ConfigureAwait(false);
+            await writer.WriteLineAsync(Heading(Strings.Report_Title_BrokenPlaylists)).ConfigureAwait(false);
             await writer.WriteLineAsync(new string('-', RuleWidth)).ConfigureAwait(false);
 
             foreach (PlaylistCheckResult playlist in brokenPlaylists)
@@ -138,7 +152,7 @@ public sealed class TextReportExporter : IReportExporter
 
                 foreach (PlaylistEntry entry in playlist.Entries.Where(e => !e.Exists))
                 {
-                    await writer.WriteLineAsync($"    не найден: {entry.RawPath}").ConfigureAwait(false);
+                    await writer.WriteLineAsync("    " + Common.Format.Text(Strings.Report_NotFound, entry.RawPath)).ConfigureAwait(false);
                 }
 
                 await writer.WriteLineAsync().ConfigureAwait(false);
@@ -147,7 +161,7 @@ public sealed class TextReportExporter : IReportExporter
 
         if (summary.InaccessibleFolders.Count > 0)
         {
-            await writer.WriteLineAsync("ПАПКИ, КОТОРЫЕ НЕ УДАЛОСЬ ПРОЧИТАТЬ").ConfigureAwait(false);
+            await writer.WriteLineAsync(Heading(Strings.Report_Title_UnreadableFolders)).ConfigureAwait(false);
             await writer.WriteLineAsync(new string('-', RuleWidth)).ConfigureAwait(false);
 
             foreach (InaccessibleFolder folder in summary.InaccessibleFolders)
@@ -160,9 +174,22 @@ public sealed class TextReportExporter : IReportExporter
         }
 
         await writer.WriteLineAsync(new string('=', RuleWidth)).ConfigureAwait(false);
-        await writer.WriteLineAsync($"Отчёт сформирован программой {ReportData.ProductName} " +
-            $"{DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.GetCultureInfo("ru-RU"))}").ConfigureAwait(false);
+        await writer.WriteLineAsync(Common.Format.Text(Strings.Report_TextFooter, ReportData.ProductName, data.GeneratedAt)).ConfigureAwait(false);
 
         await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>Upper-cased section heading.</summary>
+    private static string Heading(string title) => title.ToUpper(CultureInfo.CurrentUICulture);
+
+    /// <summary>Writes "label: value" lines with values aligned in one column.</summary>
+    private static async Task WriteAlignedAsync(StreamWriter writer, IReadOnlyList<(string Label, string Value)> rows)
+    {
+        int width = rows.Max(r => r.Label.Length) + 2;
+
+        foreach ((string label, string value) in rows)
+        {
+            await writer.WriteLineAsync((label + ":").PadRight(width) + value).ConfigureAwait(false);
+        }
     }
 }

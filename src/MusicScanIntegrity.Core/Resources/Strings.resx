@@ -420,6 +420,9 @@
   <data name="Format_Unknown" xml:space="preserve">
     <value>неизвестный</value>
   </data>
+  <data name="History_OpenFailed" xml:space="preserve">
+    <value>Не удалось открыть базу истории: {0}</value>
+  </data>
   <data name="Issue_Short_AudioDropout" xml:space="preserve">
     <value>Провал в тишину</value>
   </data>
@@ -719,6 +722,123 @@
   </data>
   <data name="Probe_Unknown" xml:space="preserve">
     <value>Неизвестная ошибка.</value>
+  </data>
+  <data name="Report_Attention" xml:space="preserve">
+    <value>Внимание</value>
+  </data>
+  <data name="Report_BrokenLinksNote" xml:space="preserve">
+    <value>(битых ссылок: {0})</value>
+  </data>
+  <data name="Report_BrokenPlaylistLinks" xml:space="preserve">
+    <value>Битых ссылок в плейлистах</value>
+  </data>
+  <data name="Report_Checked" xml:space="preserve">
+    <value>Проверено</value>
+  </data>
+  <data name="Report_Col_Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="Report_Col_FileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Report_Col_Format" xml:space="preserve">
+    <value>Формат</value>
+  </data>
+  <data name="Report_Col_Missing" xml:space="preserve">
+    <value>Не найдено</value>
+  </data>
+  <data name="Report_Col_MissingPath" xml:space="preserve">
+    <value>Отсутствующий путь</value>
+  </data>
+  <data name="Report_Col_Path" xml:space="preserve">
+    <value>Путь</value>
+  </data>
+  <data name="Report_Col_Playlist" xml:space="preserve">
+    <value>Плейлист</value>
+  </data>
+  <data name="Report_Col_SizeBytes" xml:space="preserve">
+    <value>Размер, байт</value>
+  </data>
+  <data name="Report_Col_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Report_Col_TechnicalCause" xml:space="preserve">
+    <value>Техническая причина</value>
+  </data>
+  <data name="Report_Col_TotalEntries" xml:space="preserve">
+    <value>Всего записей</value>
+  </data>
+  <data name="Report_CollectionFindings" xml:space="preserve">
+    <value>Замечаний по коллекции</value>
+  </data>
+  <data name="Report_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Report_CriticalFailure" xml:space="preserve">
+    <value>Критический сбой</value>
+  </data>
+  <data name="Report_DateTime" xml:space="preserve">
+    <value>{0:dd.MM.yyyy HH:mm}</value>
+  </data>
+  <data name="Report_Folder" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="Report_FormatUnsupported" xml:space="preserve">
+    <value>Формат отчёта {0} не поддерживается.</value>
+  </data>
+  <data name="Report_Generated" xml:space="preserve">
+    <value>Сформирован</value>
+  </data>
+  <data name="Report_Method" xml:space="preserve">
+    <value>Как проверяли</value>
+  </data>
+  <data name="Report_NotFound" xml:space="preserve">
+    <value>не найден: {0}</value>
+  </data>
+  <data name="Report_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Report_Playlists" xml:space="preserve">
+    <value>Плейлистов</value>
+  </data>
+  <data name="Report_Report" xml:space="preserve">
+    <value>Отчёт</value>
+  </data>
+  <data name="Report_ScanDuration" xml:space="preserve">
+    <value>Время проверки</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
+  <data name="Report_StoppedIncomplete" xml:space="preserve">
+    <value>Проверка была остановлена — отчёт неполный.</value>
+  </data>
+  <data name="Report_TextFooter" xml:space="preserve">
+    <value>Отчёт сформирован программой {0} {1:dd.MM.yyyy}</value>
+  </data>
+  <data name="Report_TextTitle" xml:space="preserve">
+    <value>{0} — отчёт о проверке коллекции</value>
+  </data>
+  <data name="Report_Threads" xml:space="preserve">
+    <value>Потоков</value>
+  </data>
+  <data name="Report_Title_BrokenPlaylists" xml:space="preserve">
+    <value>Плейлисты с проблемами</value>
+  </data>
+  <data name="Report_Title_CollectionFindings" xml:space="preserve">
+    <value>Замечания по коллекции</value>
+  </data>
+  <data name="Report_Title_Summary" xml:space="preserve">
+    <value>Сводка</value>
+  </data>
+  <data name="Report_Title_UnreadableFolders" xml:space="preserve">
+    <value>Папки, которые не удалось прочитать</value>
+  </data>
+  <data name="Report_TotalFiles" xml:space="preserve">
+    <value>Всего файлов</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Предупреждений</value>
   </data>
   <data name="Result_Decoded" xml:space="preserve">
     <value>Файл прочитан и декодирован без ошибок.</value>

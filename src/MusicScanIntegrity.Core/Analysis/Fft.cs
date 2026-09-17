@@ -21,12 +21,12 @@ public static class Fft
 
         if (imaginary.Length != length)
         {
-            throw new ArgumentException("Длины действительной и мнимой частей должны совпадать.", nameof(imaginary));
+            throw new ArgumentException("Real and imaginary parts must have the same length.", nameof(imaginary));
         }
 
         if (length < 2 || (length & (length - 1)) != 0)
         {
-            throw new ArgumentException("Длина должна быть степенью двойки.", nameof(real));
+            throw new ArgumentException("Length must be a power of two.", nameof(real));
         }
 
         Reorder(real, imaginary);

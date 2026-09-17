@@ -2,6 +2,7 @@
 using System.Text;
 using MusicScanIntegrity.Core.Common;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
@@ -36,44 +37,44 @@ public sealed class CsvReportExporter : IReportExporter
         // The summary is a block of its own before the table; every report
         // format carries one.
         ScanSummary summary = data.Summary;
-        await WriteRowAsync(writer, ["Отчёт", ReportData.ProductName]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Папка", summary.RootPath]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Сформирован", data.GeneratedAt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Время проверки", Common.Format.Duration(summary.Duration)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Потоков", summary.Parallelism.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Как проверяли", summary.DepthLabel]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Report, ReportData.ProductName]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Folder, summary.RootPath]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Generated, data.GeneratedAt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_ScanDuration, Common.Format.Duration(summary.Duration)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Threads, summary.Parallelism.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Method, summary.DepthLabel]).ConfigureAwait(false);
 
         if (data.Findings is { Count: > 0 } collectionFindings)
         {
-            await WriteRowAsync(writer, ["Замечаний по коллекции", collectionFindings.Count.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+            await WriteRowAsync(writer, [Strings.Report_CollectionFindings, collectionFindings.Count.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
 
             foreach (CollectionFinding finding in collectionFindings)
             {
                 await WriteRowAsync(writer, [finding.KindLabel, $"{finding.Path} — {finding.Message}"]).ConfigureAwait(false);
             }
         }
-        await WriteRowAsync(writer, ["Всего файлов", summary.Counters.Total.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Проверено", summary.Counters.Checked.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["В порядке", summary.Counters.Ok.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Повреждено", summary.Counters.Corrupted.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Предупреждений", summary.Counters.Warnings.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Пропущено", summary.Counters.Skipped.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Плейлистов", summary.PlaylistCount.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
-        await WriteRowAsync(writer, ["Битых ссылок в плейлистах", summary.PlaylistMissingLinks.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_TotalFiles, summary.Counters.Total.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Checked, summary.Counters.Checked.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Ok, summary.Counters.Ok.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Corrupted, summary.Counters.Corrupted.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Warnings, summary.Counters.Warnings.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Skipped, summary.Counters.Skipped.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_Playlists, summary.PlaylistCount.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
+        await WriteRowAsync(writer, [Strings.Report_BrokenPlaylistLinks, summary.PlaylistMissingLinks.ToString(CultureInfo.InvariantCulture)]).ConfigureAwait(false);
 
         if (summary.WasStopped)
         {
-            await WriteRowAsync(writer, ["Внимание", "Проверка была остановлена — отчёт неполный."]).ConfigureAwait(false);
+            await WriteRowAsync(writer, [Strings.Report_Attention, Strings.Report_StoppedIncomplete]).ConfigureAwait(false);
         }
 
         if (summary.CriticalFailure is { } failure)
         {
-            await WriteRowAsync(writer, ["Критический сбой", failure]).ConfigureAwait(false);
+            await WriteRowAsync(writer, [Strings.Report_CriticalFailure, failure]).ConfigureAwait(false);
         }
 
         await writer.WriteLineAsync().ConfigureAwait(false);
 
-        await WriteRowAsync(writer, ["Имя файла", "Путь", "Формат", "Размер, байт", "Статус", "Описание", "Техническая причина"])
+        await WriteRowAsync(writer, [Strings.Report_Col_FileName, Strings.Report_Col_Path, Strings.Report_Col_Format, Strings.Report_Col_SizeBytes, Strings.Report_Col_Status, Strings.Report_Col_Description, Strings.Report_Col_TechnicalCause])
             .ConfigureAwait(false);
 
         foreach (FileCheckResult result in data.Results)
@@ -95,7 +96,7 @@ public sealed class CsvReportExporter : IReportExporter
         if (data.Playlists.Count > 0)
         {
             await writer.WriteLineAsync().ConfigureAwait(false);
-            await WriteRowAsync(writer, ["Плейлист", "Всего записей", "Не найдено", "Отсутствующий путь"]).ConfigureAwait(false);
+            await WriteRowAsync(writer, [Strings.Report_Col_Playlist, Strings.Report_Col_TotalEntries, Strings.Report_Col_Missing, Strings.Report_Col_MissingPath]).ConfigureAwait(false);
 
             foreach (PlaylistCheckResult playlist in data.Playlists)
             {

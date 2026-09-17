@@ -1,4 +1,5 @@
 ﻿using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
@@ -139,7 +140,7 @@ public sealed class ReportService : IReportService
 
         if (!_byFormat.TryGetValue(format, out IReportExporter? exporter))
         {
-            throw new NotSupportedException($"Формат отчёта {format} не поддерживается.");
+            throw new NotSupportedException(Common.Format.Text(Strings.Report_FormatUnsupported, format));
         }
 
         string? folder = Path.GetDirectoryName(filePath);

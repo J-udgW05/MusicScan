@@ -1,6 +1,6 @@
 ﻿using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace MusicScanIntegrity.Core.Settings;
 
@@ -64,7 +64,7 @@ public sealed class JsonSettingsService : ISettingsService
 
             if (loaded is null)
             {
-                throw new InvalidDataException("Файл настроек пуст или содержит null.");
+                throw new InvalidDataException("The settings file is empty or contains null.");
             }
 
             Current = Sanitize(loaded);

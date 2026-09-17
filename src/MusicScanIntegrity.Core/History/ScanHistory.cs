@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 
 namespace MusicScanIntegrity.Core.History;
 
@@ -160,7 +161,7 @@ public sealed class ScanHistory : IScanHistory
                                           or NotSupportedException)
             {
                 Close();
-                return $"Не удалось открыть базу истории: {ex.Message}";
+                return Common.Format.Text(Strings.History_OpenFailed, ex.Message);
             }
         }
     }
