@@ -31,7 +31,7 @@ public sealed class HtmlReportExporter : IReportExporter
         await using StreamWriter writer = new(output, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
         ScanSummary summary = data.Summary;
 
-        await writer.WriteAsync(Head(summary)).ConfigureAwait(false);
+        await writer.WriteAsync(Head(summary, data.Theme)).ConfigureAwait(false);
         await writer.WriteAsync(Header(data)).ConfigureAwait(false);
         await writer.WriteAsync(Kpis(summary)).ConfigureAwait(false);
         await writer.WriteAsync(Distribution(summary.Counters)).ConfigureAwait(false);
@@ -86,27 +86,35 @@ public sealed class HtmlReportExporter : IReportExporter
         _ => "skip",
     };
 
-    private static string Head(ScanSummary summary) => $$"""
+    private const string LightPalette = """
+          --bg:#f3f3f3;--mica:#f9f9fb;--card:#fff;--card2:#fbfbfd;--bd:#e3e3e6;--bd2:#ececef;
+          --fg:#1a1a1c;--fg2:#5c5c62;--fg3:#8b8b92;--acc:#2f6fd0;
+          --ok:#0f7b3f;--okbg:#e8f6ed;--err:#c42b2f;--errbg:#fdecec;
+          --warn:#8a5a06;--warnbg:#fdf3e2;--skip:#6f6f76;--skipbg:#efeff1;
+        """;
+
+    private const string DarkPalette = """
+          --bg:#1c1c1e;--mica:#202022;--card:#26262a;--card2:#2c2c31;--bd:#38383e;--bd2:#303036;
+          --fg:#f2f2f4;--fg2:#b0b0b8;--fg3:#84848d;--acc:#5b9bf3;
+          --ok:#5ec27f;--okbg:#1c3227;--err:#ff7075;--errbg:#3a2024;
+          --warn:#f0b429;--warnbg:#372c15;--skip:#9a9aa2;--skipbg:#2b2b30;
+        """;
+
+    /// <summary>
+    /// The report takes the application's theme rather than the browser's: a report
+    /// saved from a light window should not open dark just because the OS is dark.
+    /// </summary>
+    private static string Head(ScanSummary summary, ReportTheme theme) => $$"""
         <!DOCTYPE html>
         <html lang="{{AppLanguage.Current}}">
         <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="{{(theme == ReportTheme.Dark ? "dark" : "light")}}">
         <title>{{E(Common.Format.Text(Strings.Html_Title, ReportData.ProductName, Path.GetFileName(summary.RootPath.TrimEnd(Path.DirectorySeparatorChar))))}}</title>
         <style>
         :root{
-          --bg:#f3f3f3;--mica:#f9f9fb;--card:#fff;--card2:#fbfbfd;--bd:#e3e3e6;--bd2:#ececef;
-          --fg:#1a1a1c;--fg2:#5c5c62;--fg3:#8b8b92;--acc:#2f6fd0;
-          --ok:#0f7b3f;--okbg:#e8f6ed;--err:#c42b2f;--errbg:#fdecec;
-          --warn:#8a5a06;--warnbg:#fdf3e2;--skip:#6f6f76;--skipbg:#efeff1;
-        }
-        @media (prefers-color-scheme: dark){
-          :root{
-            --bg:#1c1c1e;--mica:#202022;--card:#26262a;--card2:#2c2c31;--bd:#38383e;--bd2:#303036;
-            --fg:#f2f2f4;--fg2:#b0b0b8;--fg3:#84848d;--acc:#5b9bf3;
-            --ok:#5ec27f;--okbg:#1c3227;--err:#ff7075;--errbg:#3a2024;
-            --warn:#f0b429;--warnbg:#372c15;--skip:#9a9aa2;--skipbg:#2b2b30;
-          }
+        {{(theme == ReportTheme.Dark ? DarkPalette : LightPalette)}}
         }
         *{box-sizing:border-box}
         body{margin:0;padding:32px 24px;background:var(--bg);color:var(--fg);

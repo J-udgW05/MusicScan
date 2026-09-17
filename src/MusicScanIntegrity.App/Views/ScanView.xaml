@@ -11,8 +11,10 @@
              Background="{DynamicResource Brush.Bg}"
              c:Motion.Entrance="True">
 
-    <!-- Tab grid: 22 px content padding, 300 px right column, 20 px gap. -->
-    <Grid Margin="22">
+    <!-- Tab grid: 22 px content padding, 300 px right column, 20 px gap. No bottom
+         margin on the grid: the columns carry it inside their scrollers, so scrolled
+         content reaches the status bar instead of stopping 22 px short of it. -->
+    <Grid Margin="22,22,22,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="20" />
@@ -20,9 +22,12 @@
         </Grid.ColumnDefinitions>
 
         <!-- ══ Left column ════════════════════════════════════════════════ -->
+        <!-- The scroller reaches into the column gap and pads its content back by the same
+             amount: the bar overlays content, so this puts it between the columns
+             instead of on top of the cards and the warning list's own bar. -->
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled" Padding="0,0,4,0">
-            <StackPanel>
+                      HorizontalScrollBarVisibility="Disabled" Margin="0,0,-13,0" Padding="0,0,13,0">
+            <StackPanel Margin="0,0,0,22">
 
                 <!-- Music folder -->
                 <Border Style="{StaticResource Card.Padded}">
@@ -222,7 +227,7 @@
         <!-- ══ Right column ═══════════════════════════════════════════════ -->
         <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <StackPanel>
+            <StackPanel Margin="0,0,0,22">
 
                 <!-- Locked-file question: one at a time, without blocking the queue. It comes
                      first in the column because the scan waits on it; placed below the summary

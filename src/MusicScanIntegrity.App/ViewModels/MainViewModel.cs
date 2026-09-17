@@ -607,7 +607,9 @@ public sealed partial class MainViewModel : ObservableObject, ILockedFileDecisio
 
             IReadOnlyList<PlaylistCheckResult> playlists = choice.IncludePlaylists ? [.. Results.Playlists] : [];
 
-            ReportData data = new(_lastSummary, selected, playlists, DateTimeOffset.Now, _findings);
+            ReportData data = new(
+                _lastSummary, selected, playlists, DateTimeOffset.Now, _findings,
+                _theme.EffectiveTheme == AppTheme.Dark ? ReportTheme.Dark : ReportTheme.Light);
 
             await _reports.SaveAsync(choice.Format, choice.FilePath, data);
 

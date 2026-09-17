@@ -459,6 +459,28 @@ public sealed class ReportExporterTests
         }
     }
 
+    [Fact]
+    public async Task Html_report_uses_the_requested_theme_only()
+    {
+        ReportData light = Data(Result("a.flac"));
+        ReportData dark = light with { Theme = ReportTheme.Dark };
+
+        string lightHtml = await RenderAsync(new HtmlReportExporter(), light);
+        string darkHtml = await RenderAsync(new HtmlReportExporter(), dark);
+
+        Assert.Contains("<meta name=\"color-scheme\" content=\"light\">", lightHtml, StringComparison.Ordinal);
+        Assert.Contains("--bg:#f3f3f3", lightHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("--bg:#1c1c1e", lightHtml, StringComparison.Ordinal);
+
+        Assert.Contains("<meta name=\"color-scheme\" content=\"dark\">", darkHtml, StringComparison.Ordinal);
+        Assert.Contains("--bg:#1c1c1e", darkHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("--bg:#f3f3f3", darkHtml, StringComparison.Ordinal);
+
+        // The browser's own preference must not override the application's theme.
+        Assert.DoesNotContain("prefers-color-scheme", lightHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("prefers-color-scheme", darkHtml, StringComparison.Ordinal);
+    }
+
     private static bool IsCyrillic(char c) => c is >= (char)0x0400 and <= (char)0x04FF;
 
     [Fact]

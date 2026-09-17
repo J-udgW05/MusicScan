@@ -36,10 +36,11 @@
     </UserControl.Resources>
 
     <!-- Horizontal scrolling off: columns stretch to fit, and the default Auto
-         showed a pointless scroll bar at the bottom. -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                  Padding="22">
-        <Grid DataContext="{Binding Settings}">
+         showed a pointless scroll bar at the bottom. Spacing is a margin inside the
+         scroller, not its padding: padding shrinks the viewport and cut content off
+         22 px above the status bar. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="22" DataContext="{Binding Settings}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="18" />
