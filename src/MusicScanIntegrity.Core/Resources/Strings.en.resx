@@ -423,6 +423,105 @@
   <data name="History_OpenFailed" xml:space="preserve">
     <value>Could not open the history database: {0}</value>
   </data>
+  <data name="Html_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Html_AllFormats" xml:space="preserve">
+    <value>Format: all</value>
+  </data>
+  <data name="Html_Category_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Html_Category_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Html_Category_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Html_Category_Warnings" xml:space="preserve">
+    <value>Warnings</value>
+  </data>
+  <data name="Html_Col_Entries" xml:space="preserve">
+    <value>Entries</value>
+  </data>
+  <data name="Html_Col_Finding" xml:space="preserve">
+    <value>Finding</value>
+  </data>
+  <data name="Html_Col_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Html_Col_Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Html_Col_WhereWhat" xml:space="preserve">
+    <value>Where and what</value>
+  </data>
+  <data name="Html_CriticalFailure" xml:space="preserve">
+    <value>The scan was aborted by a critical failure.</value>
+  </data>
+  <data name="Html_Distribution" xml:space="preserve">
+    <value>Status breakdown</value>
+  </data>
+  <data name="Html_Eyebrow" xml:space="preserve">
+    <value>{0} · collection scan report</value>
+  </data>
+  <data name="Html_FilterByFormat" xml:space="preserve">
+    <value>Filter by format</value>
+  </data>
+  <data name="Html_FilterByStatus" xml:space="preserve">
+    <value>Filter by status</value>
+  </data>
+  <data name="Html_Footer" xml:space="preserve">
+    <value>{0} · report generated {1:yyyy-MM-dd HH:mm}</value>
+  </data>
+  <data name="Html_Generated" xml:space="preserve">
+    <value>Generated {0:yyyy-MM-dd} at {0:HH:mm}</value>
+  </data>
+  <data name="Html_Kpi_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention" xml:space="preserve">
+    <value>Need attention</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention_Note" xml:space="preserve">
+    <value>tags, locks, extension</value>
+  </data>
+  <data name="Html_Kpi_ScanTime" xml:space="preserve">
+    <value>Scan time</value>
+  </data>
+  <data name="Html_Kpi_TotalFiles" xml:space="preserve">
+    <value>Total files</value>
+  </data>
+  <data name="Html_NothingFound" xml:space="preserve">
+    <value>Nothing found; change the filter.</value>
+  </data>
+  <data name="Html_OfCollection" xml:space="preserve">
+    <value>{0} of the collection</value>
+  </data>
+  <data name="Html_OkExcluded" xml:space="preserve">
+    <value>The table only lists files with findings. {0} healthy files are not included (setting "Include healthy files in report").</value>
+  </data>
+  <data name="Html_Search" xml:space="preserve">
+    <value>Search by name or path</value>
+  </data>
+  <data name="Html_ShownSome" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="Html_StoppedManually" xml:space="preserve">
+    <value>The scan was stopped manually</value>
+  </data>
+  <data name="Html_StoppedManually_Note" xml:space="preserve">
+    <value>; the report only includes what was checked before that.</value>
+  </data>
+  <data name="Html_Threads" xml:space="preserve">
+    <value>threads: {0}</value>
+  </data>
+  <data name="Html_Title" xml:space="preserve">
+    <value>{0} — report for folder {1}</value>
+  </data>
+  <data name="Html_Took" xml:space="preserve">
+    <value>scan took {0}</value>
+  </data>
   <data name="Issue_Short_AudioDropout" xml:space="preserve">
     <value>Dropout</value>
   </data>
@@ -686,6 +785,33 @@
   </data>
   <data name="Plural_Hours_One" xml:space="preserve">
     <value>{0} hour</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Few" xml:space="preserve">
+    <value>{0} files checked</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Many" xml:space="preserve">
+    <value>{0} files checked</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_One" xml:space="preserve">
+    <value>{0} file checked</value>
+  </data>
+  <data name="Plural_Html_InFolders_Few" xml:space="preserve">
+    <value>in {0} folders</value>
+  </data>
+  <data name="Plural_Html_InFolders_Many" xml:space="preserve">
+    <value>in {0} folders</value>
+  </data>
+  <data name="Plural_Html_InFolders_One" xml:space="preserve">
+    <value>in {0} folder</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Few" xml:space="preserve">
+    <value>Showing all {0} files</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Many" xml:space="preserve">
+    <value>Showing all {0} files</value>
+  </data>
+  <data name="Plural_Html_ShownAll_One" xml:space="preserve">
+    <value>Showing all {0} file</value>
   </data>
   <data name="Plural_Minutes_Few" xml:space="preserve">
     <value>{0} minutes</value>

@@ -423,6 +423,105 @@
   <data name="History_OpenFailed" xml:space="preserve">
     <value>Не удалось открыть базу истории: {0}</value>
   </data>
+  <data name="Html_All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Html_AllFormats" xml:space="preserve">
+    <value>Формат: все</value>
+  </data>
+  <data name="Html_Category_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Html_Category_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Html_Category_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
+  <data name="Html_Category_Warnings" xml:space="preserve">
+    <value>Предупреждения</value>
+  </data>
+  <data name="Html_Col_Entries" xml:space="preserve">
+    <value>Записей</value>
+  </data>
+  <data name="Html_Col_Finding" xml:space="preserve">
+    <value>Замечание</value>
+  </data>
+  <data name="Html_Col_Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="Html_Col_Size" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="Html_Col_WhereWhat" xml:space="preserve">
+    <value>Где и что</value>
+  </data>
+  <data name="Html_CriticalFailure" xml:space="preserve">
+    <value>Проверка прервана критическим сбоем.</value>
+  </data>
+  <data name="Html_Distribution" xml:space="preserve">
+    <value>Распределение по статусам</value>
+  </data>
+  <data name="Html_Eyebrow" xml:space="preserve">
+    <value>{0} · отчёт о проверке коллекции</value>
+  </data>
+  <data name="Html_FilterByFormat" xml:space="preserve">
+    <value>Отбор по формату</value>
+  </data>
+  <data name="Html_FilterByStatus" xml:space="preserve">
+    <value>Отбор по статусу</value>
+  </data>
+  <data name="Html_Footer" xml:space="preserve">
+    <value>{0} · отчёт сформирован {1:dd.MM.yyyy HH:mm}</value>
+  </data>
+  <data name="Html_Generated" xml:space="preserve">
+    <value>Сформирован {0:dd.MM.yyyy} в {0:HH:mm}</value>
+  </data>
+  <data name="Html_Kpi_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention" xml:space="preserve">
+    <value>Требуют внимания</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention_Note" xml:space="preserve">
+    <value>теги, занятость, расширение</value>
+  </data>
+  <data name="Html_Kpi_ScanTime" xml:space="preserve">
+    <value>Время проверки</value>
+  </data>
+  <data name="Html_Kpi_TotalFiles" xml:space="preserve">
+    <value>Всего файлов</value>
+  </data>
+  <data name="Html_NothingFound" xml:space="preserve">
+    <value>Ничего не найдено — измените условия отбора.</value>
+  </data>
+  <data name="Html_OfCollection" xml:space="preserve">
+    <value>{0} коллекции</value>
+  </data>
+  <data name="Html_OkExcluded" xml:space="preserve">
+    <value>В таблице только файлы с замечаниями. Исправных {0} — они в отчёт не включены (настройка «Добавлять в отчёт исправные файлы»).</value>
+  </data>
+  <data name="Html_Search" xml:space="preserve">
+    <value>Поиск по имени или пути</value>
+  </data>
+  <data name="Html_ShownSome" xml:space="preserve">
+    <value>Показано {0} из {1}</value>
+  </data>
+  <data name="Html_StoppedManually" xml:space="preserve">
+    <value>Проверка была остановлена вручную</value>
+  </data>
+  <data name="Html_StoppedManually_Note" xml:space="preserve">
+    <value> — в отчёт попало только то, что успели проверить.</value>
+  </data>
+  <data name="Html_Threads" xml:space="preserve">
+    <value>потоков: {0}</value>
+  </data>
+  <data name="Html_Title" xml:space="preserve">
+    <value>{0} — отчёт по папке {1}</value>
+  </data>
+  <data name="Html_Took" xml:space="preserve">
+    <value>проверка заняла {0}</value>
+  </data>
   <data name="Issue_Short_AudioDropout" xml:space="preserve">
     <value>Провал в тишину</value>
   </data>
@@ -686,6 +785,33 @@
   </data>
   <data name="Plural_Hours_One" xml:space="preserve">
     <value>{0} час</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Few" xml:space="preserve">
+    <value>{0} файла проверено</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Many" xml:space="preserve">
+    <value>{0} файлов проверено</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_One" xml:space="preserve">
+    <value>{0} файл проверен</value>
+  </data>
+  <data name="Plural_Html_InFolders_Few" xml:space="preserve">
+    <value>в {0} папках</value>
+  </data>
+  <data name="Plural_Html_InFolders_Many" xml:space="preserve">
+    <value>в {0} папках</value>
+  </data>
+  <data name="Plural_Html_InFolders_One" xml:space="preserve">
+    <value>в {0} папке</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Few" xml:space="preserve">
+    <value>Показаны все {0} файла</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Many" xml:space="preserve">
+    <value>Показаны все {0} файлов</value>
+  </data>
+  <data name="Plural_Html_ShownAll_One" xml:space="preserve">
+    <value>Показаны все {0} файл</value>
   </data>
   <data name="Plural_Minutes_Few" xml:space="preserve">
     <value>{0} минуты</value>

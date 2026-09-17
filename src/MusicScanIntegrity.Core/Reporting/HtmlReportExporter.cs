@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using MusicScanIntegrity.Core.Models;
+using MusicScanIntegrity.Core.Resources;
 using MusicScanIntegrity.Core.Settings;
 
 namespace MusicScanIntegrity.Core.Reporting;
@@ -87,11 +88,11 @@ public sealed class HtmlReportExporter : IReportExporter
 
     private static string Head(ScanSummary summary) => $$"""
         <!DOCTYPE html>
-        <html lang="ru">
+        <html lang="{{AppLanguage.Current}}">
         <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{E(ReportData.ProductName)}} — отчёт по папке {{E(Path.GetFileName(summary.RootPath.TrimEnd(Path.DirectorySeparatorChar)))}}</title>
+        <title>{{E(Common.Format.Text(Strings.Html_Title, ReportData.ProductName, Path.GetFileName(summary.RootPath.TrimEnd(Path.DirectorySeparatorChar))))}}</title>
         <style>
         :root{
           --bg:#f3f3f3;--mica:#f9f9fb;--card:#fff;--card2:#fbfbfd;--bd:#e3e3e6;--bd2:#ececef;
@@ -127,8 +128,8 @@ public sealed class HtmlReportExporter : IReportExporter
         .legend div{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--fg2)}
         .dot{width:10px;height:10px;border-radius:3px;flex:none}
         .legend b{margin-left:auto;color:var(--fg);font-weight:650}
-        /* Своя прокрутка: секция обрезает по краю, и без неё крайняя
-           колонка на узком окне пропадала бы совсем. */
+        /* Own scrolling: the section clips at its edge, and without it the last
+           column would vanish on a narrow window. */
         .scroll{overflow-x:auto}
         table{width:100%;min-width:620px;border-collapse:collapse}
         th{background:var(--card2);border-bottom:1px solid var(--bd);padding:11px 16px;text-align:left;
@@ -150,7 +151,7 @@ public sealed class HtmlReportExporter : IReportExporter
         .notice{border-left:3px solid var(--warn);background:var(--warnbg);color:var(--fg);
           border-radius:8px;padding:13px 16px;margin-top:18px;font-size:12.5px}
         footer{margin-top:22px;font-size:11.5px;color:var(--fg3);text-align:center}
-        /* ── Панель отбора: то же, что на вкладке «Результаты» ───────────── */
+        /* ── Filter bar, same as the results tab ───────────────────────────── */
         .tools{position:sticky;top:0;z-index:5;overflow:visible;
           display:flex;flex-wrap:wrap;gap:10px;align-items:center;
           background:var(--mica);border:1px solid var(--bd);border-radius:10px;
@@ -188,11 +189,11 @@ public sealed class HtmlReportExporter : IReportExporter
         """;
 
     private static string Header(ReportData data) => $"""
-        <div class="eyebrow">{E(ReportData.ProductName)} · отчёт о проверке коллекции</div>
+        <div class="eyebrow">{E(Common.Format.Text(Strings.Html_Eyebrow, ReportData.ProductName))}</div>
         <h1>{E(data.Summary.RootPath)}</h1>
-        <div class="sub">Сформирован {data.GeneratedAt:dd.MM.yyyy} в {data.GeneratedAt:HH:mm} ·
-        проверка заняла {E(Common.Format.Duration(data.Summary.Duration))} ·
-        потоков: {data.Summary.Parallelism}</div>
+        <div class="sub">{E(Common.Format.Text(Strings.Html_Generated, data.GeneratedAt))} ·
+        {E(Common.Format.Text(Strings.Html_Took, Common.Format.Duration(data.Summary.Duration)))} ·
+        {E(Common.Format.Text(Strings.Html_Threads, data.Summary.Parallelism))}</div>
         <div class="sub">{E(data.Summary.DepthLabel)}</div>
 
         """;
@@ -204,18 +205,18 @@ public sealed class HtmlReportExporter : IReportExporter
 
         return $"""
             <div class="kpis">
-              <div class="kpi"><div class="eyebrow">Всего файлов</div>
+              <div class="kpi"><div class="eyebrow">{E(Strings.Html_Kpi_TotalFiles)}</div>
                 <div class="v">{E(Common.Format.Number(c.Total))}</div>
-                <div class="n">в {E(Common.Format.Number(summary.Folders.Count))} {E(Common.Format.Plural(summary.Folders.Count, "папке", "папках", "папках"))}</div></div>
-              <div class="kpi"><div class="eyebrow">Повреждено</div>
+                <div class="n">{E(Common.Format.Count(summary.Folders.Count, "Plural_Html_InFolders"))}</div></div>
+              <div class="kpi"><div class="eyebrow">{E(Strings.Html_Kpi_Corrupted)}</div>
                 <div class="v" style="color:var(--err)">{E(Common.Format.Number(c.Corrupted))}</div>
-                <div class="n">{E(Common.Format.Percent(corruptedShare))} коллекции</div></div>
-              <div class="kpi"><div class="eyebrow">Требуют внимания</div>
+                <div class="n">{E(Common.Format.Text(Strings.Html_OfCollection, Common.Format.Percent(corruptedShare)))}</div></div>
+              <div class="kpi"><div class="eyebrow">{E(Strings.Html_Kpi_NeedAttention)}</div>
                 <div class="v" style="color:var(--warn)">{E(Common.Format.Number(c.Warnings))}</div>
-                <div class="n">теги, занятость, расширение</div></div>
-              <div class="kpi"><div class="eyebrow">Время проверки</div>
+                <div class="n">{E(Strings.Html_Kpi_NeedAttention_Note)}</div></div>
+              <div class="kpi"><div class="eyebrow">{E(Strings.Html_Kpi_ScanTime)}</div>
                 <div class="v">{E(Common.Format.Duration(summary.Duration))}</div>
-                <div class="n">{c.Checked} {E(Common.Format.Plural(c.Checked, "файл проверен", "файла проверено", "файлов проверено"))}</div></div>
+                <div class="n">{E(Common.Format.Count(c.Checked, "Plural_Html_FilesChecked"))}</div></div>
             </div>
 
             """;
@@ -228,7 +229,7 @@ public sealed class HtmlReportExporter : IReportExporter
 
         return $"""
             <section class="pad">
-              <div style="font-size:13px;font-weight:650">Распределение по статусам</div>
+              <div style="font-size:13px;font-weight:650">{E(Strings.Html_Distribution)}</div>
               <div class="bar">
                 <div class="b-ok" style="width:{Width(c.Ok)}%"></div>
                 <div class="b-err" style="width:{Width(c.Corrupted)}%"></div>
@@ -236,10 +237,10 @@ public sealed class HtmlReportExporter : IReportExporter
                 <div class="b-skip" style="width:{Width(c.Skipped)}%"></div>
               </div>
               <div class="legend">
-                <div><span class="dot b-ok"></span>✓ В порядке<b>{E(Common.Format.Number(c.Ok))}</b></div>
-                <div><span class="dot b-err"></span>✕ Повреждено<b>{E(Common.Format.Number(c.Corrupted))}</b></div>
-                <div><span class="dot b-warn"></span>! Предупреждения<b>{E(Common.Format.Number(c.Warnings))}</b></div>
-                <div><span class="dot b-skip"></span>– Пропущено<b>{E(Common.Format.Number(c.Skipped))}</b></div>
+                <div><span class="dot b-ok"></span>✓ {E(Strings.Html_Category_Ok)}<b>{E(Common.Format.Number(c.Ok))}</b></div>
+                <div><span class="dot b-err"></span>✕ {E(Strings.Html_Category_Corrupted)}<b>{E(Common.Format.Number(c.Corrupted))}</b></div>
+                <div><span class="dot b-warn"></span>! {E(Strings.Html_Category_Warnings)}<b>{E(Common.Format.Number(c.Warnings))}</b></div>
+                <div><span class="dot b-skip"></span>– {E(Strings.Html_Category_Skipped)}<b>{E(Common.Format.Number(c.Skipped))}</b></div>
               </div>
             </section>
 
@@ -253,23 +254,23 @@ public sealed class HtmlReportExporter : IReportExporter
 
         if (summary.CriticalFailure is { } failure)
         {
-            builder.Append("<b>Проверка прервана критическим сбоем.</b> ").Append(E(failure)).Append(' ');
+            builder.Append("<b>").Append(E(Strings.Html_CriticalFailure)).Append("</b> ").Append(E(failure)).Append(' ');
         }
 
         if (summary.WasStopped)
         {
-            builder.Append("<b>Проверка была остановлена вручную</b> — в отчёт попало только то, что успели проверить.");
+            builder.Append("<b>").Append(E(Strings.Html_StoppedManually)).Append("</b>").Append(E(Strings.Html_StoppedManually_Note));
         }
 
         builder.Append("</div>\n");
         return builder.ToString();
     }
 
-    private static string TableHead() => """
+    private static string TableHead() => $"""
         <section><div class="scroll">
         <table><thead><tr>
-          <th style="width:26px"></th><th>Имя</th><th>Путь</th>
-          <th style="width:72px">Формат</th><th style="width:92px;text-align:right">Размер</th><th style="width:220px">Статус</th>
+          <th style="width:26px"></th><th>{E(Strings.Html_Col_Name)}</th><th>{E(Strings.Report_Col_Path)}</th>
+          <th style="width:72px">{E(Strings.Report_Col_Format)}</th><th style="width:92px;text-align:right">{E(Strings.Html_Col_Size)}</th><th style="width:220px">{E(Strings.Report_Col_Status)}</th>
         </tr></thead><tbody>
 
         """;
@@ -330,18 +331,18 @@ public sealed class HtmlReportExporter : IReportExporter
 
         builder.Append("<div class=\"tools\">")
                .Append("<input id=\"q\" class=\"search\" type=\"search\" autocomplete=\"off\" ")
-               .Append("placeholder=\"Поиск по имени или пути\" aria-label=\"Поиск по имени или пути\">")
-               .Append("<div class=\"chips\" role=\"group\" aria-label=\"Отбор по статусу\">")
-               .Append(Chip("all", "all", string.Empty, "Все", total));
+               .Append("placeholder=\"").Append(E(Strings.Html_Search)).Append("\" aria-label=\"").Append(E(Strings.Html_Search)).Append("\">")
+               .Append("<div class=\"chips\" role=\"group\" aria-label=\"").Append(E(Strings.Html_FilterByStatus)).Append("\">")
+               .Append(Chip("all", "all", string.Empty, Strings.Html_All, total));
 
         // Labels are category names, as on the results tab, rather than the
         // status of a single file — the reader should see familiar wording.
         foreach ((CheckStatus status, string css, string label) in new[]
                  {
-                     (CheckStatus.Ok, "ok", "В порядке"),
-                     (CheckStatus.Corrupted, "err", "Повреждено"),
-                     (CheckStatus.Warning, "warn", "Предупреждения"),
-                     (CheckStatus.Skipped, "skip", "Пропущено"),
+                     (CheckStatus.Ok, "ok", Strings.Html_Category_Ok),
+                     (CheckStatus.Corrupted, "err", Strings.Html_Category_Corrupted),
+                     (CheckStatus.Warning, "warn", Strings.Html_Category_Warnings),
+                     (CheckStatus.Skipped, "skip", Strings.Html_Category_Skipped),
                  })
         {
             int count = data.Results.Count(r => r.Status == status);
@@ -359,8 +360,8 @@ public sealed class HtmlReportExporter : IReportExporter
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)];
 
-        builder.Append("<select id=\"fmt\" class=\"fmt\" aria-label=\"Отбор по формату\">")
-               .Append("<option value=\"all\">Формат: все</option>");
+        builder.Append("<select id=\"fmt\" class=\"fmt\" aria-label=\"").Append(E(Strings.Html_FilterByFormat)).Append("\">")
+               .Append("<option value=\"all\">").Append(E(Strings.Html_AllFormats)).Append("</option>");
 
         foreach (string format in formats)
         {
@@ -369,9 +370,15 @@ public sealed class HtmlReportExporter : IReportExporter
                    .Append(E(format)).Append(" · ").Append(count).Append("</option>");
         }
 
+        // The filter script only substitutes numbers; the wording for the current
+        // language travels in data attributes, and the plural rule follows <html lang>.
         builder.Append("</select></div>")
-               .Append("<div id=\"shown\" class=\"shown\">Показаны все ")
-               .Append(E(Common.Format.Files(total))).Append("</div>");
+               .Append("<div id=\"shown\" class=\"shown\"")
+               .Append(" data-one=\"").Append(E(Strings.Plural_Html_ShownAll_One)).Append('"')
+               .Append(" data-few=\"").Append(E(Strings.Plural_Html_ShownAll_Few)).Append('"')
+               .Append(" data-many=\"").Append(E(Strings.Plural_Html_ShownAll_Many)).Append('"')
+               .Append(" data-some=\"").Append(E(Strings.Html_ShownSome)).Append("\">")
+               .Append(E(Common.Format.Count(total, "Plural_Html_ShownAll"))).Append("</div>");
 
         // When healthy files were excluded, say so: otherwise the table count
         // disagrees with the summary above it for no visible reason.
@@ -380,9 +387,9 @@ public sealed class HtmlReportExporter : IReportExporter
 
         if (okInReport == 0 && okInScan > 0)
         {
-            builder.Append("<div class=\"hint\">В таблице только файлы с замечаниями. Исправных ")
-                   .Append(E(Common.Format.Number(okInScan)))
-                   .Append(" — они в отчёт не включены (настройка «Добавлять в отчёт исправные файлы»).</div>");
+            builder.Append("<div class=\"hint\">")
+                   .Append(E(Common.Format.Text(Strings.Html_OkExcluded, Common.Format.Number(okInScan))))
+                   .Append("</div>");
         }
 
         return builder.Append('\n').ToString();
@@ -406,14 +413,14 @@ public sealed class HtmlReportExporter : IReportExporter
 
     /// <summary>Table tail: the empty row shown when the filter matches nothing.</summary>
     private static string TableTail(ReportData data) => data.Results.Count > 0
-        ? "<tr id=\"none\" class=\"none\" hidden><td colspan=\"6\">Ничего не найдено — измените условия отбора.</td></tr>\n</tbody></table></div></section>\n"
+        ? "<tr id=\"none\" class=\"none\" hidden><td colspan=\"6\">" + E(Strings.Html_NothingFound) + "</td></tr>\n</tbody></table></div></section>\n"
         : "</tbody></table></div></section>\n";
 
     /// <summary>Findings about folders and duplicates rather than single files.</summary>
     private static string Findings(IReadOnlyList<CollectionFinding> findings, CancellationToken cancellationToken)
     {
         StringBuilder builder = new();
-        builder.Append("<section><div class=\"scroll\"><table><thead><tr><th style=\"width:200px\">Замечание</th><th>Где и что</th></tr></thead><tbody>\n");
+        builder.Append("<section><div class=\"scroll\"><table><thead><tr><th style=\"width:200px\">" + E(Strings.Html_Col_Finding) + "</th><th>" + E(Strings.Html_Col_WhereWhat) + "</th></tr></thead><tbody>\n");
 
         foreach (CollectionFinding finding in findings)
         {
@@ -438,7 +445,7 @@ public sealed class HtmlReportExporter : IReportExporter
     private static string Playlists(IReadOnlyList<PlaylistCheckResult> playlists, CancellationToken cancellationToken)
     {
         StringBuilder builder = new();
-        builder.Append("<section><div class=\"scroll\"><table><thead><tr><th>Плейлист</th><th style=\"width:120px;text-align:right\">Записей</th><th style=\"width:140px;text-align:right\">Не найдено</th></tr></thead><tbody>\n");
+        builder.Append("<section><div class=\"scroll\"><table><thead><tr><th>" + E(Strings.Report_Col_Playlist) + "</th><th style=\"width:120px;text-align:right\">" + E(Strings.Html_Col_Entries) + "</th><th style=\"width:140px;text-align:right\">" + E(Strings.Report_Col_Missing) + "</th></tr></thead><tbody>\n");
 
         foreach (PlaylistCheckResult playlist in playlists)
         {
@@ -454,7 +461,7 @@ public sealed class HtmlReportExporter : IReportExporter
 
             foreach (PlaylistEntry entry in playlist.Entries.Where(e => !e.Exists))
             {
-                builder.Append("<div class=\"tech mono\">не найден: ").Append(E(entry.RawPath)).Append("</div>");
+                builder.Append("<div class=\"tech mono\">").Append(E(Common.Format.Text(Strings.Report_NotFound, entry.RawPath))).Append("</div>");
             }
 
             builder.Append("</td><td class=\"num\">").Append(playlist.Entries.Count)
@@ -470,7 +477,7 @@ public sealed class HtmlReportExporter : IReportExporter
     private static string Inaccessible(IReadOnlyList<InaccessibleFolder> folders)
     {
         StringBuilder builder = new();
-        builder.Append("<section class=\"pad\"><div class=\"eyebrow\">Папки, которые не удалось прочитать</div>");
+        builder.Append("<section class=\"pad\"><div class=\"eyebrow\">").Append(E(Strings.Report_Title_UnreadableFolders)).Append("</div>");
 
         foreach (InaccessibleFolder folder in folders)
         {
@@ -483,7 +490,7 @@ public sealed class HtmlReportExporter : IReportExporter
     }
 
     private static string Footer(ReportData data) => $"""
-        <footer>{E(ReportData.ProductName)} · отчёт сформирован {data.GeneratedAt:dd.MM.yyyy HH:mm}</footer>
+        <footer>{E(Common.Format.Text(Strings.Html_Footer, ReportData.ProductName, data.GeneratedAt))}</footer>
         </div>
         {(data.Results.Count > 0 ? FilterScript : string.Empty)}</body></html>
 
@@ -513,13 +520,16 @@ public sealed class HtmlReportExporter : IReportExporter
           var none = document.getElementById('none');
           var status = 'all';
 
-          function plural(n, one, few, many) {
+          var english = document.documentElement.lang === 'en';
+
+          function plural(n) {
+            if (english) { return n === 1 ? 'one' : 'many'; }
             var d = Math.abs(n) % 100;
-            if (d >= 11 && d <= 14) { return many; }
+            if (d >= 11 && d <= 14) { return 'many'; }
             d = d % 10;
-            if (d === 1) { return one; }
-            if (d >= 2 && d <= 4) { return few; }
-            return many;
+            if (d === 1) { return 'one'; }
+            if (d >= 2 && d <= 4) { return 'few'; }
+            return 'many';
           }
 
           function apply() {
@@ -542,9 +552,8 @@ public sealed class HtmlReportExporter : IReportExporter
 
             if (shown) {
               shown.textContent = visible === rows.length
-                ? 'Показаны все ' + rows.length + ' ' +
-                  plural(rows.length, 'файл', 'файла', 'файлов')
-                : 'Показано ' + visible + ' из ' + rows.length;
+                ? shown.getAttribute('data-' + plural(rows.length)).replace('{0}', rows.length)
+                : shown.getAttribute('data-some').replace('{0}', visible).replace('{1}', rows.length);
             }
           }
 

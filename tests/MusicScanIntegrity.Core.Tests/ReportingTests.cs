@@ -432,6 +432,44 @@ public sealed class ReportExporterTests
     {
         Assert.Equal(value, CsvReportExporter.Escape(value));
     }
+
+    [Fact]
+    public async Task Reports_follow_english_interface_language()
+    {
+        using CultureScope _ = new(AppLanguage.English);
+        ReportData data = Data(
+            Result("a.flac", CheckStatus.Corrupted, new CheckIssue(IssueCode.FileNotFound, "x"), size: 25_270_000),
+            Result("b.flac"));
+
+        string html = await RenderAsync(new HtmlReportExporter(), data);
+        string csv = await RenderAsync(new CsvReportExporter(), data);
+        string text = await RenderAsync(new TextReportExporter(), data);
+
+        Assert.Contains("<html lang=\"en\">", html, StringComparison.Ordinal);
+        Assert.Contains("Showing all 2 files", html, StringComparison.Ordinal);
+        Assert.Contains("data-some=\"Showing {0} of {1}\"", html, StringComparison.Ordinal);
+        Assert.Contains("24.1&#160;MB", html, StringComparison.Ordinal);
+        Assert.Contains("Total files", csv, StringComparison.Ordinal);
+        Assert.Contains("COLLECTION SCAN REPORT", text.ToUpperInvariant(), StringComparison.Ordinal);
+
+        foreach (string report in new[] { WithoutScripts(html), csv, text })
+        {
+            // The folder name is data and stays as it is.
+            Assert.DoesNotContain(report.Replace("Коллекция", string.Empty, StringComparison.Ordinal), IsCyrillic);
+        }
+    }
+
+    private static bool IsCyrillic(char c) => c is >= (char)0x0400 and <= (char)0x04FF;
+
+    [Fact]
+    public async Task Russian_html_report_keeps_three_plural_forms()
+    {
+        string html = await RenderAsync(new HtmlReportExporter(), Data(Result("a.flac"), Result("b.flac")));
+
+        Assert.Contains("<html lang=\"ru\">", html, StringComparison.Ordinal);
+        Assert.Contains("Показаны все 2 файла", html, StringComparison.Ordinal);
+        Assert.Contains("data-many=\"Показаны все {0} файлов\"", html, StringComparison.Ordinal);
+    }
 }
 
 public sealed class ReportServiceTests
