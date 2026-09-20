@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="dn_doc_title">Поддержать проект — Music Scan Integrity</title>
+<meta name="description" data-i18n-content="dn_desc" content="Music Scan Integrity бесплатна и с открытым кодом. На что идут пожертвования и как поддержать проект.">
+
+<link rel="icon" href="assets/icon.png" sizes="any">
+<link rel="apple-touch-icon" href="assets/icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<link rel="stylesheet" href="style.css">
+<script>
+    (function () {
+        var root = document.documentElement;
+        try {
+            var t = localStorage.getItem('msi-theme');
+            if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t);
+        } catch (e) { }
+
+        var lang = null;
+        try { lang = localStorage.getItem('msi-lang'); } catch (e) { }
+        if (lang !== 'ru' && lang !== 'en') {
+            var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+            lang = 'en';
+            for (var i = 0; i < list.length; i++) {
+                var code = String(list[i]).toLowerCase().split('-')[0];
+                if (code === 'ru' || code === 'uk' || code === 'be') { lang = 'ru'; break; }
+                if (code) break;
+            }
+        }
+        root.setAttribute('lang', lang);
+    })();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+    <div class="masthead-inner">
+        <a class="wordmark" href="index.html">Music Scan Integrity</a>
+        <nav>
+            <a href="index.html#check" data-i18n="nav_check">Как это работает</a>
+            <a href="index.html#install" data-i18n="nav_install">Скачать</a>
+            <a href="donate.html" data-i18n="nav_donate">Поддержать</a>
+        </nav>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <span class="switches">
+            <div class="lang-switch" role="radiogroup" aria-label="Language / Язык">
+                <button type="button" class="lang-option active" data-lang="ru" role="radio" aria-checked="true">RU</button>
+                <button type="button" class="lang-option" data-lang="en" role="radio" aria-checked="false">EN</button>
+            </div>
+            <button class="icon-btn" id="theme" type="button">
+                <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4.2"/>
+                    <path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.3 6.3 4.8 4.8M19.2 19.2l-1.5-1.5M17.7 6.3l1.5-1.5M4.8 19.2l1.5-1.5"/>
+                </svg>
+                <svg class="i-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z"/>
+                </svg>
+            </button>
+        </span>
+    </div>
+</header>
+
+<div class="page">
+
+    <main class="legal">
+        <div class="legal-head">
+            <h1 data-i18n="dn_title">Поддержать проект</h1>
+            <p data-i18n="dn_s4_p1">
+                Если Music Scan Integrity оказалась вам полезна и вы хотите поддержать
+                её развитие — вот как это можно сделать.
+            </p>
+        </div>
+
+        <section>
+            <div class="donate-links">
+                <a class="action primary" href="https://github.com/sponsors/J-udgW05" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20.5 3.9 12.4a5 5 0 1 1 7.1-7.1l1 1 1-1a5 5 0 1 1 7.1 7.1z"/>
+                    </svg>
+                    <span>GitHub Sponsors</span>
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <h2 data-i18n="dn_s5_h">Помочь можно и бесплатно</h2>
+            <p data-i18n="dn_s5_p1">
+                Деньги — не единственная и далеко не обязательная форма участия. Всё
+                перечисленное ниже помогает проекту не меньше.
+            </p>
+            <ul>
+                <li data-i18n="dn_s5_i1">Звезда <a href="https://github.com/J-udgW05/MusicScan">репозиторию</a> и рассказ о программе тем, кому она пригодится</li>
+                <li data-i18n="dn_s5_i2">Сообщение об ошибке с примером файла <a href="https://github.com/J-udgW05/MusicScan/issues">в разделе Issues</a> — после самого кода это самая полезная помощь</li>
+                <li data-i18n="dn_s5_i3">Перевод, документация, правки кода — pull request всегда к месту</li>
+            </ul>
+        </section>
+
+        <a class="action legal-back" href="index.html">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5M11 6l-6 6 6 6"/>
+            </svg>
+            <span data-i18n="nav_back">Вернуться на сайт</span>
+        </a>
+    </main>
+
+    <footer>
+        <span class="footer-copy" data-i18n="footer_copy">© 2026 Music Scan Integrity · <a href="https://github.com/J-udgW05" target="_blank" rel="noopener noreferrer">J-udgW05</a></span>
+        <span class="footer-links">
+            <a href="https://github.com/J-udgW05/MusicScan" data-i18n="nav_repo" target="_blank" rel="noopener noreferrer">Репозиторий</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/docs/INTERNALS.md" data-i18n="footer_docs" target="_blank" rel="noopener noreferrer">Документация</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/LICENSE.txt" data-i18n="footer_license" target="_blank" rel="noopener noreferrer">Лицензия</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/THIRD-PARTY-NOTICES.md" data-i18n="footer_third" target="_blank" rel="noopener noreferrer">Компоненты</a>
+            <a href="privacy.html" data-i18n="footer_privacy">Конфиденциальность</a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <button type="button" class="footer-email" id="copy-email" data-copy="j-udgw05@tuta.io">
+                <span data-i18n="footer_email">j-udgw05@tuta.io</span>
+                <span class="copy-toast" aria-hidden="true" data-i18n="footer_copied">Скопировано</span>
+            </button>
+        </span>
+    </footer>
+
+</div>
+
+<button id="back-to-top" class="icon-btn" type="button" aria-label="Наверх">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5M6 11l6-6 6 6"/>
+    </svg>
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>

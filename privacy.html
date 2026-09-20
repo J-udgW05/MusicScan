@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="pp_doc_title">Политика конфиденциальности — Music Scan Integrity</title>
+<meta name="description" data-i18n-content="pp_desc" content="Что сайт Music Scan Integrity сохраняет в браузере и какие запросы отправляет при открытии страницы.">
+
+<link rel="icon" href="assets/icon.png" sizes="any">
+<link rel="apple-touch-icon" href="assets/icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<link rel="stylesheet" href="style.css">
+<script>
+    (function () {
+        var root = document.documentElement;
+        try {
+            var t = localStorage.getItem('msi-theme');
+            if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t);
+        } catch (e) { }
+
+        var lang = null;
+        try { lang = localStorage.getItem('msi-lang'); } catch (e) { }
+        if (lang !== 'ru' && lang !== 'en') {
+            var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+            lang = 'en';
+            for (var i = 0; i < list.length; i++) {
+                var code = String(list[i]).toLowerCase().split('-')[0];
+                if (code === 'ru' || code === 'uk' || code === 'be') { lang = 'ru'; break; }
+                if (code) break;
+            }
+        }
+        root.setAttribute('lang', lang);
+    })();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+    <div class="masthead-inner">
+        <a class="wordmark" href="index.html">Music Scan Integrity</a>
+        <nav>
+            <a href="index.html#check" data-i18n="nav_check">Как это работает</a>
+            <a href="index.html#install" data-i18n="nav_install">Скачать</a>
+            <a href="donate.html" data-i18n="nav_donate">Поддержать</a>
+        </nav>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <span class="switches">
+            <div class="lang-switch" role="radiogroup" aria-label="Language / Язык">
+                <button type="button" class="lang-option active" data-lang="ru" role="radio" aria-checked="true">RU</button>
+                <button type="button" class="lang-option" data-lang="en" role="radio" aria-checked="false">EN</button>
+            </div>
+            <button class="icon-btn" id="theme" type="button">
+                <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4.2"/>
+                    <path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.3 6.3 4.8 4.8M19.2 19.2l-1.5-1.5M17.7 6.3l1.5-1.5M4.8 19.2l1.5-1.5"/>
+                </svg>
+                <svg class="i-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z"/>
+                </svg>
+            </button>
+        </span>
+    </div>
+</header>
+
+<div class="page">
+
+    <main class="legal">
+        <div class="legal-head">
+            <h1 data-i18n="pp_title">Политика конфиденциальности</h1>
+            <p class="legal-date" data-i18n="pp_date">Обновлено 15 сентября 2026 года</p>
+        </div>
+
+        <section>
+            <h2 data-i18n="pp_s1_h">О чём эта страница</h2>
+            <p data-i18n="pp_s1_p1">
+                Это страница проекта Music Scan Integrity — программы для проверки музыкальной
+                коллекции на повреждённые файлы. Здесь нет ни регистрации, ни личного кабинета,
+                ни форм обратной связи: весь сайт — это страница с описанием и ссылками
+                на загрузку, страница о поддержке проекта и эта страница.
+            </p>
+            <p data-i18n="pp_s1_p2">
+                Ниже перечислено ровно то, что происходит при открытии страницы. Список
+                составлен по исходному коду сайта, который открыт и доступен для проверки.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s2_h">Что сохраняется в вашем браузере</h2>
+            <p data-i18n="pp_s2_p1">
+                Сайт сохраняет два значения в локальном хранилище браузера (localStorage):
+            </p>
+            <ul>
+                <li data-i18n="pp_s2_i1"><code>msi-theme</code> — выбранная вами тема: светлая или тёмная</li>
+                <li data-i18n="pp_s2_i2"><code>msi-lang</code> — выбранный язык страницы: русский или английский</li>
+            </ul>
+            <p data-i18n="pp_s2_p2">
+                Эти записи нужны только для того, чтобы при следующем заходе страница открылась
+                в том же виде. Они <b>хранятся в вашем браузере и никуда не отправляются</b> —
+                ни на сервер сайта, ни автору, ни кому-либо ещё. Удалить их можно в настройках
+                браузера вместе с данными сайта; страница после этого снова возьмёт тему
+                и язык из настроек системы и браузера.
+            </p>
+            <p data-i18n="pp_s2_p3">
+                Файлы cookie сайт не использует.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s3_h">Какие запросы уходят при открытии страницы</h2>
+            <p data-i18n="pp_s3_p1">
+                Сайт обращается к трём внешним адресам. При любом таком обращении браузер
+                по устройству сети сообщает получателю IP-адрес, тип браузера и время запроса —
+                это неизбежная часть работы интернета, а не сбор данных сайтом.
+            </p>
+            <ul>
+                <li data-i18n="pp_s3_i1"><b>GitHub Pages</b> — здесь сайт размещён, оттуда браузер получает саму страницу</li>
+                <li data-i18n="pp_s3_i2"><b>Google Fonts</b> (fonts.googleapis.com, fonts.gstatic.com) — оттуда загружаются шрифты страницы</li>
+                <li data-i18n="pp_s3_i3"><b>api.github.com</b> — один запрос за номером последней версии программы и именами файлов, чтобы кнопки «Скачать» вели прямо на них; уходит только с главной страницы</li>
+            </ul>
+            <p data-i18n="pp_s3_p2">
+                Обработка данных на стороне GitHub и Google подчиняется их собственным условиям:
+                <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">заявление GitHub о конфиденциальности</a>
+                и <a href="https://policies.google.com/privacy">политика конфиденциальности Google</a>.
+                Автор сайта доступа к этим данным не имеет.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s4_h">Чего сайт не делает</h2>
+            <ul>
+                <li data-i18n="pp_s4_i1">Не устанавливает счётчики посещаемости и системы аналитики</li>
+                <li data-i18n="pp_s4_i2">Не показывает рекламу и не подключает рекламные сети</li>
+                <li data-i18n="pp_s4_i3">Не собирает имена, адреса электронной почты и другие личные сведения</li>
+                <li data-i18n="pp_s4_i4">Не отслеживает вас между сайтами и не составляет профиль посетителя</li>
+                <li data-i18n="pp_s4_i5">Не передаёт и не продаёт данные третьим лицам — передавать нечего</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s5_h">Сама программа</h2>
+            <p data-i18n="pp_s5_p1">
+                Music Scan Integrity работает без подключения к сети и только читает файлы:
+                ничего не удаляет, не переименовывает и никуда не отправляет. Настройки и база
+                отпечатков для слежения за порчей остаются на вашем компьютере — рядом
+                с программой либо в профиле пользователя, если рядом с программой писать нельзя.
+            </p>
+            <p data-i18n="pp_s5_p2">
+                Проверить это можно по исходному коду:
+                <a href="https://github.com/J-udgW05/MusicScan">репозиторий проекта</a> открыт.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s6_h">Переходы на другие сайты</h2>
+            <p data-i18n="pp_s6_p1">
+                Ссылки со страницы ведут на GitHub — к исходному коду, документации и файлам
+                выпусков. После перехода действуют правила того сайта, на который вы попали.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s7_h">Ваши права</h2>
+            <p data-i18n="pp_s7_p1">
+                Сайт не хранит о вас никаких сведений на своей стороне, поэтому запрашивать,
+                исправлять или удалять здесь нечего. Всё, что сайт создал, лежит в вашем
+                браузере, и вы удаляете это сами, очистив данные сайта.
+            </p>
+            <p data-i18n="pp_s7_p2">
+                По данным, которые получают GitHub и Google как владельцы серверов, обращаться
+                следует к ним — порядок описан в их документах, ссылки выше.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s8_h">Изменения</h2>
+            <p data-i18n="pp_s8_p1">
+                Если состав запросов или сохраняемых значений изменится, изменится и эта
+                страница, а дата вверху обновится. История правок видна в репозитории
+                проекта — задним числом переписать её незаметно не получится.
+            </p>
+        </section>
+
+        <section>
+            <h2 data-i18n="pp_s9_h">Вопросы</h2>
+            <p data-i18n="pp_s9_p1">
+                Вопросы по этой странице и по программе —
+                <a href="https://github.com/J-udgW05/MusicScan/issues">в разделе Issues репозитория</a>.
+            </p>
+        </section>
+
+        <a class="action legal-back" href="index.html">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5M11 6l-6 6 6 6"/>
+            </svg>
+            <span data-i18n="nav_back">Вернуться на сайт</span>
+        </a>
+    </main>
+
+    <footer>
+        <span class="footer-copy" data-i18n="footer_copy">© 2026 Music Scan Integrity · <a href="https://github.com/J-udgW05" target="_blank" rel="noopener noreferrer">J-udgW05</a></span>
+        <span class="footer-links">
+            <a href="https://github.com/J-udgW05/MusicScan" data-i18n="nav_repo" target="_blank" rel="noopener noreferrer">Репозиторий</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/docs/INTERNALS.md" data-i18n="footer_docs" target="_blank" rel="noopener noreferrer">Документация</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/LICENSE.txt" data-i18n="footer_license" target="_blank" rel="noopener noreferrer">Лицензия</a>
+            <a href="https://github.com/J-udgW05/MusicScan/blob/main/THIRD-PARTY-NOTICES.md" data-i18n="footer_third" target="_blank" rel="noopener noreferrer">Компоненты</a>
+            <span class="footer-divider" aria-hidden="true"></span>
+            <button type="button" class="footer-email" id="copy-email" data-copy="j-udgw05@tuta.io">
+                <span data-i18n="footer_email">j-udgw05@tuta.io</span>
+                <span class="copy-toast" aria-hidden="true" data-i18n="footer_copied">Скопировано</span>
+            </button>
+        </span>
+    </footer>
+
+</div>
+
+<button id="back-to-top" class="icon-btn" type="button" aria-label="Наверх">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5M6 11l6-6 6 6"/>
+    </svg>
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>
