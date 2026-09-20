@@ -1,0 +1,464 @@
+﻿<UserControl x:Class="MusicScanIntegrity.App.Views.ScanView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
+             xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
+             xmlns:vm="clr-namespace:MusicScanIntegrity.App.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:MainViewModel}"
+             Background="{DynamicResource Brush.Bg}"
+             c:Motion.Entrance="True">
+
+    <!-- Tab grid: 22 px content padding, 300 px right column, 20 px gap. No bottom
+         margin on the grid: the columns carry it inside their scrollers, so scrolled
+         content reaches the status bar instead of stopping 22 px short of it. -->
+    <Grid Margin="22,22,22,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ══ Left column ════════════════════════════════════════════════ -->
+        <!-- The scroller reaches into the column gap and pads its content back by the same
+             amount: the bar overlays content, so this puts it between the columns
+             instead of on top of the cards and the warning list's own bar. -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" Margin="0,0,-13,0" Padding="0,0,13,0">
+            <StackPanel Margin="0,0,0,22">
+
+                <!-- Music folder -->
+                <Border Style="{StaticResource Card.Padded}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Scan_MusicFolder}" />
+
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" Style="{StaticResource TextBox.Field}"
+                                     Text="{Binding FolderPath, Mode=OneWay}" IsReadOnly="True"
+                                     TextWrapping="NoWrap" />
+
+                            <Button Grid.Column="1" Style="{StaticResource Button.Outline}"
+                                    Content="{svc:T Scan_Browse}" Margin="10,0,0,0" Padding="14,9"
+                                    AutomationProperties.Name="{svc:T Scan_Browse_Name}"
+                                    Background="{DynamicResource Brush.Card2}"
+                                    Command="{Binding PickFolderCommand}" />
+                        </Grid>
+
+                        <!-- Drop zone with a 1.5 px dashed outline. Border cannot draw dashes, so a
+                             Rectangle does. -->
+                        <Button Style="{StaticResource Drop.Zone}" Margin="0,12,0,0"
+                                AutomationProperties.Name="{svc:T Scan_DropZone_Name}"
+                                ToolTip="{svc:T Scan_DropZone_Tip}"
+                                Command="{Binding PickFolderCommand}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <!-- A folder icon rather than "arrow into tray": a folder is what gets dragged
+                                     here, and the icon reads unambiguously. -->
+                                <c:MsIcon Kind="folder" Size="32" StrokeWeight="1.5"
+                                          HorizontalAlignment="Center"
+                                          Foreground="{DynamicResource Brush.Fg3}" />
+                                <TextBlock Style="{StaticResource Text.Secondary}" Margin="14,10,14,0"
+                                           HorizontalAlignment="Center" TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Foreground="{DynamicResource Brush.Fg3}"
+                                           Text="{svc:T Scan_DropZone}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Start offer, so Start never has to be searched for. -->
+                <!-- The row spans the column like the cards above, so widening the window
+                     stretches the banner instead of leaving a gap beside it.
+
+                     The button sits beside the banner, not inside it: the banner informs, the
+                     button acts, and inside the message frame it read as part of the message.
+                     Outside it is the window's primary action, hence wider than the others.
+                     It is shorter than the banner and vertically centred; full height looked
+                     like a slab next to two lines of text.
+
+                     A dock panel rather than a horizontal stack: a stack measures the banner
+                     with unlimited width, so the text never wrapped and pushed the button out
+                     of the column. -->
+                <DockPanel Margin="0,16,0,0" LastChildFill="True"
+                           Visibility="{Binding IsOfferVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource Button.Accent}" Content="{svc:T Scan_Start}"
+                            Margin="12,0,0,0" VerticalAlignment="Center"
+                            Padding="34,12" FontSize="16"
+                            AutomationProperties.Name="{svc:T Ui_StartScan}"
+                            Command="{Binding StartCommand}" />
+
+                    <Border CornerRadius="12" Padding="22,16"
+                            Background="{DynamicResource Brush.AccSoft}"
+                            BorderBrush="{DynamicResource Brush.Acc}" BorderThickness="1">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource Text.CardTitle}" FontSize="18"
+                                       Text="{Binding OfferTitle}" />
+                            <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,6,0,0"
+                                       FontSize="13.5" LineHeight="19"
+                                       TextWrapping="Wrap" Text="{Binding OfferSubtitle}" />
+                        </StackPanel>
+                    </Border>
+                </DockPanel>
+
+                <!-- Scan progress -->
+                <Border Style="{StaticResource Card.Padded}" Margin="0,16,0,0"
+                        Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Style="{StaticResource Text.CardTitle}" HorizontalAlignment="Left"
+                                       Text="{svc:T Scan_Running}" />
+                            <TextBlock Style="{StaticResource Text.Secondary}" HorizontalAlignment="Right"
+                                       VerticalAlignment="Bottom" Text="{Binding ProgressText}" />
+                        </Grid>
+
+                        <ProgressBar Style="{StaticResource Progress}" Margin="0,12,0,0"
+                                     Minimum="0" Maximum="100" Value="{Binding Progress, Mode=OneWay}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <c:MsIcon Kind="current" Size="13" StrokeWeight="2"
+                                      Foreground="{DynamicResource Brush.Acc}" VerticalAlignment="Center" />
+                            <TextBlock Style="{StaticResource Text.Mono}" Margin="8,0,0,0"
+                                       FontSize="11.5" Foreground="{DynamicResource Brush.Fg2}"
+                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                       Text="{Binding CurrentFile}" />
+                        </StackPanel>
+
+                        <DockPanel Margin="0,16,0,0" LastChildFill="False">
+                            <Button DockPanel.Dock="Left" Style="{StaticResource Button.Soft}"
+                                    AutomationProperties.Name="{Binding PauseButtonText}"
+                                    Command="{Binding TogglePauseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <c:MsIcon Size="13" Kind="{Binding PauseButtonIcon}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding PauseButtonText}" Margin="7,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button DockPanel.Dock="Left" Style="{StaticResource Button.Danger}"
+                                    Margin="8,0,0,0" AutomationProperties.Name="{svc:T Ui_StopScan}"
+                                    Command="{Binding StopCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <c:MsIcon Kind="stop" Size="13" VerticalAlignment="Center" />
+                                    <TextBlock Text="{svc:T Scan_Stop}" Margin="7,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Live warnings during the scan -->
+                <Border Style="{StaticResource Card}" Margin="0,16,0,0"
+                        Visibility="{Binding LiveWarnings.Count, Converter={StaticResource NotEmptyToVisibility}}">
+                    <StackPanel>
+                        <Border Padding="18,13" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.BlockTitle}"
+                                           Text="{svc:T Scan_RunningWarnings}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Base}"
+                                           Foreground="{DynamicResource Brush.Fg3}"
+                                           FontWeight="{StaticResource Weight.Medium}"
+                                           Text="{Binding LiveWarningTotal, Converter={StaticResource NumberFormat}}" />
+                            </DockPanel>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource Text.Tertiary}" Margin="18,0,18,10"
+                                   TextWrapping="Wrap" Text="{Binding LiveWarningNote}"
+                                   Visibility="{Binding LiveWarningNote, Converter={StaticResource NotEmptyToVisibility}}" />
+
+                        <ItemsControl ItemsSource="{Binding LiveWarnings}" MaxHeight="320">
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:LiveWarningRow}">
+                                    <Border Style="{StaticResource RowSeparator}" Padding="18,12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Grid.Column="0" Width="20" Height="20" CornerRadius="5"
+                                                    Background="{DynamicResource Brush.WarnBg}"
+                                                    VerticalAlignment="Top">
+                                                <c:MsIcon Kind="status-warning" Size="14" StrokeWeight="1.7"
+                                                          Foreground="{DynamicResource Brush.Warn}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                                <TextBlock Style="{StaticResource Text.Base}"
+                                                           FontWeight="{StaticResource Weight.Medium}"
+                                                           TextWrapping="Wrap" Text="{Binding Title}" />
+                                                <TextBlock Style="{StaticResource Text.Mono}" Margin="0,3,0,0"
+                                                           TextTrimming="CharacterEllipsis" Text="{Binding Path}" />
+                                            </StackPanel>
+
+                                            <!-- Row action: "Got it" dismisses the row, "Show" opens the file on the
+                                                 results tab. -->
+                                            <Button Grid.Column="2" Style="{StaticResource Button.Link}"
+                                                    Margin="12,0,0,0" VerticalAlignment="Top"
+                                                    Content="{Binding ActionLabel}"
+                                                    AutomationProperties.Name="{Binding ActionLabel}"
+                                                    Command="{Binding DataContext.LiveWarningActionCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ══ Right column ═══════════════════════════════════════════════ -->
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="0,0,0,22">
+
+                <!-- Locked-file question: one at a time, without blocking the queue. It comes
+                     first in the column because the scan waits on it; placed below the summary
+                     and options it fell off the bottom at the default window size, and the scan
+                     stalled on a question nobody could see. -->
+                <Border Margin="0,0,0,16" CornerRadius="10" Padding="16"
+                        Background="{DynamicResource Brush.WarnBg}"
+                        BorderBrush="{DynamicResource Brush.Bd}" BorderThickness="1"
+                        Visibility="{Binding HasLockedQuestion, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.BlockTitle}"
+                                   Foreground="{DynamicResource Brush.Warn}"
+                                   Text="{svc:T Scan_Locked_Title}" TextWrapping="Wrap" />
+
+                        <TextBlock Style="{StaticResource Text.Mono}" Margin="0,6,0,0"
+                                   Foreground="{DynamicResource Brush.Fg2}"
+                                   TextWrapping="Wrap" Text="{Binding LockedFilePath}" />
+
+                        <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,8,0,0"
+                                   TextWrapping="Wrap" Text="{Binding LockedOwnerText}" />
+
+                        <!-- Every choice carries an explanation: choosing between skip and copy
+                             without knowing the consequences is guesswork. -->
+                        <Button Style="{StaticResource Choice.Action}" Margin="0,12,0,0"
+                                AutomationProperties.Name="{svc:T Scan_Locked_Skip}"
+                                Command="{Binding AnswerLockedCommand}" CommandParameter="skip">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Scan_Locked_Skip}" />
+                                <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.Fg2}" TextWrapping="Wrap"
+                                           Text="{svc:T Scan_Locked_Skip_Note}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource Choice.Action}" Margin="0,7,0,0"
+                                AutomationProperties.Name="{svc:T Scan_Locked_Retry}"
+                                Command="{Binding AnswerLockedCommand}" CommandParameter="wait">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Scan_Locked_Retry}" />
+                                <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.Fg2}" TextWrapping="Wrap"
+                                           Text="{Binding LockedWaitNote}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource Choice.Action}" Margin="0,7,0,0"
+                                AutomationProperties.Name="{svc:T Scan_Locked_Copy}"
+                                Command="{Binding AnswerLockedCommand}" CommandParameter="copy">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Scan_Locked_Copy}" />
+                                <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.Fg2}" TextWrapping="Wrap"
+                                           Text="{Binding LockedCopyNote}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource Choice.Action}" Margin="0,7,0,0"
+                                AutomationProperties.Name="{svc:T Scan_Locked_CloseOwner}"
+                                Visibility="{Binding CanCloseOwner, Converter={StaticResource BoolToVisibility}}"
+                                Command="{Binding AnswerLockedCommand}" CommandParameter="close">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Scan_Locked_CloseOwner}" />
+                                <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.Fg2}" TextWrapping="Wrap"
+                                           Text="{Binding LockedOwnerNote}" />
+                            </StackPanel>
+                        </Button>
+
+                        <CheckBox Style="{StaticResource CheckBox.Square}" Margin="0,12,0,0"
+                                  HorizontalAlignment="Stretch"
+                                  Visibility="{Binding CanApplyToAll, Converter={StaticResource BoolToVisibility}}"
+                                  IsChecked="{Binding LockedApplyToAll}">
+                            <!-- MaxWidth, or the caption does not wrap and runs past the card edge. -->
+                            <TextBlock Style="{StaticResource Text.Secondary}" TextWrapping="Wrap"
+                                       MaxWidth="232"
+                                       Text="{svc:T Settings_Locked_ApplyAll}" />
+                        </CheckBox>
+
+                        <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,10,0,0"
+                                   TextWrapping="Wrap" Text="{Binding LockedQueueText}" />
+
+                        <Button Style="{StaticResource Button.Link}" Margin="0,10,0,0"
+                                HorizontalAlignment="Left"
+                                Foreground="{DynamicResource Brush.Err}"
+                                Content="{svc:T Ui_StopScan}"
+                                Command="{Binding StopFromLockedCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Summary -->
+                <Border Style="{StaticResource Card}" Padding="16">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Scan_Summary}" Margin="0,0,0,6" />
+
+                        <Border Padding="0,8" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Fg3}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_TotalFiles}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding TotalFiles}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Padding="0,8" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Acc}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_Checked}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding CheckedFiles}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Padding="0,8" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Ok}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_Ok}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding OkFiles}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Padding="0,8" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Err}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_Corrupted}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding CorruptedFiles}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Padding="0,8" BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Warn}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_WarningsCount}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding WarningFiles}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Padding="0,8">
+                            <DockPanel LastChildFill="False">
+                                <Rectangle DockPanel.Dock="Left" Width="8" Height="8" RadiusX="3" RadiusY="3"
+                                           VerticalAlignment="Center" Fill="{DynamicResource Brush.Skip}" />
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Fg2}"
+                                           Text="{svc:T Ui_Skipped}" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Number}"
+                                           FontSize="{StaticResource Size.CardTitle}"
+                                           FontWeight="{StaticResource Weight.Semi}"
+                                           VerticalAlignment="Center" Text="{Binding SkippedFiles}" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Quick scan options -->
+                <Border Style="{StaticResource Card}" Padding="16" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Scan_Options}" Margin="0,0,0,12" />
+
+                        <DockPanel LastChildFill="False" Margin="0,7">
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                       Text="{svc:T Ui_Recurse}" VerticalAlignment="Center" />
+                            <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
+                                      AutomationProperties.Name="{svc:T Ui_Recurse}"
+                                      IsChecked="{Binding Recursive}" />
+                        </DockPanel>
+
+                        <DockPanel LastChildFill="False" Margin="0,7">
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                       Text="{svc:T Ui_CheckTags}" VerticalAlignment="Center" />
+                            <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
+                                      AutomationProperties.Name="{svc:T Ui_CheckTags}"
+                                      IsChecked="{Binding CheckMetadata}" />
+                        </DockPanel>
+
+                        <!-- The label wraps rather than being cut off: the panel is narrow and
+                             these names match the settings screen. -->
+                        <Grid Margin="0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource Text.Base}" Margin="0,0,8,0"
+                                       Text="{svc:T Settings_LargeFrom}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                      MinWidth="80" AutomationProperties.Name="{svc:T Settings_LargeFrom}"
+                                      ItemsSource="{x:Static vm:SettingsViewModel.ThresholdOptions}"
+                                      ItemTemplate="{StaticResource EnumItemTemplate}"
+                                      SelectedItem="{Binding Threshold}" />
+                        </Grid>
+
+                        <!-- The label wraps rather than being cut off: the panel is narrow and
+                             these names match the settings screen. -->
+                        <Grid Margin="0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource Text.Base}" Margin="0,0,8,0"
+                                       Text="{svc:T Settings_Timeout}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                      MinWidth="80" AutomationProperties.Name="{svc:T Settings_Timeout}"
+                                      ItemsSource="{x:Static vm:SettingsViewModel.TimeoutOptions}"
+                                      ItemTemplate="{StaticResource EnumItemTemplate}"
+                                      SelectedItem="{Binding Timeout}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,2088 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_Repository" xml:space="preserve">
+    <value>Repository</value>
+  </data>
+  <data name="About_Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="About_Build" xml:space="preserve">
+    <value>Build</value>
+  </data>
+  <data name="About_Components" xml:space="preserve">
+    <value>Components: BASS for audio decoding; TagLib# for tag reading; WPF-UI for the window chrome.</value>
+  </data>
+  <data name="About_Decoding" xml:space="preserve">
+    <value>Decoding</value>
+  </data>
+  <data name="About_NoPlugins" xml:space="preserve">
+    <value>Format plugins are not loaded; some formats cannot be checked.</value>
+  </data>
+  <data name="About_Plugins" xml:space="preserve">
+    <value>Format plugins: {0}</value>
+  </data>
+  <data name="About_Tagline" xml:space="preserve">
+    <value>Checks a music collection for corrupted files.</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Ape_BadSignature" xml:space="preserve">
+    <value>The file does not start with the Monkey's Audio signature; the header is broken.</value>
+  </data>
+  <data name="Ape_BadSignature_Detail" xml:space="preserve">
+    <value>The first bytes are not "MAC "</value>
+  </data>
+  <data name="Ape_NoAudio" xml:space="preserve">
+    <value>The file holds no compressed audio, only a header.</value>
+  </data>
+  <data name="Ape_NoAudio_Detail" xml:space="preserve">
+    <value>Audio data length is zero</value>
+  </data>
+  <data name="Ape_OldVersion" xml:space="preserve">
+    <value>Version {0:0.00}: the old format has no length descriptor, only the signature was checked</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared" xml:space="preserve">
+    <value>The file is truncated: less data than its descriptor promises.</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>{0} B declared, {1} B on disk excluding tags</value>
+  </data>
+  <data name="Ape_StructureOnly" xml:space="preserve">
+    <value>Version {0:0.00}; the descriptor MD5 covers decompressed audio and is not verified here</value>
+  </data>
+  <data name="Ape_TooShort" xml:space="preserve">
+    <value>The file is too short to even hold a descriptor.</value>
+  </data>
+  <data name="App_FatalError" xml:space="preserve">
+    <value>An error occurred and the program is closing.</value>
+  </data>
+  <data name="App_NoAudio_Text" xml:space="preserve">
+    <value>The audio decoder did not start. The program will open, but scanning will not work.</value>
+  </data>
+  <data name="App_NoAudio_Title" xml:space="preserve">
+    <value>Files cannot be checked yet</value>
+  </data>
+  <data name="App_UnexpectedError" xml:space="preserve">
+    <value>An unexpected error occurred. The program keeps running, but something may not have worked.</value>
+  </data>
+  <data name="App_UnknownError" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
+  <data name="Bass_CannotOpen" xml:space="preserve">
+    <value>The file could not be opened for reading.</value>
+  </data>
+  <data name="Bass_DecodeStartFailed" xml:space="preserve">
+    <value>Decoding could not be started: {0}.</value>
+  </data>
+  <data name="Bass_DllMissing" xml:space="preserve">
+    <value>bass.dll not found in {0}. Run tools\fetch-bass.ps1 (see README). Details: {1}{2}</value>
+  </data>
+  <data name="Bass_Empty" xml:space="preserve">
+    <value>The file is empty and holds no audio.</value>
+  </data>
+  <data name="Bass_EngineFailed" xml:space="preserve">
+    <value>The audio decoder failed: {0}.</value>
+  </data>
+  <data name="Bass_Error_Code" xml:space="preserve">
+    <value>code {0}</value>
+  </data>
+  <data name="Bass_Error_Codec" xml:space="preserve">
+    <value>no decoder for this format</value>
+  </data>
+  <data name="Bass_Error_Empty" xml:space="preserve">
+    <value>the file is empty</value>
+  </data>
+  <data name="Bass_Error_Ended" xml:space="preserve">
+    <value>end of data</value>
+  </data>
+  <data name="Bass_Error_FileFormat" xml:space="preserve">
+    <value>file format not recognised</value>
+  </data>
+  <data name="Bass_Error_FileOpen" xml:space="preserve">
+    <value>the file cannot be opened</value>
+  </data>
+  <data name="Bass_Error_Handle" xml:space="preserve">
+    <value>invalid stream handle</value>
+  </data>
+  <data name="Bass_Error_Init" xml:space="preserve">
+    <value>audio subsystem not initialised</value>
+  </data>
+  <data name="Bass_Error_Memory" xml:space="preserve">
+    <value>out of memory</value>
+  </data>
+  <data name="Bass_Error_Mp4NoStream" xml:space="preserve">
+    <value>the MP4 container has no audio track</value>
+  </data>
+  <data name="Bass_Error_NotAvailable" xml:space="preserve">
+    <value>feature not available</value>
+  </data>
+  <data name="Bass_Error_OK" xml:space="preserve">
+    <value>no error</value>
+  </data>
+  <data name="Bass_Error_Position" xml:space="preserve">
+    <value>invalid stream position</value>
+  </data>
+  <data name="Bass_Error_SampleFormat" xml:space="preserve">
+    <value>sample format not supported</value>
+  </data>
+  <data name="Bass_Error_Timeout" xml:space="preserve">
+    <value>timed out</value>
+  </data>
+  <data name="Bass_Error_Unknown" xml:space="preserve">
+    <value>unknown decoder error</value>
+  </data>
+  <data name="Bass_Error_Unstreamable" xml:space="preserve">
+    <value>the file cannot be decoded as a stream</value>
+  </data>
+  <data name="Bass_Error_WmaAccessDenied" xml:space="preserve">
+    <value>access to the protected file denied</value>
+  </data>
+  <data name="Bass_Error_WmaIndividual" xml:space="preserve">
+    <value>player individualisation required</value>
+  </data>
+  <data name="Bass_Error_WmaLicense" xml:space="preserve">
+    <value>a playback licence is required</value>
+  </data>
+  <data name="Bass_FolderMissing" xml:space="preserve">
+    <value>BASS library folder not found: {0}. Run tools\fetch-bass.ps1 or copy the libraries manually (see README).</value>
+  </data>
+  <data name="Bass_InitFailed" xml:space="preserve">
+    <value>BASS failed to initialise: {0} ({1}).{2}</value>
+  </data>
+  <data name="Bass_NoSamples" xml:space="preserve">
+    <value>The decoder got no samples; the file holds no audio data.</value>
+  </data>
+  <data name="Bass_NoSamples_Detail" xml:space="preserve">
+    <value>BASS_ChannelGetData returned 0 bytes</value>
+  </data>
+  <data name="Bass_NotInitialised" xml:space="preserve">
+    <value>BASS is not initialised</value>
+  </data>
+  <data name="Bass_NotStarted" xml:space="preserve">
+    <value>The audio decoder is not running.</value>
+  </data>
+  <data name="Bass_Protected" xml:space="preserve">
+    <value>The file is protected by a licence or password and cannot be decoded.</value>
+  </data>
+  <data name="Bass_ReadInterrupted" xml:space="preserve">
+    <value>Reading audio data was interrupted: {0}.</value>
+  </data>
+  <data name="Bass_SearchPathFailed" xml:space="preserve">
+    <value> Could not add {0} to the library search path (code {1}).</value>
+  </data>
+  <data name="Bass_SeekUnavailable" xml:space="preserve">
+    <value>Seeking unavailable; only the start was read</value>
+  </data>
+  <data name="Bass_StartFailed" xml:space="preserve">
+    <value>Could not start the audio decoder: {0}</value>
+  </data>
+  <data name="Bass_UnexpectedRead" xml:space="preserve">
+    <value>Unexpected error while reading the file.</value>
+  </data>
+  <data name="Bass_WrongBitness" xml:space="preserve">
+    <value>bass.dll has the wrong bitness; the 64-bit version is required. Details: {0}</value>
+  </data>
+  <data name="Check_AccessDenied" xml:space="preserve">
+    <value>Windows denied reading the file, so it could not be checked.</value>
+  </data>
+  <data name="Check_BrokenTagText" xml:space="preserve">
+    <value>Tags were read with the wrong encoding and show garbled text: {0}.</value>
+  </data>
+  <data name="Check_Clipping" xml:space="preserve">
+    <value>Audio hits full scale: {0:0.#}% of samples.</value>
+  </data>
+  <data name="Check_Clipping_Detail" xml:space="preserve">
+    <value>{0} of {1} samples</value>
+  </data>
+  <data name="Check_DcOffset" xml:space="preserve">
+    <value>The recording has a DC offset, a sign of poor digitisation.</value>
+  </data>
+  <data name="Check_DcOffset_Detail" xml:space="preserve">
+    <value>DC component {0:0.###}</value>
+  </data>
+  <data name="Check_DecoderFailed" xml:space="preserve">
+    <value>The audio decoder failed.</value>
+  </data>
+  <data name="Check_DigitalSilence" xml:space="preserve">
+    <value>The file reads, but contains nothing but silence.</value>
+  </data>
+  <data name="Check_DigitalSilence_Detail" xml:space="preserve">
+    <value>Peak level {0:0.####}</value>
+  </data>
+  <data name="Check_Dropout" xml:space="preserve">
+    <value>A {0:0.#} s silent gap inside the track; looks like lost data.</value>
+  </data>
+  <data name="Check_Dropout_Detail" xml:space="preserve">
+    <value>{0} consecutive silent samples at mean level {1:0.###}</value>
+  </data>
+  <data name="Check_EmptyFile" xml:space="preserve">
+    <value>The file is empty (0 bytes) and holds no audio.</value>
+  </data>
+  <data name="Check_EmptyFile_Detail" xml:space="preserve">
+    <value>File size is zero</value>
+  </data>
+  <data name="Check_ExtensionMismatch" xml:space="preserve">
+    <value>Extension does not match contents: this is {0}, not {1}.</value>
+  </data>
+  <data name="Check_ExtensionMismatch_Detail" xml:space="preserve">
+    <value>Signature → {0}</value>
+  </data>
+  <data name="Check_FileDamaged" xml:space="preserve">
+    <value>The file is damaged.</value>
+  </data>
+  <data name="Check_FileNotFound" xml:space="preserve">
+    <value>File not found: it disappeared from disk after it was listed.</value>
+  </data>
+  <data name="Check_LargeFile" xml:space="preserve">
+    <value>Very large file ({0}); checking will take longer.</value>
+  </data>
+  <data name="Check_LargeFile_Detail" xml:space="preserve">
+    <value>Size {0} B, threshold {1} B</value>
+  </data>
+  <data name="Check_SilentCorruption" xml:space="preserve">
+    <value>The file changed on its own: same size and date, different bytes.</value>
+  </data>
+  <data name="Check_SilentCorruption_Detail" xml:space="preserve">
+    <value>Was {0}, now {1}; previous scan {2:yyyy-MM-dd}</value>
+  </data>
+  <data name="Check_TagsMissing" xml:space="preserve">
+    <value>Missing tags: {0}. This is not file damage.</value>
+  </data>
+  <data name="Check_TagsUnreadable" xml:space="preserve">
+    <value>Tags cannot be read; the audio itself is fine.</value>
+  </data>
+  <data name="Check_Timeout" xml:space="preserve">
+    <value>Checking took longer than {0} s and was aborted; the file is suspicious.</value>
+  </data>
+  <data name="Check_Timeout_Detail" xml:space="preserve">
+    <value>Timeout {0} s</value>
+  </data>
+  <data name="Check_Timeout_StructureDetail" xml:space="preserve">
+    <value>Timeout {0} s while parsing structure</value>
+  </data>
+  <data name="Check_TranscodeBitrate" xml:space="preserve">
+    <value>Looks re-encoded: {0} kbps, but the audio stops at {1:0.#} kHz.</value>
+  </data>
+  <data name="Check_TranscodeBitrate_Detail" xml:space="preserve">
+    <value>Upper edge {0:0} Hz, {1} blocks</value>
+  </data>
+  <data name="Check_TranscodeLossless" xml:space="preserve">
+    <value>Looks re-encoded: a lossless format, but the audio stops at {0:0.#} kHz.</value>
+  </data>
+  <data name="Check_TranscodeLossless_Detail" xml:space="preserve">
+    <value>Upper edge {0:0} Hz of a possible {1:0} Hz, {2} blocks</value>
+  </data>
+  <data name="Check_Truncated" xml:space="preserve">
+    <value>The file is truncated: it holds less audio than its header promises.</value>
+  </data>
+  <data name="Check_Truncated_Detail" xml:space="preserve">
+    <value>Declared {0:0.#} s, read {1:0.#} s</value>
+  </data>
+  <data name="Check_Unexpected" xml:space="preserve">
+    <value>The file could not be checked due to an unexpected error.</value>
+  </data>
+  <data name="Collection_AndMore" xml:space="preserve">
+    <value> and more</value>
+  </data>
+  <data name="Collection_MissingTracks" xml:space="preserve">
+    <value>Tracks missing from the album: {0}.</value>
+  </data>
+  <data name="Collection_MissingTracks_Detail" xml:space="preserve">
+    <value>{0} of {1} found by tag numbering</value>
+  </data>
+  <data name="Collection_MixedAlbums" xml:space="preserve">
+    <value>The folder holds tracks from different albums: {0}.</value>
+  </data>
+  <data name="Collection_MixedAlbums_Detail" xml:space="preserve">
+    <value>Distinct tag values in total: {0}</value>
+  </data>
+  <data name="Collection_MixedFormats" xml:space="preserve">
+    <value>One folder holds several formats: {0}.</value>
+  </data>
+  <data name="Collection_MixedFormats_Detail" xml:space="preserve">
+    <value>Usually part of the album was downloaded again in a different quality</value>
+  </data>
+  <data name="Collection_NoCover" xml:space="preserve">
+    <value>The album has no cover art, neither in tags nor as a file.</value>
+  </data>
+  <data name="Color_Code" xml:space="preserve">
+    <value>Color code</value>
+  </data>
+  <data name="Color_CodeHeader" xml:space="preserve">
+    <value>COLOR CODE (#RRGGBB)</value>
+  </data>
+  <data name="Color_Hint" xml:space="preserve">
+    <value>Drag across the field or enter a color code</value>
+  </data>
+  <data name="Color_Invalid" xml:space="preserve">
+    <value>That is not a color. Use #RRGGBB, for example #0F7B3F.</value>
+  </data>
+  <data name="Color_Presets" xml:space="preserve">
+    <value>PRESETS</value>
+  </data>
+  <data name="Color_Title" xml:space="preserve">
+    <value>Status color</value>
+  </data>
+  <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
+    <value>{0}; container checksums not verified</value>
+  </data>
+  <data name="Depth_ChecksumsVerified" xml:space="preserve">
+    <value>{0}; container checksums verified</value>
+  </data>
+  <data name="Depth_Full" xml:space="preserve">
+    <value>every file was read in full</value>
+  </data>
+  <data name="Depth_Quick" xml:space="preserve">
+    <value>the start of each file was read</value>
+  </data>
+  <data name="Depth_Sampled" xml:space="preserve">
+    <value>the start, end and middle of each file were read</value>
+  </data>
+  <data name="Duration_LessThanSecond" xml:space="preserve">
+    <value>less than a second</value>
+  </data>
+  <data name="Engine_AlreadyRunning" xml:space="preserve">
+    <value>A scan is already running.</value>
+  </data>
+  <data name="Engine_LargeFile" xml:space="preserve">
+    <value>Very large file ({0}); checking will take longer</value>
+  </data>
+  <data name="Engine_PlaylistMissing" xml:space="preserve">
+    <value>Files missing from playlist: {0}</value>
+  </data>
+  <data name="Engine_UnexpectedFailure" xml:space="preserve">
+    <value>The scan was aborted by an unexpected error: {0}</value>
+  </data>
+  <data name="Enum_Density_Compact" xml:space="preserve">
+    <value>Compact</value>
+  </data>
+  <data name="Enum_Density_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Enum_Depth_Full" xml:space="preserve">
+    <value>Whole file</value>
+  </data>
+  <data name="Enum_Depth_Quick" xml:space="preserve">
+    <value>Beginning only</value>
+  </data>
+  <data name="Enum_Depth_Sampled" xml:space="preserve">
+    <value>Sampled</value>
+  </data>
+  <data name="Enum_Locked_Ask" xml:space="preserve">
+    <value>Ask</value>
+  </data>
+  <data name="Enum_Locked_CloseOwner" xml:space="preserve">
+    <value>Close the owning program</value>
+  </data>
+  <data name="Enum_Locked_Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="Enum_Locked_TempCopy" xml:space="preserve">
+    <value>Temporary copy</value>
+  </data>
+  <data name="Enum_Locked_Wait" xml:space="preserve">
+    <value>Wait</value>
+  </data>
+  <data name="Enum_Report_Csv" xml:space="preserve">
+    <value>CSV table</value>
+  </data>
+  <data name="Enum_Report_Html" xml:space="preserve">
+    <value>HTML page</value>
+  </data>
+  <data name="Enum_Report_Text" xml:space="preserve">
+    <value>Plain text list</value>
+  </data>
+  <data name="Enum_Theme_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Enum_Theme_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Enum_Theme_System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Export_Csv" xml:space="preserve">
+    <value>CSV table</value>
+  </data>
+  <data name="Export_Csv_Note" xml:space="preserve">
+    <value>For Excel and further processing</value>
+  </data>
+  <data name="Export_Filter_Csv" xml:space="preserve">
+    <value>CSV table (*.csv)|*.csv</value>
+  </data>
+  <data name="Export_Filter_Html" xml:space="preserve">
+    <value>HTML page (*.html)|*.html</value>
+  </data>
+  <data name="Export_Filter_Text" xml:space="preserve">
+    <value>Text file (*.txt)|*.txt</value>
+  </data>
+  <data name="Export_Html" xml:space="preserve">
+    <value>HTML page</value>
+  </data>
+  <data name="Export_Html_Note" xml:space="preserve">
+    <value>Same color coding, opens in a browser</value>
+  </data>
+  <data name="Export_Include" xml:space="preserve">
+    <value>INCLUDE</value>
+  </data>
+  <data name="Export_Include_Corrupted" xml:space="preserve">
+    <value>Corrupted files</value>
+  </data>
+  <data name="Export_Include_Playlists" xml:space="preserve">
+    <value>Broken playlist links</value>
+  </data>
+  <data name="Export_Include_Warnings" xml:space="preserve">
+    <value>Warnings and skipped files</value>
+  </data>
+  <data name="Export_OkHeavy" xml:space="preserve">
+    <value>{0}; the report will be large</value>
+  </data>
+  <data name="Export_SaveTitle" xml:space="preserve">
+    <value>Where to save the report</value>
+  </data>
+  <data name="Export_SaveTo" xml:space="preserve">
+    <value>Save to</value>
+  </data>
+  <data name="Export_Text" xml:space="preserve">
+    <value>Plain text list</value>
+  </data>
+  <data name="Export_Text_Note" xml:space="preserve">
+    <value>For reading, problem files only</value>
+  </data>
+  <data name="Finding_Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
+  <data name="Finding_MissingTracks" xml:space="preserve">
+    <value>Numbering gaps</value>
+  </data>
+  <data name="Finding_MixedAlbums" xml:space="preserve">
+    <value>Mixed albums in folder</value>
+  </data>
+  <data name="Finding_MixedFormats" xml:space="preserve">
+    <value>Mixed formats</value>
+  </data>
+  <data name="Finding_NoCover" xml:space="preserve">
+    <value>No cover art</value>
+  </data>
+  <data name="Finding_Other" xml:space="preserve">
+    <value>Finding</value>
+  </data>
+  <data name="Finished_Corrupted" xml:space="preserve">
+    <value>corrupted</value>
+  </data>
+  <data name="Finished_In" xml:space="preserve">
+    <value>In {0}</value>
+  </data>
+  <data name="Finished_NeedAttention" xml:space="preserve">
+    <value>need attention</value>
+  </data>
+  <data name="Finished_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Finished_OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="Finished_PlaylistsMissing" xml:space="preserve">
+    <value>Playlists checked: {0}, paths not found: {1}.</value>
+  </data>
+  <data name="Finished_PlaylistsOk" xml:space="preserve">
+    <value>Playlists checked: {0}, all paths present.</value>
+  </data>
+  <data name="Finished_Skipped" xml:space="preserve">
+    <value>skipped</value>
+  </data>
+  <data name="Finished_Stopped" xml:space="preserve">
+    <value>The scan was stopped; the totals only include what was checked before that.</value>
+  </data>
+  <data name="Finished_StoppedTitle" xml:space="preserve">
+    <value>Scan stopped</value>
+  </data>
+  <data name="Finished_Title" xml:space="preserve">
+    <value>Scan complete</value>
+  </data>
+  <data name="Finished_ToResults" xml:space="preserve">
+    <value>Go to results</value>
+  </data>
+  <data name="FirstRun_DontShow" xml:space="preserve">
+    <value>Do not show again</value>
+  </data>
+  <data name="FirstRun_Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="FirstRun_Lead" xml:space="preserve">
+    <value>Music Scan Integrity checks your collection in three steps</value>
+  </data>
+  <data name="FirstRun_Step1" xml:space="preserve">
+    <value>Choose a folder</value>
+  </data>
+  <data name="FirstRun_Step1_Note" xml:space="preserve">
+    <value>With the button or by dropping it onto the window</value>
+  </data>
+  <data name="FirstRun_Step2" xml:space="preserve">
+    <value>Press Start</value>
+  </data>
+  <data name="FirstRun_Step2_Note" xml:space="preserve">
+    <value>Files are read and decoded; progress is shown on the Scan tab</value>
+  </data>
+  <data name="FirstRun_Step3" xml:space="preserve">
+    <value>Review the results</value>
+  </data>
+  <data name="FirstRun_Step3_Note" xml:space="preserve">
+    <value>Status filters and a report in HTML, CSV or text</value>
+  </data>
+  <data name="FirstRun_Title" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="Flac_BadSignature" xml:space="preserve">
+    <value>The file does not start with the FLAC signature; the header is broken.</value>
+  </data>
+  <data name="Flac_BadSignature_Detail" xml:space="preserve">
+    <value>The first bytes are not "fLaC"</value>
+  </data>
+  <data name="Flac_EndlessMetadata" xml:space="preserve">
+    <value>The stream description is damaged: the blocks never end.</value>
+  </data>
+  <data name="Flac_EndlessMetadata_Detail" xml:space="preserve">
+    <value>More than 1024 consecutive metadata blocks</value>
+  </data>
+  <data name="Flac_FirstFrameBroken" xml:space="preserve">
+    <value>The first audio frame is broken; the file will not play.</value>
+  </data>
+  <data name="Flac_FrameBroken" xml:space="preserve">
+    <value>Frame {0} is broken: no frame header where it should be.</value>
+  </data>
+  <data name="Flac_FrameBroken_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected a FLAC frame header</value>
+  </data>
+  <data name="Flac_FrameChecksum" xml:space="preserve">
+    <value>The checksum of frame {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Flac_FrameChecksum_Detail" xml:space="preserve">
+    <value>Offset {0} B, frames checked: {1}, {2} B remaining</value>
+  </data>
+  <data name="Flac_FrameUnfinished" xml:space="preserve">
+    <value>The file is damaged: frame {0} is incomplete or there is extra data at the end.</value>
+  </data>
+  <data name="Flac_InvalidBlock" xml:space="preserve">
+    <value>The stream description is damaged: an invalid block was found.</value>
+  </data>
+  <data name="Flac_InvalidBlock_Detail" xml:space="preserve">
+    <value>Metadata block type 127</value>
+  </data>
+  <data name="Flac_MetadataTruncated" xml:space="preserve">
+    <value>The stream description is cut short.</value>
+  </data>
+  <data name="Flac_MissingAudio" xml:space="preserve">
+    <value>The file is truncated: {0} of the declared audio is missing.</value>
+  </data>
+  <data name="Flac_MissingAudio_Detail" xml:space="preserve">
+    <value>{0} samples declared, {1} found</value>
+  </data>
+  <data name="Flac_NoFrames" xml:space="preserve">
+    <value>The file has a header but no audio frames.</value>
+  </data>
+  <data name="Flac_NoFrames_Detail" xml:space="preserve">
+    <value>Audio data ends at {0} B</value>
+  </data>
+  <data name="Flac_NoStreamInfo" xml:space="preserve">
+    <value>The mandatory stream description block is missing.</value>
+  </data>
+  <data name="Flac_NoStreamInfo_Detail" xml:space="preserve">
+    <value>STREAMINFO block not found</value>
+  </data>
+  <data name="Flac_TruncatedInMetadata" xml:space="preserve">
+    <value>The file ends inside the metadata.</value>
+  </data>
+  <data name="Flac_TruncatedStreamInfo" xml:space="preserve">
+    <value>The file ends inside the stream description.</value>
+  </data>
+  <data name="Folder_AccessDenied" xml:space="preserve">
+    <value>Windows denied access to the folder.</value>
+  </data>
+  <data name="Folder_NotFound" xml:space="preserve">
+    <value>Folder not found.</value>
+  </data>
+  <data name="Folder_Unreadable" xml:space="preserve">
+    <value>The folder could not be read.</value>
+  </data>
+  <data name="Format_Unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="Help_Corrupted" xml:space="preserve">
+    <value>: the decoder stopped, the stream is broken, the file is empty or could not be reached. Such files are worth downloading again.</value>
+  </data>
+  <data name="Help_CorruptedName" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Help_HowItWorks" xml:space="preserve">
+    <value>HOW IT WORKS</value>
+  </data>
+  <data name="Help_HowItWorks_Decode" xml:space="preserve">
+    <value>The program does not just look at the extension; it tries to decode the first two seconds of every file. If the decoder fails, the file really is corrupted. Files are checked in parallel.</value>
+  </data>
+  <data name="Help_HowItWorks_Playlists" xml:space="preserve">
+    <value>Playlists (M3U, M3U8, PLS, CUE) are checked differently: only whether the files they reference exist. A file found both in the folder and in a playlist gets a single status.</value>
+  </data>
+  <data name="Help_Ok" xml:space="preserve">
+    <value>— the file was read and decoded without errors.</value>
+  </data>
+  <data name="Help_Shortcuts" xml:space="preserve">
+    <value>KEYBOARD SHORTCUTS</value>
+  </data>
+  <data name="Help_Skipped" xml:space="preserve">
+    <value>— the file was in use by another program and skipped at your choice.</value>
+  </data>
+  <data name="Help_SkippedName" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Help_Statuses" xml:space="preserve">
+    <value>WHAT THE STATUSES MEAN</value>
+  </data>
+  <data name="Help_Warning" xml:space="preserve">
+    <value>: the file reads, but something is odd: no tags, the extension does not match the content, or the check took too long. This is not corruption.</value>
+  </data>
+  <data name="Help_WarningName" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="History_OpenFailed" xml:space="preserve">
+    <value>Could not open the history database: {0}</value>
+  </data>
+  <data name="Html_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Html_AllFormats" xml:space="preserve">
+    <value>Format: all</value>
+  </data>
+  <data name="Html_Category_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Html_Category_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Html_Category_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Html_Category_Warnings" xml:space="preserve">
+    <value>Warnings</value>
+  </data>
+  <data name="Html_Col_Entries" xml:space="preserve">
+    <value>Entries</value>
+  </data>
+  <data name="Html_Col_Finding" xml:space="preserve">
+    <value>Finding</value>
+  </data>
+  <data name="Html_Col_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Html_Col_Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Html_Col_WhereWhat" xml:space="preserve">
+    <value>Where and what</value>
+  </data>
+  <data name="Html_CriticalFailure" xml:space="preserve">
+    <value>The scan was aborted by a critical failure.</value>
+  </data>
+  <data name="Html_Distribution" xml:space="preserve">
+    <value>Status breakdown</value>
+  </data>
+  <data name="Html_Eyebrow" xml:space="preserve">
+    <value>{0} · collection scan report</value>
+  </data>
+  <data name="Html_FilterByFormat" xml:space="preserve">
+    <value>Filter by format</value>
+  </data>
+  <data name="Html_FilterByStatus" xml:space="preserve">
+    <value>Filter by status</value>
+  </data>
+  <data name="Html_Footer" xml:space="preserve">
+    <value>{0} · report generated {1:yyyy-MM-dd HH:mm}</value>
+  </data>
+  <data name="Html_Generated" xml:space="preserve">
+    <value>Generated {0:yyyy-MM-dd} at {0:HH:mm}</value>
+  </data>
+  <data name="Html_Kpi_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention" xml:space="preserve">
+    <value>Need attention</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention_Note" xml:space="preserve">
+    <value>tags, locks, extension</value>
+  </data>
+  <data name="Html_Kpi_ScanTime" xml:space="preserve">
+    <value>Scan time</value>
+  </data>
+  <data name="Html_Kpi_TotalFiles" xml:space="preserve">
+    <value>Total files</value>
+  </data>
+  <data name="Html_NothingFound" xml:space="preserve">
+    <value>Nothing found; change the filter.</value>
+  </data>
+  <data name="Html_OfCollection" xml:space="preserve">
+    <value>{0} of the collection</value>
+  </data>
+  <data name="Html_OkExcluded" xml:space="preserve">
+    <value>The table only lists files with findings. {0} healthy files are not included (setting "Include files without findings in reports").</value>
+  </data>
+  <data name="Html_Search" xml:space="preserve">
+    <value>Search by name or path</value>
+  </data>
+  <data name="Html_ShownSome" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="Html_StoppedManually" xml:space="preserve">
+    <value>The scan was stopped manually</value>
+  </data>
+  <data name="Html_StoppedManually_Note" xml:space="preserve">
+    <value>; the report only includes what was checked before that.</value>
+  </data>
+  <data name="Html_Threads" xml:space="preserve">
+    <value>threads: {0}</value>
+  </data>
+  <data name="Html_Title" xml:space="preserve">
+    <value>{0} — report for folder {1}</value>
+  </data>
+  <data name="Html_Took" xml:space="preserve">
+    <value>scan took {0}</value>
+  </data>
+  <data name="Issue_Short_AudioDropout" xml:space="preserve">
+    <value>Dropout</value>
+  </data>
+  <data name="Issue_Short_BrokenTagText" xml:space="preserve">
+    <value>Garbled tags</value>
+  </data>
+  <data name="Issue_Short_ChecksumMismatch" xml:space="preserve">
+    <value>Checksum mismatch</value>
+  </data>
+  <data name="Issue_Short_CheckTimeout" xml:space="preserve">
+    <value>Slow check</value>
+  </data>
+  <data name="Issue_Short_Clipping" xml:space="preserve">
+    <value>Clipping</value>
+  </data>
+  <data name="Issue_Short_ContainerDamaged" xml:space="preserve">
+    <value>Broken structure</value>
+  </data>
+  <data name="Issue_Short_CueMarksBeyondFile" xml:space="preserve">
+    <value>Cue marks past end</value>
+  </data>
+  <data name="Issue_Short_DcOffset" xml:space="preserve">
+    <value>DC offset</value>
+  </data>
+  <data name="Issue_Short_DigitalSilence" xml:space="preserve">
+    <value>No sound</value>
+  </data>
+  <data name="Issue_Short_ExtensionMismatch" xml:space="preserve">
+    <value>Wrong extension</value>
+  </data>
+  <data name="Issue_Short_LargeFile" xml:space="preserve">
+    <value>Large file</value>
+  </data>
+  <data name="Issue_Short_LockedCheckedViaCopy" xml:space="preserve">
+    <value>Checked via copy</value>
+  </data>
+  <data name="Issue_Short_LockedWaitTimeout" xml:space="preserve">
+    <value>Was locked</value>
+  </data>
+  <data name="Issue_Short_MetadataProblem" xml:space="preserve">
+    <value>No tags</value>
+  </data>
+  <data name="Issue_Short_PasswordProtected" xml:space="preserve">
+    <value>Protected</value>
+  </data>
+  <data name="Issue_Short_SilentCorruption" xml:space="preserve">
+    <value>Changed on its own</value>
+  </data>
+  <data name="Issue_Short_TranscodeSuspected" xml:space="preserve">
+    <value>Top end cut off</value>
+  </data>
+  <data name="Issue_Short_Truncated" xml:space="preserve">
+    <value>Truncated</value>
+  </data>
+  <data name="Lock_CheckedViaCopy" xml:space="preserve">
+    <value>The file was locked by another program; checked through a temporary copy.</value>
+  </data>
+  <data name="Lock_CopyFailed" xml:space="preserve">
+    <value>The file is locked and a temporary copy could not be made.</value>
+  </data>
+  <data name="Lock_HeldBy" xml:space="preserve">
+    <value>Held by: {0}</value>
+  </data>
+  <data name="Lock_NoOwner" xml:space="preserve">
+    <value>The file seems to be free now; no program holds it.</value>
+  </data>
+  <data name="Lock_OwnerDetectionOff" xml:space="preserve">
+    <value>The "Find out which process holds the file" setting is off</value>
+  </data>
+  <data name="Lock_OwnerUnknown" xml:space="preserve">
+    <value>Could not determine which program holds the file.</value>
+  </data>
+  <data name="Lock_Skipped" xml:space="preserve">
+    <value>The file is locked by another program and was skipped.</value>
+  </data>
+  <data name="Lock_WaitTimeout" xml:space="preserve">
+    <value>The file stayed locked for the whole {0} s wait and could not be checked.</value>
+  </data>
+  <data name="Main_Back_Tip" xml:space="preserve">
+    <value>Back to work (Esc)</value>
+  </data>
+  <data name="Main_BassNotRunning" xml:space="preserve">
+    <value>BASS is not running</value>
+  </data>
+  <data name="Main_BassRunning" xml:space="preserve">
+    <value>BASS is running</value>
+  </data>
+  <data name="Main_CloseRequestTo" xml:space="preserve">
+    <value>The close request goes to: {0}</value>
+  </data>
+  <data name="Main_ContinueScan" xml:space="preserve">
+    <value>Continue scan</value>
+  </data>
+  <data name="Main_CopyNote" xml:space="preserve">
+    <value>{0} will be copied to %TEMP% and deleted afterwards</value>
+  </data>
+  <data name="Main_DropHint" xml:space="preserve">
+    <value>Drop the folder to start counting files</value>
+  </data>
+  <data name="Main_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Main_ExitConfirm_Text" xml:space="preserve">
+    <value>A scan is still running. Closing the program now stops it and the results are lost: a report for a partial scan can only be exported if you stop the scan first and keep the window open.</value>
+  </data>
+  <data name="Main_ExitConfirm_Title" xml:space="preserve">
+    <value>Abort the scan and exit?</value>
+  </data>
+  <data name="Main_FolderUnreadable_Text" xml:space="preserve">
+    <value>Could not walk this folder. Check that it exists and is accessible.</value>
+  </data>
+  <data name="Main_FolderUnreadable_Title" xml:space="preserve">
+    <value>The folder could not be read</value>
+  </data>
+  <data name="Main_Inaccessible_Text" xml:space="preserve">
+    <value>{0} Files inside remain unchecked.{1}</value>
+  </data>
+  <data name="Main_Inaccessible_Title" xml:space="preserve">
+    <value>Some folders are inaccessible</value>
+  </data>
+  <data name="Main_InaccessibleMore" xml:space="preserve">
+    <value> Folders like this: {0}.</value>
+  </data>
+  <data name="Main_LiveWarningNote" xml:space="preserve">
+    <value>Showing the latest {0}; the full list is on the Results tab</value>
+  </data>
+  <data name="Main_NoDecoder_Text" xml:space="preserve">
+    <value>Files cannot be checked: the BASS libraries were not found or failed to load. Check that a bass folder with bass.dll and the format plugins sits next to the program.</value>
+  </data>
+  <data name="Main_NoDecoder_Title" xml:space="preserve">
+    <value>The decoder is not running</value>
+  </data>
+  <data name="Main_NoFilesFound" xml:space="preserve">
+    <value>No matching files found</value>
+  </data>
+  <data name="Main_OfferReady" xml:space="preserve">
+    <value>Ready to start; scan options are on the right.</value>
+  </data>
+  <data name="Main_Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="Main_PickFolder_Tip" xml:space="preserve">
+    <value>Choose a music folder (Ctrl+O)</value>
+  </data>
+  <data name="Main_PickFolderTitle" xml:space="preserve">
+    <value>Music folder</value>
+  </data>
+  <data name="Main_ProgressText" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="Main_QuestionsOneByOne" xml:space="preserve">
+    <value>Questions are asked one at a time</value>
+  </data>
+  <data name="Main_QuestionsQueued" xml:space="preserve">
+    <value>Questions are asked one at a time; {0} more queued</value>
+  </data>
+  <data name="Main_ReportNotSaved_Text" xml:space="preserve">
+    <value>Could not save the report. Check that the folder is writable and the disk has free space.</value>
+  </data>
+  <data name="Main_ReportNotSaved_Title" xml:space="preserve">
+    <value>Report not saved</value>
+  </data>
+  <data name="Main_Rescan_Tip" xml:space="preserve">
+    <value>Scan the same folder again (Ctrl+R)</value>
+  </data>
+  <data name="Main_Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="Main_ScanAborted_Text" xml:space="preserve">
+    <value>An error occurred that prevents the scan from continuing. Everything checked so far remains in the results.</value>
+  </data>
+  <data name="Main_ScanAborted_Title" xml:space="preserve">
+    <value>Scan aborted</value>
+  </data>
+  <data name="Main_ScanStopped_Text" xml:space="preserve">
+    <value>{0} Everything checked so far is kept and available on the Results tab.</value>
+  </data>
+  <data name="Main_ScanStopped_Title" xml:space="preserve">
+    <value>Scan stopped</value>
+  </data>
+  <data name="Main_Settings_Tip" xml:space="preserve">
+    <value>Settings (Ctrl+,)</value>
+  </data>
+  <data name="Main_Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Main_StatusCounts" xml:space="preserve">
+    <value>{0} · {1} checked</value>
+  </data>
+  <data name="Main_Stay" xml:space="preserve">
+    <value>Stay</value>
+  </data>
+  <data name="Main_StopConfirm_Text" xml:space="preserve">
+    <value>{0} of {1} files checked. Results found so far are kept and a report can be exported for the partial scan. The scan cannot be resumed from this point later.</value>
+  </data>
+  <data name="Main_StopConfirm_Title" xml:space="preserve">
+    <value>Stop the scan?</value>
+  </data>
+  <data name="Message_Confirm" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="Message_CopyPath" xml:space="preserve">
+    <value>Copy path</value>
+  </data>
+  <data name="Message_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Message_Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Message_TechnicalCause" xml:space="preserve">
+    <value>TECHNICAL CAUSE</value>
+  </data>
+  <data name="Mojibake_ReplacementChars" xml:space="preserve">
+    <value>the text contains characters the system could not read</value>
+  </data>
+  <data name="Mojibake_Utf8Bytes" xml:space="preserve">
+    <value>looks like UTF-8 read byte by byte</value>
+  </data>
+  <data name="Mojibake_WesternTable" xml:space="preserve">
+    <value>looks like Cyrillic read with a Western European code page</value>
+  </data>
+  <data name="Mp3_FrameChecksum" xml:space="preserve">
+    <value>The checksum of frame {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished" xml:space="preserve">
+    <value>The file ends at frame {0}: it was started but not finished.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B needed, {2} B remaining</value>
+  </data>
+  <data name="Mp3_Junk" xml:space="preserve">
+    <value>Junk found between frames; the file is damaged or spliced together.</value>
+  </data>
+  <data name="Mp3_Junk_Detail" xml:space="preserve">
+    <value>Extra bytes: {0}, frames: {1}</value>
+  </data>
+  <data name="Mp3_MissingFrames" xml:space="preserve">
+    <value>The file is truncated: {0} frames declared, {1} found.</value>
+  </data>
+  <data name="Mp3_MissingFrames_Detail" xml:space="preserve">
+    <value>The Xing/Info header declares {0} frames</value>
+  </data>
+  <data name="Mp3_NoFrames" xml:space="preserve">
+    <value>The file contains no MP3 frames.</value>
+  </data>
+  <data name="Mp3_NoFrames_Detail" xml:space="preserve">
+    <value>Scanned {0} B without a single frame header</value>
+  </data>
+  <data name="Mp3_StructureOnly" xml:space="preserve">
+    <value>{0} frames; the file has no checksums, so only the frame chain was checked</value>
+  </data>
+  <data name="Mp3_Verified_Detail" xml:space="preserve">
+    <value>{0} frames, {1} with verified checksums</value>
+  </data>
+  <data name="Mp4_BoxShort" xml:space="preserve">
+    <value>The file is truncated: box "{0}" is shorter than declared.</value>
+  </data>
+  <data name="Mp4_BoxShort_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared, {2} B remaining</value>
+  </data>
+  <data name="Mp4_ImpossibleLength" xml:space="preserve">
+    <value>The file structure is broken: a box declares an impossible length.</value>
+  </data>
+  <data name="Mp4_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Box "{0}" at {1} B declares {2} B</value>
+  </data>
+  <data name="Mp4_NoFtyp" xml:space="preserve">
+    <value>The file has no format description box; its start is broken.</value>
+  </data>
+  <data name="Mp4_NoFtyp_Detail" xml:space="preserve">
+    <value>Box "ftyp" not found</value>
+  </data>
+  <data name="Mp4_NoMdat" xml:space="preserve">
+    <value>The file contains no audio data.</value>
+  </data>
+  <data name="Mp4_NoMdat_Detail" xml:space="preserve">
+    <value>Box "mdat" not found</value>
+  </data>
+  <data name="Mp4_NoMoov" xml:space="preserve">
+    <value>The file has no track description and will not play without it.</value>
+  </data>
+  <data name="Mp4_NoMoov_Detail" xml:space="preserve">
+    <value>Box "moov" not found</value>
+  </data>
+  <data name="Mp4_StructureOnly" xml:space="preserve">
+    <value>{0} boxes; MP4 has no checksums, so only the structure was checked</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader" xml:space="preserve">
+    <value>The file ends inside a box header.</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B remaining</value>
+  </data>
+  <data name="Mp4_TruncatedInBox" xml:space="preserve">
+    <value>The file ends inside box "{0}".</value>
+  </data>
+  <data name="Ogg_BadStart" xml:space="preserve">
+    <value>The file does not start with an Ogg page; the header is broken.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream" xml:space="preserve">
+    <value>The file is truncated: the stream has no end-of-stream page.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, {1} pages</value>
+  </data>
+  <data name="Ogg_NoPages" xml:space="preserve">
+    <value>The file contains no Ogg pages.</value>
+  </data>
+  <data name="Ogg_NoPages_Detail" xml:space="preserve">
+    <value>The file is empty or not Ogg</value>
+  </data>
+  <data name="Ogg_NotAPage" xml:space="preserve">
+    <value>The data after page {0} is not a page.</value>
+  </data>
+  <data name="Ogg_NotAPage_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected the "OggS" signature</value>
+  </data>
+  <data name="Ogg_PageChecksum" xml:space="preserve">
+    <value>The checksum of page {0} does not match; the file is damaged.</value>
+  </data>
+  <data name="Ogg_PageChecksum_Detail" xml:space="preserve">
+    <value>Offset {0} B, stored {1:X8}, computed {2:X8}</value>
+  </data>
+  <data name="Ogg_SequenceGap" xml:space="preserve">
+    <value>Pages are out of sequence; part of the file is lost.</value>
+  </data>
+  <data name="Ogg_SequenceGap_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, expected page {1}, found {2}</value>
+  </data>
+  <data name="Ogg_StartLost" xml:space="preserve">
+    <value>The start of the file is lost: the stream does not begin at page one.</value>
+  </data>
+  <data name="Ogg_StartLost_Detail" xml:space="preserve">
+    <value>Stream {0:X8}, page number {1}, offset {2} B</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage" xml:space="preserve">
+    <value>The file ends inside a page: less data than its header promises.</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B needed</value>
+  </data>
+  <data name="Ogg_TruncatedPage" xml:space="preserve">
+    <value>The file ends in the middle of a page.</value>
+  </data>
+  <data name="Ogg_TruncatedPage_Detail" xml:space="preserve">
+    <value>Offset {0} B, pages checked: {1}</value>
+  </data>
+  <data name="Ogg_TruncatedSegments" xml:space="preserve">
+    <value>The file ends inside a page segment table.</value>
+  </data>
+  <data name="Ogg_UnknownVersion" xml:space="preserve">
+    <value>Unknown Ogg version; the file is damaged or badly built.</value>
+  </data>
+  <data name="Ogg_UnknownVersion_Detail" xml:space="preserve">
+    <value>Page version {0}, offset {1} B</value>
+  </data>
+  <data name="Option_Gigabytes" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="Option_Megabytes" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="Option_Minutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="Option_NoLimit" xml:space="preserve">
+    <value>No limit</value>
+  </data>
+  <data name="Option_Seconds" xml:space="preserve">
+    <value>{0} s</value>
+  </data>
+  <data name="Playlist_CueBeyondFile" xml:space="preserve">
+    <value>The cue sheet does not fit the file: track {0} starts after the file ends.</value>
+  </data>
+  <data name="Playlist_CueBeyondFile_Detail" xml:space="preserve">
+    <value>Mark at {0:0.#} s, file length {1:0.#} s</value>
+  </data>
+  <data name="Playlist_Unreadable" xml:space="preserve">
+    <value>The playlist file could not be read.</value>
+  </data>
+  <data name="Playlist_Unsupported" xml:space="preserve">
+    <value>Playlist format not supported.</value>
+  </data>
+  <data name="Playlist_Unsupported_Detail" xml:space="preserve">
+    <value>Extension {0}</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Few" xml:space="preserve">
+    <value>The same track exists in {0} other places: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Many" xml:space="preserve">
+    <value>The same track exists in {0} other places: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_One" xml:space="preserve">
+    <value>The same track exists in {0} other place: {1} — {2}.</value>
+  </data>
+  <data name="Plural_Files_Few" xml:space="preserve">
+    <value>{0} files</value>
+  </data>
+  <data name="Plural_Files_Many" xml:space="preserve">
+    <value>{0} files</value>
+  </data>
+  <data name="Plural_Files_One" xml:space="preserve">
+    <value>{0} file</value>
+  </data>
+  <data name="Plural_Hours_Few" xml:space="preserve">
+    <value>{0} hours</value>
+  </data>
+  <data name="Plural_Hours_Many" xml:space="preserve">
+    <value>{0} hours</value>
+  </data>
+  <data name="Plural_Hours_One" xml:space="preserve">
+    <value>{0} hour</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Few" xml:space="preserve">
+    <value>{0} files checked</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Many" xml:space="preserve">
+    <value>{0} files checked</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_One" xml:space="preserve">
+    <value>{0} file checked</value>
+  </data>
+  <data name="Plural_Html_InFolders_Few" xml:space="preserve">
+    <value>in {0} folders</value>
+  </data>
+  <data name="Plural_Html_InFolders_Many" xml:space="preserve">
+    <value>in {0} folders</value>
+  </data>
+  <data name="Plural_Html_InFolders_One" xml:space="preserve">
+    <value>in {0} folder</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Few" xml:space="preserve">
+    <value>Showing all {0} files</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Many" xml:space="preserve">
+    <value>Showing all {0} files</value>
+  </data>
+  <data name="Plural_Html_ShownAll_One" xml:space="preserve">
+    <value>Showing all {0} file</value>
+  </data>
+  <data name="Plural_Main_FilesFound_Few" xml:space="preserve">
+    <value>Found {0} matching files</value>
+  </data>
+  <data name="Plural_Main_FilesFound_Many" xml:space="preserve">
+    <value>Found {0} matching files</value>
+  </data>
+  <data name="Plural_Main_FilesFound_One" xml:space="preserve">
+    <value>Found {0} matching file</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_Few" xml:space="preserve">
+    <value>Plus {0} playlists.</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_Many" xml:space="preserve">
+    <value>Plus {0} playlists.</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_One" xml:space="preserve">
+    <value>Plus {0} playlist.</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_Few" xml:space="preserve">
+    <value>{1}, up to {0} attempts</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_Many" xml:space="preserve">
+    <value>{1}, up to {0} attempts</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_One" xml:space="preserve">
+    <value>{1}, up to {0} attempt</value>
+  </data>
+  <data name="Plural_Minutes_Few" xml:space="preserve">
+    <value>{0} minutes</value>
+  </data>
+  <data name="Plural_Minutes_Many" xml:space="preserve">
+    <value>{0} minutes</value>
+  </data>
+  <data name="Plural_Minutes_One" xml:space="preserve">
+    <value>{0} minute</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_Few" xml:space="preserve">
+    <value>{0} threads</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_Many" xml:space="preserve">
+    <value>{0} threads</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_One" xml:space="preserve">
+    <value>{0} thread</value>
+  </data>
+  <data name="Plural_Seconds_Few" xml:space="preserve">
+    <value>{0} seconds</value>
+  </data>
+  <data name="Plural_Seconds_Many" xml:space="preserve">
+    <value>{0} seconds</value>
+  </data>
+  <data name="Plural_Seconds_One" xml:space="preserve">
+    <value>{0} second</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_Few" xml:space="preserve">
+    <value>{0} files in history; database at {1}</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_Many" xml:space="preserve">
+    <value>{0} files in history; database at {1}</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_One" xml:space="preserve">
+    <value>{0} file in history; database at {1}</value>
+  </data>
+  <data name="Probe_AudioReadFailed" xml:space="preserve">
+    <value>Reading audio data failed.</value>
+  </data>
+  <data name="Probe_DecodeStartFailed" xml:space="preserve">
+    <value>Decoding could not be started.</value>
+  </data>
+  <data name="Probe_EmptyFile" xml:space="preserve">
+    <value>The file is empty and holds no audio.</value>
+  </data>
+  <data name="Probe_EngineFailure" xml:space="preserve">
+    <value>The audio decoder failed.</value>
+  </data>
+  <data name="Probe_PasswordProtected" xml:space="preserve">
+    <value>The file is protected by a password or licence.</value>
+  </data>
+  <data name="Probe_Unknown" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
+  <data name="Report_Attention" xml:space="preserve">
+    <value>Attention</value>
+  </data>
+  <data name="Report_BrokenLinksNote" xml:space="preserve">
+    <value>(broken links: {0})</value>
+  </data>
+  <data name="Report_BrokenPlaylistLinks" xml:space="preserve">
+    <value>Broken playlist links</value>
+  </data>
+  <data name="Report_Checked" xml:space="preserve">
+    <value>Checked</value>
+  </data>
+  <data name="Report_Col_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Report_Col_FileName" xml:space="preserve">
+    <value>File name</value>
+  </data>
+  <data name="Report_Col_Format" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="Report_Col_Missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="Report_Col_MissingPath" xml:space="preserve">
+    <value>Missing path</value>
+  </data>
+  <data name="Report_Col_Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Report_Col_Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="Report_Col_SizeBytes" xml:space="preserve">
+    <value>Size, bytes</value>
+  </data>
+  <data name="Report_Col_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Report_Col_TechnicalCause" xml:space="preserve">
+    <value>Technical cause</value>
+  </data>
+  <data name="Report_Col_TotalEntries" xml:space="preserve">
+    <value>Total entries</value>
+  </data>
+  <data name="Report_CollectionFindings" xml:space="preserve">
+    <value>Collection findings</value>
+  </data>
+  <data name="Report_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Report_CriticalFailure" xml:space="preserve">
+    <value>Critical failure</value>
+  </data>
+  <data name="Report_DateTime" xml:space="preserve">
+    <value>{0:yyyy-MM-dd HH:mm}</value>
+  </data>
+  <data name="Report_Folder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="Report_FormatUnsupported" xml:space="preserve">
+    <value>Report format {0} is not supported.</value>
+  </data>
+  <data name="Report_Generated" xml:space="preserve">
+    <value>Generated</value>
+  </data>
+  <data name="Report_Method" xml:space="preserve">
+    <value>How the scan was done</value>
+  </data>
+  <data name="Report_NotFound" xml:space="preserve">
+    <value>not found: {0}</value>
+  </data>
+  <data name="Report_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Report_Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="Report_Report" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="Report_ScanDuration" xml:space="preserve">
+    <value>Scan time</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Report_StoppedIncomplete" xml:space="preserve">
+    <value>The scan was stopped; the report is incomplete.</value>
+  </data>
+  <data name="Report_TextFooter" xml:space="preserve">
+    <value>Report generated by {0} on {1:yyyy-MM-dd}</value>
+  </data>
+  <data name="Report_TextTitle" xml:space="preserve">
+    <value>{0} — collection scan report</value>
+  </data>
+  <data name="Report_Threads" xml:space="preserve">
+    <value>Threads</value>
+  </data>
+  <data name="Report_Title_BrokenPlaylists" xml:space="preserve">
+    <value>Playlists with problems</value>
+  </data>
+  <data name="Report_Title_CollectionFindings" xml:space="preserve">
+    <value>Collection findings</value>
+  </data>
+  <data name="Report_Title_Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="Report_Title_UnreadableFolders" xml:space="preserve">
+    <value>Folders that could not be read</value>
+  </data>
+  <data name="Report_TotalFiles" xml:space="preserve">
+    <value>Total files</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Warnings</value>
+  </data>
+  <data name="ReportTab_CollectionEmpty" xml:space="preserve">
+    <value>the collection is empty</value>
+  </data>
+  <data name="ReportTab_CollectionFindings" xml:space="preserve">
+    <value>Collection findings</value>
+  </data>
+  <data name="ReportTab_Corrupted" xml:space="preserve">
+    <value>CORRUPTED</value>
+  </data>
+  <data name="ReportTab_DefaultFormat" xml:space="preserve">
+    <value>DEFAULT REPORT FORMAT</value>
+  </data>
+  <data name="ReportTab_Distribution" xml:space="preserve">
+    <value>Status breakdown</value>
+  </data>
+  <data name="ReportTab_Empty" xml:space="preserve">
+    <value>The report appears after the first scan.</value>
+  </data>
+  <data name="ReportTab_FindingsCapped" xml:space="preserve">
+    <value>Showing {0} of {1} findings; the rest go into the report</value>
+  </data>
+  <data name="ReportTab_Folder" xml:space="preserve">
+    <value>REPORTS FOLDER</value>
+  </data>
+  <data name="ReportTab_Folders" xml:space="preserve">
+    <value>Scanned folders</value>
+  </data>
+  <data name="ReportTab_FoldersCapped" xml:space="preserve">
+    <value>Showing {0} folders with the most files out of {1}</value>
+  </data>
+  <data name="ReportTab_NeedAttention" xml:space="preserve">
+    <value>NEED ATTENTION</value>
+  </data>
+  <data name="ReportTab_NeedAttention_Note" xml:space="preserve">
+    <value>tags, locks, extension</value>
+  </data>
+  <data name="ReportTab_NotRunYet" xml:space="preserve">
+    <value>no scan yet</value>
+  </data>
+  <data name="ReportTab_RootFolder" xml:space="preserve">
+    <value>· root of the selected folder</value>
+  </data>
+  <data name="ReportTab_SaveEllipsis" xml:space="preserve">
+    <value>Save…</value>
+  </data>
+  <data name="ReportTab_SaveReport" xml:space="preserve">
+    <value>Save report</value>
+  </data>
+  <data name="ReportTab_ScanTime" xml:space="preserve">
+    <value>SCAN TIME</value>
+  </data>
+  <data name="ReportTab_TotalFiles" xml:space="preserve">
+    <value>TOTAL FILES</value>
+  </data>
+  <data name="Result_Decoded" xml:space="preserve">
+    <value>Read and decoded without errors.</value>
+  </data>
+  <data name="Result_StructureOnly" xml:space="preserve">
+    <value>Read successfully, structure intact. This format has no checksums, so declared lengths were checked.</value>
+  </data>
+  <data name="Result_Unchanged" xml:space="preserve">
+    <value>Unchanged since the last scan; checked by content fingerprint.</value>
+  </data>
+  <data name="Result_Verified" xml:space="preserve">
+    <value>Read successfully; container checksums matched ({0} units checked).</value>
+  </data>
+  <data name="Results_BrokenLinks" xml:space="preserve">
+    <value>Broken links</value>
+  </data>
+  <data name="Results_ClearSearch" xml:space="preserve">
+    <value>Clear search</value>
+  </data>
+  <data name="Results_Col_Format" xml:space="preserve">
+    <value>FORMAT</value>
+  </data>
+  <data name="Results_Col_Name" xml:space="preserve">
+    <value>NAME</value>
+  </data>
+  <data name="Results_Col_Path" xml:space="preserve">
+    <value>PATH</value>
+  </data>
+  <data name="Results_Col_Size" xml:space="preserve">
+    <value>SIZE</value>
+  </data>
+  <data name="Results_Col_Status" xml:space="preserve">
+    <value>STATUS</value>
+  </data>
+  <data name="Results_CopyPath" xml:space="preserve">
+    <value>Copy path</value>
+  </data>
+  <data name="Results_Details" xml:space="preserve">
+    <value>SELECTED FILE DETAILS</value>
+  </data>
+  <data name="Results_Empty" xml:space="preserve">
+    <value>No results yet. Choose a folder and start a scan.</value>
+  </data>
+  <data name="Results_Found" xml:space="preserve">
+    <value>Found</value>
+  </data>
+  <data name="Results_NoSelection" xml:space="preserve">
+    <value>No file selected</value>
+  </data>
+  <data name="Results_NoSelection_Note" xml:space="preserve">
+    <value>Select a row in the table to see what exactly is wrong with the file. Double-click opens the containing folder.</value>
+  </data>
+  <data name="Results_OpenFile" xml:space="preserve">
+    <value>Open file</value>
+  </data>
+  <data name="Results_OpenFileFolder" xml:space="preserve">
+    <value>Open containing folder</value>
+  </data>
+  <data name="Results_PlaylistNote" xml:space="preserve">
+    <value>A file found both in the folder and in a playlist is shown as one row with one status.</value>
+  </data>
+  <data name="Results_Playlists" xml:space="preserve">
+    <value>PLAYLISTS</value>
+  </data>
+  <data name="Results_Search" xml:space="preserve">
+    <value>Search by file name</value>
+  </data>
+  <data name="Results_SortFormat" xml:space="preserve">
+    <value>Sort by format</value>
+  </data>
+  <data name="Results_SortName" xml:space="preserve">
+    <value>Sort by name</value>
+  </data>
+  <data name="Results_SortPath" xml:space="preserve">
+    <value>Sort by path</value>
+  </data>
+  <data name="Results_SortSize" xml:space="preserve">
+    <value>Sort by size</value>
+  </data>
+  <data name="Results_SortStatus" xml:space="preserve">
+    <value>Sort by status</value>
+  </data>
+  <data name="Riff_DataShort" xml:space="preserve">
+    <value>The file is truncated: less audio data than the header promises.</value>
+  </data>
+  <data name="Riff_NoData" xml:space="preserve">
+    <value>The file contains no audio data.</value>
+  </data>
+  <data name="Riff_NoData_Detail" xml:space="preserve">
+    <value>Chunk "data" not found</value>
+  </data>
+  <data name="Riff_NoFmt" xml:space="preserve">
+    <value>The file has no audio format description; the header is broken.</value>
+  </data>
+  <data name="Riff_NoFmt_Detail" xml:space="preserve">
+    <value>Chunk "fmt " not found</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared" xml:space="preserve">
+    <value>The file is truncated: it is shorter than its own header declares.</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>{0} B declared, {1} B on disk</value>
+  </data>
+  <data name="Riff_StructureOnly" xml:space="preserve">
+    <value>{0} chunks; this format has no checksums, so declared lengths were checked</value>
+  </data>
+  <data name="Riff_TooShort" xml:space="preserve">
+    <value>The file is too short to even hold a header.</value>
+  </data>
+  <data name="Riff_TruncatedInChunk" xml:space="preserve">
+    <value>The file ends inside chunk "{0}".</value>
+  </data>
+  <data name="Riff_TruncatedInChunk_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared, {2} B remaining</value>
+  </data>
+  <data name="Scan_Browse" xml:space="preserve">
+    <value>Browse…</value>
+  </data>
+  <data name="Scan_Browse_Name" xml:space="preserve">
+    <value>Browse for a folder</value>
+  </data>
+  <data name="Scan_DropZone" xml:space="preserve">
+    <value>Drop a folder here or click to choose one</value>
+  </data>
+  <data name="Scan_DropZone_Name" xml:space="preserve">
+    <value>Choose a folder or drop it here</value>
+  </data>
+  <data name="Scan_DropZone_Tip" xml:space="preserve">
+    <value>Click to choose a folder, or drop it here</value>
+  </data>
+  <data name="Scan_Locked_CloseOwner" xml:space="preserve">
+    <value>Close the owning program</value>
+  </data>
+  <data name="Scan_Locked_Copy" xml:space="preserve">
+    <value>Check a temporary copy</value>
+  </data>
+  <data name="Scan_Locked_Retry" xml:space="preserve">
+    <value>Wait and retry</value>
+  </data>
+  <data name="Scan_Locked_Skip" xml:space="preserve">
+    <value>Skip file</value>
+  </data>
+  <data name="Scan_Locked_Skip_Note" xml:space="preserve">
+    <value>It will appear in the report as skipped</value>
+  </data>
+  <data name="Scan_Locked_Title" xml:space="preserve">
+    <value>The file is in use by another program</value>
+  </data>
+  <data name="Scan_MusicFolder" xml:space="preserve">
+    <value>MUSIC FOLDER</value>
+  </data>
+  <data name="Scan_Options" xml:space="preserve">
+    <value>SCAN OPTIONS</value>
+  </data>
+  <data name="Scan_Running" xml:space="preserve">
+    <value>Scan in progress</value>
+  </data>
+  <data name="Scan_RunningWarnings" xml:space="preserve">
+    <value>Warnings during the scan</value>
+  </data>
+  <data name="Scan_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Scan_Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Scan_Summary" xml:space="preserve">
+    <value>SUMMARY</value>
+  </data>
+  <data name="Settings_Albums" xml:space="preserve">
+    <value>Check albums and find duplicates</value>
+  </data>
+  <data name="Settings_Albums_Note" xml:space="preserve">
+    <value>gaps in track numbers, mixed formats in a folder, missing cover art, the same track in several places; shown on the Report tab</value>
+  </data>
+  <data name="Settings_Animations" xml:space="preserve">
+    <value>Animations</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Settings_AutoThreads" xml:space="preserve">
+    <value>Choose load automatically</value>
+  </data>
+  <data name="Settings_AutoThreads_Note" xml:space="preserve">
+    <value>by CPU core count, at most 8</value>
+  </data>
+  <data name="Settings_Checksums" xml:space="preserve">
+    <value>Verify checksums stored in the file</value>
+  </data>
+  <data name="Settings_Checksums_Note" xml:space="preserve">
+    <value>FLAC and Ogg are verified by their checksums, MP3 and MP4 by structure</value>
+  </data>
+  <data name="Settings_ClearHistory" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="Settings_ClearHistory_Text" xml:space="preserve">
+    <value>Fingerprints of all files will be forgotten. The next scan reads the collection again, and any corruption that happened before then goes unnoticed, as there is nothing to compare against.</value>
+  </data>
+  <data name="Settings_ClearHistory_Title" xml:space="preserve">
+    <value>Clear scan history?</value>
+  </data>
+  <data name="Settings_Clipping" xml:space="preserve">
+    <value>Detect clipping and DC offset</value>
+  </data>
+  <data name="Settings_Clipping_Note" xml:space="preserve">
+    <value>off on purpose: modern masters hit full scale all the time</value>
+  </data>
+  <data name="Settings_DefaultReportFormat" xml:space="preserve">
+    <value>Default report format</value>
+  </data>
+  <data name="Settings_Density" xml:space="preserve">
+    <value>Results list density</value>
+  </data>
+  <data name="Settings_ExtensionMatch" xml:space="preserve">
+    <value>Match extension against content</value>
+  </data>
+  <data name="Settings_ExtensionMatch_Note" xml:space="preserve">
+    <value>an MP3 that is actually FLAC gets a warning</value>
+  </data>
+  <data name="Settings_Extra" xml:space="preserve">
+    <value>What else to look for</value>
+  </data>
+  <data name="Settings_ExtraExtensions" xml:space="preserve">
+    <value>Additional file extensions</value>
+  </data>
+  <data name="Settings_ExtraExtensions_Note" xml:space="preserve">
+    <value>Comma-separated, for example: .mpc, .tta</value>
+  </data>
+  <data name="Settings_File" xml:space="preserve">
+    <value>SETTINGS FILE</value>
+  </data>
+  <data name="Settings_FirstRunHint" xml:space="preserve">
+    <value>Show the tips on first run</value>
+  </data>
+  <data name="Settings_Formats" xml:space="preserve">
+    <value>Formats</value>
+  </data>
+  <data name="Settings_Formats_Tip" xml:space="preserve">
+    <value>Click to turn the format on or off</value>
+  </data>
+  <data name="Settings_FormatsSummary" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="Settings_FullPaths" xml:space="preserve">
+    <value>Show full file paths</value>
+  </data>
+  <data name="Settings_Hdd" xml:space="preserve">
+    <value>Hard disk optimization</value>
+  </data>
+  <data name="Settings_Hdd_Note" xml:space="preserve">
+    <value>a hard disk reads faster without jumping around: eight files at once make the head seek constantly, and the scan is slower than with two</value>
+  </data>
+  <data name="Settings_HistoryEmpty" xml:space="preserve">
+    <value>The history is empty; it fills up on the first scan.</value>
+  </data>
+  <data name="Settings_IncludeOk" xml:space="preserve">
+    <value>Include files without findings in reports</value>
+  </data>
+  <data name="Settings_Iso" xml:space="preserve">
+    <value>Check ISO disc images (SACD)</value>
+  </data>
+  <data name="Settings_Iso_Note" xml:space="preserve">
+    <value>Experimental, does not always work</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_LargeFrom" xml:space="preserve">
+    <value>Large file from</value>
+  </data>
+  <data name="Settings_Locked" xml:space="preserve">
+    <value>Locked files (in use by another process)</value>
+  </data>
+  <data name="Settings_Locked_Action" xml:space="preserve">
+    <value>What to do with a locked file</value>
+  </data>
+  <data name="Settings_Locked_ApplyAll" xml:space="preserve">
+    <value>Apply the answer to all locked files</value>
+  </data>
+  <data name="Settings_Locked_ApplyAll_Note" xml:space="preserve">
+    <value>checkbox in the prompt itself</value>
+  </data>
+  <data name="Settings_Locked_DetectOwner" xml:space="preserve">
+    <value>Find out which process holds the file</value>
+  </data>
+  <data name="Settings_Locked_OfferClose" xml:space="preserve">
+    <value>Offer to close that program</value>
+  </data>
+  <data name="Settings_Locked_OfferClose_Note" xml:space="preserve">
+    <value>potentially dangerous</value>
+  </data>
+  <data name="Settings_Locked_Retries" xml:space="preserve">
+    <value>Number of retries</value>
+  </data>
+  <data name="Settings_Locked_Retries_Note" xml:space="preserve">
+    <value>then the file is marked as skipped</value>
+  </data>
+  <data name="Settings_Locked_Wait" xml:space="preserve">
+    <value>How long to wait for the file, seconds</value>
+  </data>
+  <data name="Settings_Locked_Wait_Note" xml:space="preserve">
+    <value>before retrying</value>
+  </data>
+  <data name="Settings_Mica" xml:space="preserve">
+    <value>Mica effect</value>
+  </data>
+  <data name="Settings_MicaUnavailable" xml:space="preserve">
+    <value>unavailable: only Windows 11 can draw the backdrop</value>
+  </data>
+  <data name="Settings_MonoPaths" xml:space="preserve">
+    <value>Fixed-width font for paths</value>
+  </data>
+  <data name="Settings_OfferStart" xml:space="preserve">
+    <value>Offer to start right after choosing a folder</value>
+  </data>
+  <data name="Settings_OpenFileFolder" xml:space="preserve">
+    <value>Open the settings file folder</value>
+  </data>
+  <data name="Settings_OpenReport" xml:space="preserve">
+    <value>Open the report after saving</value>
+  </data>
+  <data name="Settings_Other" xml:space="preserve">
+    <value>Reports and more</value>
+  </data>
+  <data name="Settings_PickColor" xml:space="preserve">
+    <value>Choose color</value>
+  </data>
+  <data name="Settings_PickColor_Name" xml:space="preserve">
+    <value>Status color: {0}</value>
+  </data>
+  <data name="Settings_PickReportsFolder" xml:space="preserve">
+    <value>Where to save reports</value>
+  </data>
+  <data name="Settings_Playlists" xml:space="preserve">
+    <value>Check playlists</value>
+  </data>
+  <data name="Settings_Playlists_Note" xml:space="preserve">
+    <value>looks for missing paths in M3U, PLS, CUE</value>
+  </data>
+  <data name="Settings_ReadMode" xml:space="preserve">
+    <value>How files are read</value>
+  </data>
+  <data name="Settings_ReadMode_Note" xml:space="preserve">
+    <value>sampled: the end and three points in the middle; full is more reliable but takes longer</value>
+  </data>
+  <data name="Settings_RememberFolder" xml:space="preserve">
+    <value>Remember the last folder</value>
+  </data>
+  <data name="Settings_ReportsFolder" xml:space="preserve">
+    <value>Reports folder</value>
+  </data>
+  <data name="Settings_ReportsFolder_Default" xml:space="preserve">
+    <value>Documents</value>
+  </data>
+  <data name="Settings_ResetAll" xml:space="preserve">
+    <value>Reset all</value>
+  </data>
+  <data name="Settings_ResetAll_Name" xml:space="preserve">
+    <value>Reset all settings</value>
+  </data>
+  <data name="Settings_ResetAll_Tip" xml:space="preserve">
+    <value>Restore all settings to their defaults</value>
+  </data>
+  <data name="Settings_ResetColor_Name" xml:space="preserve">
+    <value>Restore the theme color: {0}</value>
+  </data>
+  <data name="Settings_ResetColor_Tip" xml:space="preserve">
+    <value>Restore the theme color</value>
+  </data>
+  <data name="Settings_ResetConfirm_Text" xml:space="preserve">
+    <value>All options return to their defaults, for example: "Include subfolders" on, "Check tags" off, "Large file from" 500 MB, "File timeout" 60 s, "Theme" System.</value>
+  </data>
+  <data name="Settings_ResetConfirm_Title" xml:space="preserve">
+    <value>Reset all settings?</value>
+  </data>
+  <data name="Settings_Silence" xml:space="preserve">
+    <value>Detect silence and audio dropouts</value>
+  </data>
+  <data name="Settings_Silence_Note" xml:space="preserve">
+    <value>the file reads fine but plays silence</value>
+  </data>
+  <data name="Settings_Sound" xml:space="preserve">
+    <value>Sound when the scan finishes</value>
+  </data>
+  <data name="Settings_StatusBar" xml:space="preserve">
+    <value>Status bar</value>
+  </data>
+  <data name="Settings_StatusColors" xml:space="preserve">
+    <value>Status colors</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="Settings_Theme_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_Theme_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_Theme_System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Settings_Threads" xml:space="preserve">
+    <value>Files to check at once</value>
+  </data>
+  <data name="Settings_Threads_Note" xml:space="preserve">
+    <value>used when automatic choice is off</value>
+  </data>
+  <data name="Settings_Timeout" xml:space="preserve">
+    <value>File timeout</value>
+  </data>
+  <data name="Settings_Timeout_Note" xml:space="preserve">
+    <value>after that the file gets the Warning status</value>
+  </data>
+  <data name="Settings_Transcodes" xml:space="preserve">
+    <value>Find transcoded files</value>
+  </data>
+  <data name="Settings_WarnLarge" xml:space="preserve">
+    <value>Warn about large files</value>
+  </data>
+  <data name="Settings_WarnLarge_Note" xml:space="preserve">
+    <value>before checking them</value>
+  </data>
+  <data name="Settings_Watch" xml:space="preserve">
+    <value>Track file decay</value>
+  </data>
+  <data name="Settings_Watch_Note" xml:space="preserve">
+    <value>remembers a fingerprint of every file and finds silent corruption: the content changed while size and date stayed the same. The first scan reads every file in full</value>
+  </data>
+  <data name="Status_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Status_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Status_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Status_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Status_Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Tag_Album" xml:space="preserve">
+    <value>album</value>
+  </data>
+  <data name="Tag_Artist" xml:space="preserve">
+    <value>artist</value>
+  </data>
+  <data name="Tag_Field_Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Tag_Field_Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Tag_Field_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Tag_Title" xml:space="preserve">
+    <value>title</value>
+  </data>
+  <data name="Tags_Corrupt" xml:space="preserve">
+    <value>Tags are corrupt: {0}</value>
+  </data>
+  <data name="Tags_Unreadable" xml:space="preserve">
+    <value>The file cannot be read for tags: {0}</value>
+  </data>
+  <data name="Tags_UnsupportedContainer" xml:space="preserve">
+    <value>TagLib does not support this container: {0}</value>
+  </data>
+  <data name="Ui_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Ui_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Ui_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Ui_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Ui_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ui_Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Ui_ChangeEllipsis" xml:space="preserve">
+    <value>Change…</value>
+  </data>
+  <data name="Ui_Checked" xml:space="preserve">
+    <value>Checked</value>
+  </data>
+  <data name="Ui_CheckTags" xml:space="preserve">
+    <value>Check tags</value>
+  </data>
+  <data name="Ui_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Ui_Corrupted" xml:space="preserve">
+    <value>Corrupted</value>
+  </data>
+  <data name="Ui_GotIt" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Ui_Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Ui_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Ui_PickFolder" xml:space="preserve">
+    <value>Choose folder</value>
+  </data>
+  <data name="Ui_Recurse" xml:space="preserve">
+    <value>Include subfolders</value>
+  </data>
+  <data name="Ui_Report" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="Ui_Rescan" xml:space="preserve">
+    <value>Scan again</value>
+  </data>
+  <data name="Ui_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Ui_Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="Ui_Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Ui_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Ui_Scan" xml:space="preserve">
+    <value>Scan</value>
+  </data>
+  <data name="Ui_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Ui_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Ui_StartScan" xml:space="preserve">
+    <value>Start scan</value>
+  </data>
+  <data name="Ui_StopScan" xml:space="preserve">
+    <value>Stop scan</value>
+  </data>
+  <data name="Ui_TotalFiles" xml:space="preserve">
+    <value>Total files</value>
+  </data>
+  <data name="Ui_Warnings" xml:space="preserve">
+    <value>Warnings</value>
+  </data>
+  <data name="Ui_WarningsCount" xml:space="preserve">
+    <value>Warnings</value>
+  </data>
+  <data name="Unit_B" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="Unit_GB" xml:space="preserve">
+    <value>GB</value>
+  </data>
+  <data name="Unit_KB" xml:space="preserve">
+    <value>KB</value>
+  </data>
+  <data name="Unit_MB" xml:space="preserve">
+    <value>MB</value>
+  </data>
+  <data name="Unit_TB" xml:space="preserve">
+    <value>TB</value>
+  </data>
+  <data name="Valid_Offset" xml:space="preserve">
+    <value>Offset {0} B</value>
+  </data>
+  <data name="Valid_Size" xml:space="preserve">
+    <value>Size {0} B</value>
+  </data>
+  <data name="Valid_TagLongerThanFile" xml:space="preserve">
+    <value>The tag takes {0} B, but the file is shorter</value>
+  </data>
+  <data name="Valid_TruncatedInLeadingTag" xml:space="preserve">
+    <value>The file ends inside the leading tag.</value>
+  </data>
+  <data name="WavPack_BadStart" xml:space="preserve">
+    <value>The file does not start with a WavPack block; the header is broken.</value>
+  </data>
+  <data name="WavPack_BlockUnfinished" xml:space="preserve">
+    <value>The file ends at block {0}: it was started but not finished.</value>
+  </data>
+  <data name="WavPack_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Offset {0} B, {1} B declared</value>
+  </data>
+  <data name="WavPack_NoBlocks" xml:space="preserve">
+    <value>The file contains no WavPack blocks.</value>
+  </data>
+  <data name="WavPack_NoBlocks_Detail" xml:space="preserve">
+    <value>The file is empty or not WavPack</value>
+  </data>
+  <data name="WavPack_NotABlock" xml:space="preserve">
+    <value>The data after block {0} is not a block.</value>
+  </data>
+  <data name="WavPack_NotABlock_Detail" xml:space="preserve">
+    <value>Offset {0} B, expected the "wvpk" signature</value>
+  </data>
+  <data name="WavPack_StructureOnly" xml:space="preserve">
+    <value>{0} blocks; WavPack checksums cover decompressed audio and are not verified here</value>
+  </data>
+</root>

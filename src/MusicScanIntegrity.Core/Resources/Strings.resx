@@ -1,0 +1,2088 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_Repository" xml:space="preserve">
+    <value>Репозиторий</value>
+  </data>
+  <data name="About_Website" xml:space="preserve">
+    <value>Сайт</value>
+  </data>
+  <data name="About_Build" xml:space="preserve">
+    <value>Сборка</value>
+  </data>
+  <data name="About_Components" xml:space="preserve">
+    <value>Компоненты: BASS - декодирование аудио; TagLib# - чтение тегов; WPF-UI - оформление окна.</value>
+  </data>
+  <data name="About_Decoding" xml:space="preserve">
+    <value>Декодирование</value>
+  </data>
+  <data name="About_NoPlugins" xml:space="preserve">
+    <value>Плагины форматов не загружены — часть форматов проверить не получится.</value>
+  </data>
+  <data name="About_Plugins" xml:space="preserve">
+    <value>Плагины форматов: {0}</value>
+  </data>
+  <data name="About_Tagline" xml:space="preserve">
+    <value>Проверка музыкальной коллекции на повреждённые файлы.</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="Ape_BadSignature" xml:space="preserve">
+    <value>Файл не начинается подписью Monkey's Audio — заголовок разрушен.</value>
+  </data>
+  <data name="Ape_BadSignature_Detail" xml:space="preserve">
+    <value>Первые байты не равны «MAC »</value>
+  </data>
+  <data name="Ape_NoAudio" xml:space="preserve">
+    <value>В файле нет сжатого звука — только заголовок.</value>
+  </data>
+  <data name="Ape_NoAudio_Detail" xml:space="preserve">
+    <value>Длина звуковых данных равна нулю</value>
+  </data>
+  <data name="Ape_OldVersion" xml:space="preserve">
+    <value>Версия {0:0.00}: у старого формата нет описания длин, проверена только подпись</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared" xml:space="preserve">
+    <value>Файл обрывается: данных меньше, чем обещано его описанием.</value>
+  </data>
+  <data name="Ape_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>Обещано {0} Б, на диске {1} Б без тегов</value>
+  </data>
+  <data name="Ape_StructureOnly" xml:space="preserve">
+    <value>Версия {0:0.00}; MD5 в описании считается по распакованному звуку и здесь не сверяется</value>
+  </data>
+  <data name="Ape_TooShort" xml:space="preserve">
+    <value>Файл слишком короткий: в нём нет даже описания.</value>
+  </data>
+  <data name="App_FatalError" xml:space="preserve">
+    <value>Произошла ошибка, из-за которой программа закрывается.</value>
+  </data>
+  <data name="App_NoAudio_Text" xml:space="preserve">
+    <value>Не запустился механизм декодирования аудио. Программа откроется, но проверка работать не будет.</value>
+  </data>
+  <data name="App_NoAudio_Title" xml:space="preserve">
+    <value>Проверять файлы пока нельзя</value>
+  </data>
+  <data name="App_UnexpectedError" xml:space="preserve">
+    <value>Произошла непредвиденная ошибка. Программа продолжит работу, но что-то могло не сработать.</value>
+  </data>
+  <data name="App_UnknownError" xml:space="preserve">
+    <value>Неизвестная ошибка</value>
+  </data>
+  <data name="Bass_CannotOpen" xml:space="preserve">
+    <value>Файл не удалось открыть для чтения.</value>
+  </data>
+  <data name="Bass_DecodeStartFailed" xml:space="preserve">
+    <value>Не удалось начать декодирование: {0}.</value>
+  </data>
+  <data name="Bass_DllMissing" xml:space="preserve">
+    <value>Не найдена библиотека bass.dll в {0}. Запустите tools\fetch-bass.ps1 (см. README). Подробности: {1}{2}</value>
+  </data>
+  <data name="Bass_Empty" xml:space="preserve">
+    <value>Файл пустой — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Bass_EngineFailed" xml:space="preserve">
+    <value>Механизм декодирования отказал: {0}.</value>
+  </data>
+  <data name="Bass_Error_Code" xml:space="preserve">
+    <value>код {0}</value>
+  </data>
+  <data name="Bass_Error_Codec" xml:space="preserve">
+    <value>нет декодера для этого формата</value>
+  </data>
+  <data name="Bass_Error_Empty" xml:space="preserve">
+    <value>файл пустой</value>
+  </data>
+  <data name="Bass_Error_Ended" xml:space="preserve">
+    <value>данные закончились</value>
+  </data>
+  <data name="Bass_Error_FileFormat" xml:space="preserve">
+    <value>формат файла не распознан</value>
+  </data>
+  <data name="Bass_Error_FileOpen" xml:space="preserve">
+    <value>файл не открывается</value>
+  </data>
+  <data name="Bass_Error_Handle" xml:space="preserve">
+    <value>неверный дескриптор потока</value>
+  </data>
+  <data name="Bass_Error_Init" xml:space="preserve">
+    <value>звуковая подсистема не инициализирована</value>
+  </data>
+  <data name="Bass_Error_Memory" xml:space="preserve">
+    <value>не хватило памяти</value>
+  </data>
+  <data name="Bass_Error_Mp4NoStream" xml:space="preserve">
+    <value>в контейнере MP4 нет аудиодорожки</value>
+  </data>
+  <data name="Bass_Error_NotAvailable" xml:space="preserve">
+    <value>функция недоступна</value>
+  </data>
+  <data name="Bass_Error_OK" xml:space="preserve">
+    <value>ошибок нет</value>
+  </data>
+  <data name="Bass_Error_Position" xml:space="preserve">
+    <value>неверная позиция в потоке</value>
+  </data>
+  <data name="Bass_Error_SampleFormat" xml:space="preserve">
+    <value>формат отсчётов не поддерживается</value>
+  </data>
+  <data name="Bass_Error_Timeout" xml:space="preserve">
+    <value>истекло время ожидания</value>
+  </data>
+  <data name="Bass_Error_Unknown" xml:space="preserve">
+    <value>неизвестная ошибка декодера</value>
+  </data>
+  <data name="Bass_Error_Unstreamable" xml:space="preserve">
+    <value>файл нельзя декодировать потоком</value>
+  </data>
+  <data name="Bass_Error_WmaAccessDenied" xml:space="preserve">
+    <value>доступ к защищённому файлу запрещён</value>
+  </data>
+  <data name="Bass_Error_WmaIndividual" xml:space="preserve">
+    <value>требуется индивидуализация проигрывателя</value>
+  </data>
+  <data name="Bass_Error_WmaLicense" xml:space="preserve">
+    <value>нужна лицензия на воспроизведение</value>
+  </data>
+  <data name="Bass_FolderMissing" xml:space="preserve">
+    <value>Не найдена папка с библиотеками BASS: {0}. Запустите tools\fetch-bass.ps1 или скопируйте библиотеки вручную (см. README).</value>
+  </data>
+  <data name="Bass_InitFailed" xml:space="preserve">
+    <value>BASS не удалось инициализировать: {0} ({1}).{2}</value>
+  </data>
+  <data name="Bass_NoSamples" xml:space="preserve">
+    <value>Декодер не получил ни одного отсчёта — аудиоданных в файле нет.</value>
+  </data>
+  <data name="Bass_NoSamples_Detail" xml:space="preserve">
+    <value>BASS_ChannelGetData вернул 0 байт</value>
+  </data>
+  <data name="Bass_NotInitialised" xml:space="preserve">
+    <value>BASS не инициализирована</value>
+  </data>
+  <data name="Bass_NotStarted" xml:space="preserve">
+    <value>Механизм декодирования аудио не запущен.</value>
+  </data>
+  <data name="Bass_Protected" xml:space="preserve">
+    <value>Файл защищён лицензией или паролем — декодировать его нельзя.</value>
+  </data>
+  <data name="Bass_ReadInterrupted" xml:space="preserve">
+    <value>Чтение аудиоданных прервалось: {0}.</value>
+  </data>
+  <data name="Bass_SearchPathFailed" xml:space="preserve">
+    <value> Не удалось добавить {0} в пути поиска библиотек (код {1}).</value>
+  </data>
+  <data name="Bass_SeekUnavailable" xml:space="preserve">
+    <value>Перемотка недоступна — прочитано только начало</value>
+  </data>
+  <data name="Bass_StartFailed" xml:space="preserve">
+    <value>Не удалось запустить механизм декодирования: {0}</value>
+  </data>
+  <data name="Bass_UnexpectedRead" xml:space="preserve">
+    <value>Непредвиденная ошибка при чтении файла.</value>
+  </data>
+  <data name="Bass_WrongBitness" xml:space="preserve">
+    <value>Библиотека bass.dll не подходит по разрядности — нужна 64-битная версия. Подробности: {0}</value>
+  </data>
+  <data name="Check_AccessDenied" xml:space="preserve">
+    <value>Windows не дал прочитать файл — проверить его не получилось.</value>
+  </data>
+  <data name="Check_BrokenTagText" xml:space="preserve">
+    <value>Теги прочитаны не в той кодировке — вместо букв кракозябры: {0}.</value>
+  </data>
+  <data name="Check_Clipping" xml:space="preserve">
+    <value>Звук упирается в предел громкости: {0:0.#} % отсчётов.</value>
+  </data>
+  <data name="Check_Clipping_Detail" xml:space="preserve">
+    <value>{0} отсчётов из {1}</value>
+  </data>
+  <data name="Check_DcOffset" xml:space="preserve">
+    <value>У записи смещён ноль — признак плохой оцифровки.</value>
+  </data>
+  <data name="Check_DcOffset_Detail" xml:space="preserve">
+    <value>Постоянная составляющая {0:0.###}</value>
+  </data>
+  <data name="Check_DecoderFailed" xml:space="preserve">
+    <value>Механизм декодирования отказал.</value>
+  </data>
+  <data name="Check_DigitalSilence" xml:space="preserve">
+    <value>Файл читается, но звука в нём нет — сплошная тишина.</value>
+  </data>
+  <data name="Check_DigitalSilence_Detail" xml:space="preserve">
+    <value>Наибольший уровень {0:0.####}</value>
+  </data>
+  <data name="Check_Dropout" xml:space="preserve">
+    <value>Внутри трека провал в тишину на {0:0.#} с — похоже на потерянный кусок.</value>
+  </data>
+  <data name="Check_Dropout_Detail" xml:space="preserve">
+    <value>Тишина {0} отсчётов подряд при средней громкости {1:0.###}</value>
+  </data>
+  <data name="Check_EmptyFile" xml:space="preserve">
+    <value>Файл пустой (0 байт) — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Check_EmptyFile_Detail" xml:space="preserve">
+    <value>Размер файла равен нулю</value>
+  </data>
+  <data name="Check_ExtensionMismatch" xml:space="preserve">
+    <value>Расширение не совпадает с содержимым: это {0}, а не {1}.</value>
+  </data>
+  <data name="Check_ExtensionMismatch_Detail" xml:space="preserve">
+    <value>Сигнатура → {0}</value>
+  </data>
+  <data name="Check_FileDamaged" xml:space="preserve">
+    <value>Файл повреждён.</value>
+  </data>
+  <data name="Check_FileNotFound" xml:space="preserve">
+    <value>Файл не найден — он исчез с диска после того, как программа его нашла.</value>
+  </data>
+  <data name="Check_LargeFile" xml:space="preserve">
+    <value>Очень большой файл ({0}) — проверка займёт больше времени.</value>
+  </data>
+  <data name="Check_LargeFile_Detail" xml:space="preserve">
+    <value>Размер {0} Б, порог {1} Б</value>
+  </data>
+  <data name="Check_SilentCorruption" xml:space="preserve">
+    <value>Содержимое файла изменилось само собой: размер и дата прежние, а байты другие.</value>
+  </data>
+  <data name="Check_SilentCorruption_Detail" xml:space="preserve">
+    <value>Было {0}, стало {1}; прошлая проверка {2:dd.MM.yyyy}</value>
+  </data>
+  <data name="Check_TagsMissing" xml:space="preserve">
+    <value>Не заполнены теги: {0}. Это не повреждение файла.</value>
+  </data>
+  <data name="Check_TagsUnreadable" xml:space="preserve">
+    <value>Теги не читаются — с самим аудио при этом всё в порядке.</value>
+  </data>
+  <data name="Check_Timeout" xml:space="preserve">
+    <value>Проверка заняла больше {0} с и была прервана — файл подозрительный.</value>
+  </data>
+  <data name="Check_Timeout_Detail" xml:space="preserve">
+    <value>Таймаут {0} с</value>
+  </data>
+  <data name="Check_Timeout_StructureDetail" xml:space="preserve">
+    <value>Таймаут {0} с на разборе структуры</value>
+  </data>
+  <data name="Check_TranscodeBitrate" xml:space="preserve">
+    <value>Похоже на перекодирование: битрейт {0} кбит/с, а звук обрывается на {1:0.#} кГц.</value>
+  </data>
+  <data name="Check_TranscodeBitrate_Detail" xml:space="preserve">
+    <value>Верхняя граница {0:0} Гц, кусков {1}</value>
+  </data>
+  <data name="Check_TranscodeLossless" xml:space="preserve">
+    <value>Похоже на перекодирование: формат без потерь, а звук обрывается на {0:0.#} кГц.</value>
+  </data>
+  <data name="Check_TranscodeLossless_Detail" xml:space="preserve">
+    <value>Верхняя граница {0:0} Гц из возможных {1:0} Гц, кусков {2}</value>
+  </data>
+  <data name="Check_Truncated" xml:space="preserve">
+    <value>Файл обрывается: звука в нём меньше, чем обещает заголовок.</value>
+  </data>
+  <data name="Check_Truncated_Detail" xml:space="preserve">
+    <value>Заявлено {0:0.#} с, прочитано {1:0.#} с</value>
+  </data>
+  <data name="Check_Unexpected" xml:space="preserve">
+    <value>Проверить файл не удалось из-за непредвиденной ошибки.</value>
+  </data>
+  <data name="Collection_AndMore" xml:space="preserve">
+    <value> и другие</value>
+  </data>
+  <data name="Collection_MissingTracks" xml:space="preserve">
+    <value>В альбоме не хватает дорожек: {0}.</value>
+  </data>
+  <data name="Collection_MissingTracks_Detail" xml:space="preserve">
+    <value>Найдено {0} из {1} по нумерации в тегах</value>
+  </data>
+  <data name="Collection_MixedAlbums" xml:space="preserve">
+    <value>В папке лежат треки разных альбомов: {0}.</value>
+  </data>
+  <data name="Collection_MixedAlbums_Detail" xml:space="preserve">
+    <value>Всего разных значений тега: {0}</value>
+  </data>
+  <data name="Collection_MixedFormats" xml:space="preserve">
+    <value>В одной папке файлы разных форматов: {0}.</value>
+  </data>
+  <data name="Collection_MixedFormats_Detail" xml:space="preserve">
+    <value>Обычно так выходит, когда часть альбома докачали в другом качестве</value>
+  </data>
+  <data name="Collection_NoCover" xml:space="preserve">
+    <value>У альбома нет обложки: ни в тегах, ни отдельным файлом.</value>
+  </data>
+  <data name="Color_Code" xml:space="preserve">
+    <value>Код цвета</value>
+  </data>
+  <data name="Color_CodeHeader" xml:space="preserve">
+    <value>КОД ЦВЕТА (#RRGGBB)</value>
+  </data>
+  <data name="Color_Hint" xml:space="preserve">
+    <value>Ведите мышью по полю или введите код цвета</value>
+  </data>
+  <data name="Color_Invalid" xml:space="preserve">
+    <value>Не похоже на цвет. Нужен вид #RRGGBB, например #0F7B3F.</value>
+  </data>
+  <data name="Color_Presets" xml:space="preserve">
+    <value>ГОТОВЫЕ ОТТЕНКИ</value>
+  </data>
+  <data name="Color_Title" xml:space="preserve">
+    <value>Цвет статуса</value>
+  </data>
+  <data name="Depth_ChecksumsNotVerified" xml:space="preserve">
+    <value>{0}; контрольные суммы формата не сверялись</value>
+  </data>
+  <data name="Depth_ChecksumsVerified" xml:space="preserve">
+    <value>{0}; контрольные суммы формата сверены</value>
+  </data>
+  <data name="Depth_Full" xml:space="preserve">
+    <value>каждый файл прочитан целиком</value>
+  </data>
+  <data name="Depth_Quick" xml:space="preserve">
+    <value>прочитано начало каждого файла</value>
+  </data>
+  <data name="Depth_Sampled" xml:space="preserve">
+    <value>прочитаны начало, конец и середина каждого файла</value>
+  </data>
+  <data name="Duration_LessThanSecond" xml:space="preserve">
+    <value>меньше секунды</value>
+  </data>
+  <data name="Engine_AlreadyRunning" xml:space="preserve">
+    <value>Проверка уже идёт.</value>
+  </data>
+  <data name="Engine_LargeFile" xml:space="preserve">
+    <value>Очень большой файл ({0}) — проверка займёт больше времени</value>
+  </data>
+  <data name="Engine_PlaylistMissing" xml:space="preserve">
+    <value>В плейлисте не найдено файлов: {0}</value>
+  </data>
+  <data name="Engine_UnexpectedFailure" xml:space="preserve">
+    <value>Проверка прервана непредвиденной ошибкой: {0}</value>
+  </data>
+  <data name="Enum_Density_Compact" xml:space="preserve">
+    <value>Компактная</value>
+  </data>
+  <data name="Enum_Density_Normal" xml:space="preserve">
+    <value>Обычная</value>
+  </data>
+  <data name="Enum_Depth_Full" xml:space="preserve">
+    <value>Файл целиком</value>
+  </data>
+  <data name="Enum_Depth_Quick" xml:space="preserve">
+    <value>Только начало</value>
+  </data>
+  <data name="Enum_Depth_Sampled" xml:space="preserve">
+    <value>Выборочно</value>
+  </data>
+  <data name="Enum_Locked_Ask" xml:space="preserve">
+    <value>Спрашивать</value>
+  </data>
+  <data name="Enum_Locked_CloseOwner" xml:space="preserve">
+    <value>Закрыть программу-владельца</value>
+  </data>
+  <data name="Enum_Locked_Skip" xml:space="preserve">
+    <value>Пропускать</value>
+  </data>
+  <data name="Enum_Locked_TempCopy" xml:space="preserve">
+    <value>Временная копия</value>
+  </data>
+  <data name="Enum_Locked_Wait" xml:space="preserve">
+    <value>Подождать</value>
+  </data>
+  <data name="Enum_Report_Csv" xml:space="preserve">
+    <value>Таблица CSV</value>
+  </data>
+  <data name="Enum_Report_Html" xml:space="preserve">
+    <value>HTML-страница</value>
+  </data>
+  <data name="Enum_Report_Text" xml:space="preserve">
+    <value>Текстовый список</value>
+  </data>
+  <data name="Enum_Theme_Dark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="Enum_Theme_Light" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="Enum_Theme_System" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="Export_Csv" xml:space="preserve">
+    <value>Таблица CSV</value>
+  </data>
+  <data name="Export_Csv_Note" xml:space="preserve">
+    <value>Для Excel и дальнейшей обработки</value>
+  </data>
+  <data name="Export_Filter_Csv" xml:space="preserve">
+    <value>Таблица CSV (*.csv)|*.csv</value>
+  </data>
+  <data name="Export_Filter_Html" xml:space="preserve">
+    <value>HTML-страница (*.html)|*.html</value>
+  </data>
+  <data name="Export_Filter_Text" xml:space="preserve">
+    <value>Текстовый файл (*.txt)|*.txt</value>
+  </data>
+  <data name="Export_Html" xml:space="preserve">
+    <value>HTML-страница</value>
+  </data>
+  <data name="Export_Html_Note" xml:space="preserve">
+    <value>С той же цветовой маркировкой, открывается в браузере</value>
+  </data>
+  <data name="Export_Include" xml:space="preserve">
+    <value>ЧТО ВКЛЮЧИТЬ</value>
+  </data>
+  <data name="Export_Include_Corrupted" xml:space="preserve">
+    <value>Повреждённые файлы</value>
+  </data>
+  <data name="Export_Include_Playlists" xml:space="preserve">
+    <value>Битые ссылки плейлистов</value>
+  </data>
+  <data name="Export_Include_Warnings" xml:space="preserve">
+    <value>Предупреждения и пропущенные</value>
+  </data>
+  <data name="Export_OkHeavy" xml:space="preserve">
+    <value>{0} — отчёт станет тяжёлым</value>
+  </data>
+  <data name="Export_SaveTitle" xml:space="preserve">
+    <value>Куда сохранить отчёт</value>
+  </data>
+  <data name="Export_SaveTo" xml:space="preserve">
+    <value>Сохранить в</value>
+  </data>
+  <data name="Export_Text" xml:space="preserve">
+    <value>Текстовый список</value>
+  </data>
+  <data name="Export_Text_Note" xml:space="preserve">
+    <value>Читать глазами, только проблемные файлы</value>
+  </data>
+  <data name="Finding_Duplicate" xml:space="preserve">
+    <value>Дубликат</value>
+  </data>
+  <data name="Finding_MissingTracks" xml:space="preserve">
+    <value>Пропуски в нумерации</value>
+  </data>
+  <data name="Finding_MixedAlbums" xml:space="preserve">
+    <value>Разные альбомы в папке</value>
+  </data>
+  <data name="Finding_MixedFormats" xml:space="preserve">
+    <value>Разные форматы</value>
+  </data>
+  <data name="Finding_NoCover" xml:space="preserve">
+    <value>Нет обложки</value>
+  </data>
+  <data name="Finding_Other" xml:space="preserve">
+    <value>Замечание</value>
+  </data>
+  <data name="Finished_Corrupted" xml:space="preserve">
+    <value>повреждено</value>
+  </data>
+  <data name="Finished_In" xml:space="preserve">
+    <value>За {0}</value>
+  </data>
+  <data name="Finished_NeedAttention" xml:space="preserve">
+    <value>требуют внимания</value>
+  </data>
+  <data name="Finished_Ok" xml:space="preserve">
+    <value>в порядке</value>
+  </data>
+  <data name="Finished_OpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="Finished_PlaylistsMissing" xml:space="preserve">
+    <value>Плейлистов проверено: {0}, путей не найдено: {1}.</value>
+  </data>
+  <data name="Finished_PlaylistsOk" xml:space="preserve">
+    <value>Плейлистов проверено: {0}, все пути на месте.</value>
+  </data>
+  <data name="Finished_Skipped" xml:space="preserve">
+    <value>пропущено</value>
+  </data>
+  <data name="Finished_Stopped" xml:space="preserve">
+    <value>Проверка была остановлена — в итог попало только то, что успели проверить.</value>
+  </data>
+  <data name="Finished_StoppedTitle" xml:space="preserve">
+    <value>Проверка остановлена</value>
+  </data>
+  <data name="Finished_Title" xml:space="preserve">
+    <value>Проверка завершена</value>
+  </data>
+  <data name="Finished_ToResults" xml:space="preserve">
+    <value>К результатам</value>
+  </data>
+  <data name="FirstRun_DontShow" xml:space="preserve">
+    <value>Больше не показывать</value>
+  </data>
+  <data name="FirstRun_Later" xml:space="preserve">
+    <value>Позже</value>
+  </data>
+  <data name="FirstRun_Lead" xml:space="preserve">
+    <value>Music Scan Integrity проверит коллекцию за три шага</value>
+  </data>
+  <data name="FirstRun_Step1" xml:space="preserve">
+    <value>Укажите папку</value>
+  </data>
+  <data name="FirstRun_Step1_Note" xml:space="preserve">
+    <value>Кнопкой или перетаскиванием прямо в окно</value>
+  </data>
+  <data name="FirstRun_Step2" xml:space="preserve">
+    <value>Нажмите «Начать»</value>
+  </data>
+  <data name="FirstRun_Step2_Note" xml:space="preserve">
+    <value>Файлы читаются и декодируются, ход виден на вкладке «Проверка»</value>
+  </data>
+  <data name="FirstRun_Step3" xml:space="preserve">
+    <value>Разберите результаты</value>
+  </data>
+  <data name="FirstRun_Step3_Note" xml:space="preserve">
+    <value>Фильтры по статусам и отчёт в HTML, CSV или тексте</value>
+  </data>
+  <data name="FirstRun_Title" xml:space="preserve">
+    <value>Добро пожаловать</value>
+  </data>
+  <data name="Flac_BadSignature" xml:space="preserve">
+    <value>Файл не начинается подписью FLAC — заголовок разрушен.</value>
+  </data>
+  <data name="Flac_BadSignature_Detail" xml:space="preserve">
+    <value>Первые байты не равны «fLaC»</value>
+  </data>
+  <data name="Flac_EndlessMetadata" xml:space="preserve">
+    <value>Описание потока повреждено: блоки не заканчиваются.</value>
+  </data>
+  <data name="Flac_EndlessMetadata_Detail" xml:space="preserve">
+    <value>Более 1024 блоков метаданных подряд</value>
+  </data>
+  <data name="Flac_FirstFrameBroken" xml:space="preserve">
+    <value>Первый кадр со звуком разрушен — файл не проиграется.</value>
+  </data>
+  <data name="Flac_FrameBroken" xml:space="preserve">
+    <value>Кадр {0} разрушен: на его месте не заголовок кадра.</value>
+  </data>
+  <data name="Flac_FrameBroken_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидался заголовок кадра FLAC</value>
+  </data>
+  <data name="Flac_FrameChecksum" xml:space="preserve">
+    <value>Контрольная сумма кадра {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Flac_FrameChecksum_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, проверено кадров: {1}, осталось {2} Б</value>
+  </data>
+  <data name="Flac_FrameUnfinished" xml:space="preserve">
+    <value>Файл повреждён: кадр {0} не дописан до конца или в хвосте лишние данные.</value>
+  </data>
+  <data name="Flac_InvalidBlock" xml:space="preserve">
+    <value>Описание потока повреждено: встретился недопустимый блок.</value>
+  </data>
+  <data name="Flac_InvalidBlock_Detail" xml:space="preserve">
+    <value>Тип блока метаданных 127</value>
+  </data>
+  <data name="Flac_MetadataTruncated" xml:space="preserve">
+    <value>Описание потока обрывается.</value>
+  </data>
+  <data name="Flac_MissingAudio" xml:space="preserve">
+    <value>Файл обрывается: не хватает {0} звука от заявленного.</value>
+  </data>
+  <data name="Flac_MissingAudio_Detail" xml:space="preserve">
+    <value>Заявлено {0} отсчётов, найдено {1}</value>
+  </data>
+  <data name="Flac_NoFrames" xml:space="preserve">
+    <value>В файле есть заголовок, но нет ни одного кадра со звуком.</value>
+  </data>
+  <data name="Flac_NoFrames_Detail" xml:space="preserve">
+    <value>Аудиоданные заканчиваются на {0} Б</value>
+  </data>
+  <data name="Flac_NoStreamInfo" xml:space="preserve">
+    <value>В файле нет обязательного блока с описанием потока.</value>
+  </data>
+  <data name="Flac_NoStreamInfo_Detail" xml:space="preserve">
+    <value>Блок STREAMINFO не найден</value>
+  </data>
+  <data name="Flac_TruncatedInMetadata" xml:space="preserve">
+    <value>Файл обрывается внутри метаданных.</value>
+  </data>
+  <data name="Flac_TruncatedStreamInfo" xml:space="preserve">
+    <value>Файл обрывается на описании потока.</value>
+  </data>
+  <data name="Folder_AccessDenied" xml:space="preserve">
+    <value>Windows отказал в доступе к папке.</value>
+  </data>
+  <data name="Folder_NotFound" xml:space="preserve">
+    <value>Папка не найдена.</value>
+  </data>
+  <data name="Folder_Unreadable" xml:space="preserve">
+    <value>Папку не удалось прочитать.</value>
+  </data>
+  <data name="Format_Unknown" xml:space="preserve">
+    <value>неизвестный</value>
+  </data>
+  <data name="Help_Corrupted" xml:space="preserve">
+    <value>— декодер прервался, поток битый, файл пустой или до него не удалось добраться. Такие файлы стоит перекачать.</value>
+  </data>
+  <data name="Help_CorruptedName" xml:space="preserve">
+    <value>Повреждён</value>
+  </data>
+  <data name="Help_HowItWorks" xml:space="preserve">
+    <value>КАК ЭТО РАБОТАЕТ</value>
+  </data>
+  <data name="Help_HowItWorks_Decode" xml:space="preserve">
+    <value>Программа не просто смотрит на расширение - а пытается декодировать первые две секунды каждого файла. Если декодер не справился, файл действительно повреждён. Проверка идёт в несколько потоков.</value>
+  </data>
+  <data name="Help_HowItWorks_Playlists" xml:space="preserve">
+    <value>Плейлисты (M3U, M3U8, PLS, CUE) проверяются иначе: у них проверяется только, существуют ли файлы, на которые они ссылаются. Один и тот же файл, встретившийся и в папке, и в плейлисте, получает один статус.</value>
+  </data>
+  <data name="Help_Ok" xml:space="preserve">
+    <value>— файл прочитан и декодирован без ошибок.</value>
+  </data>
+  <data name="Help_Shortcuts" xml:space="preserve">
+    <value>ГОРЯЧИЕ КЛАВИШИ</value>
+  </data>
+  <data name="Help_Skipped" xml:space="preserve">
+    <value>— файл был занят другой программой и пропущен по вашему решению.</value>
+  </data>
+  <data name="Help_SkippedName" xml:space="preserve">
+    <value>Пропущен</value>
+  </data>
+  <data name="Help_Statuses" xml:space="preserve">
+    <value>ЧТО ОЗНАЧАЮТ СТАТУСЫ</value>
+  </data>
+  <data name="Help_Warning" xml:space="preserve">
+    <value>— файл читается, но что-то странно: нет тегов, расширение не совпадает с содержимым, проверка затянулась. Это не повреждение.</value>
+  </data>
+  <data name="Help_WarningName" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="History_OpenFailed" xml:space="preserve">
+    <value>Не удалось открыть базу истории: {0}</value>
+  </data>
+  <data name="Html_All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Html_AllFormats" xml:space="preserve">
+    <value>Формат: все</value>
+  </data>
+  <data name="Html_Category_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Html_Category_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Html_Category_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
+  <data name="Html_Category_Warnings" xml:space="preserve">
+    <value>Предупреждения</value>
+  </data>
+  <data name="Html_Col_Entries" xml:space="preserve">
+    <value>Записей</value>
+  </data>
+  <data name="Html_Col_Finding" xml:space="preserve">
+    <value>Замечание</value>
+  </data>
+  <data name="Html_Col_Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="Html_Col_Size" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="Html_Col_WhereWhat" xml:space="preserve">
+    <value>Где и что</value>
+  </data>
+  <data name="Html_CriticalFailure" xml:space="preserve">
+    <value>Проверка прервана критическим сбоем.</value>
+  </data>
+  <data name="Html_Distribution" xml:space="preserve">
+    <value>Распределение по статусам</value>
+  </data>
+  <data name="Html_Eyebrow" xml:space="preserve">
+    <value>{0} · отчёт о проверке коллекции</value>
+  </data>
+  <data name="Html_FilterByFormat" xml:space="preserve">
+    <value>Отбор по формату</value>
+  </data>
+  <data name="Html_FilterByStatus" xml:space="preserve">
+    <value>Отбор по статусу</value>
+  </data>
+  <data name="Html_Footer" xml:space="preserve">
+    <value>{0} · отчёт сформирован {1:dd.MM.yyyy HH:mm}</value>
+  </data>
+  <data name="Html_Generated" xml:space="preserve">
+    <value>Сформирован {0:dd.MM.yyyy} в {0:HH:mm}</value>
+  </data>
+  <data name="Html_Kpi_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention" xml:space="preserve">
+    <value>Требуют внимания</value>
+  </data>
+  <data name="Html_Kpi_NeedAttention_Note" xml:space="preserve">
+    <value>теги, занятость, расширение</value>
+  </data>
+  <data name="Html_Kpi_ScanTime" xml:space="preserve">
+    <value>Время проверки</value>
+  </data>
+  <data name="Html_Kpi_TotalFiles" xml:space="preserve">
+    <value>Всего файлов</value>
+  </data>
+  <data name="Html_NothingFound" xml:space="preserve">
+    <value>Ничего не найдено — измените условия отбора.</value>
+  </data>
+  <data name="Html_OfCollection" xml:space="preserve">
+    <value>{0} коллекции</value>
+  </data>
+  <data name="Html_OkExcluded" xml:space="preserve">
+    <value>В таблице только файлы с замечаниями. Исправных {0} — они в отчёт не включены (настройка «Включать в отчёт файлы без замечаний»).</value>
+  </data>
+  <data name="Html_Search" xml:space="preserve">
+    <value>Поиск по имени или пути</value>
+  </data>
+  <data name="Html_ShownSome" xml:space="preserve">
+    <value>Показано {0} из {1}</value>
+  </data>
+  <data name="Html_StoppedManually" xml:space="preserve">
+    <value>Проверка была остановлена вручную</value>
+  </data>
+  <data name="Html_StoppedManually_Note" xml:space="preserve">
+    <value> — в отчёт попало только то, что успели проверить.</value>
+  </data>
+  <data name="Html_Threads" xml:space="preserve">
+    <value>потоков: {0}</value>
+  </data>
+  <data name="Html_Title" xml:space="preserve">
+    <value>{0} — отчёт по папке {1}</value>
+  </data>
+  <data name="Html_Took" xml:space="preserve">
+    <value>проверка заняла {0}</value>
+  </data>
+  <data name="Issue_Short_AudioDropout" xml:space="preserve">
+    <value>Провал в тишину</value>
+  </data>
+  <data name="Issue_Short_BrokenTagText" xml:space="preserve">
+    <value>Кракозябры в тегах</value>
+  </data>
+  <data name="Issue_Short_ChecksumMismatch" xml:space="preserve">
+    <value>Сумма не сошлась</value>
+  </data>
+  <data name="Issue_Short_CheckTimeout" xml:space="preserve">
+    <value>Долгая проверка</value>
+  </data>
+  <data name="Issue_Short_Clipping" xml:space="preserve">
+    <value>Перегрузка</value>
+  </data>
+  <data name="Issue_Short_ContainerDamaged" xml:space="preserve">
+    <value>Структура разрушена</value>
+  </data>
+  <data name="Issue_Short_CueMarksBeyondFile" xml:space="preserve">
+    <value>Метки за пределом файла</value>
+  </data>
+  <data name="Issue_Short_DcOffset" xml:space="preserve">
+    <value>Смещение нуля</value>
+  </data>
+  <data name="Issue_Short_DigitalSilence" xml:space="preserve">
+    <value>Нет звука</value>
+  </data>
+  <data name="Issue_Short_ExtensionMismatch" xml:space="preserve">
+    <value>Не то расширение</value>
+  </data>
+  <data name="Issue_Short_LargeFile" xml:space="preserve">
+    <value>Большой файл</value>
+  </data>
+  <data name="Issue_Short_LockedCheckedViaCopy" xml:space="preserve">
+    <value>Проверен по копии</value>
+  </data>
+  <data name="Issue_Short_LockedWaitTimeout" xml:space="preserve">
+    <value>Был занят</value>
+  </data>
+  <data name="Issue_Short_MetadataProblem" xml:space="preserve">
+    <value>Нет тегов</value>
+  </data>
+  <data name="Issue_Short_PasswordProtected" xml:space="preserve">
+    <value>Защищён</value>
+  </data>
+  <data name="Issue_Short_SilentCorruption" xml:space="preserve">
+    <value>Изменился сам собой</value>
+  </data>
+  <data name="Issue_Short_TranscodeSuspected" xml:space="preserve">
+    <value>Срезан верх</value>
+  </data>
+  <data name="Issue_Short_Truncated" xml:space="preserve">
+    <value>Файл обрывается</value>
+  </data>
+  <data name="Lock_CheckedViaCopy" xml:space="preserve">
+    <value>Файл был занят другой программой — проверен по временной копии.</value>
+  </data>
+  <data name="Lock_CopyFailed" xml:space="preserve">
+    <value>Файл занят, и сделать его временную копию не удалось.</value>
+  </data>
+  <data name="Lock_HeldBy" xml:space="preserve">
+    <value>Файл держит: {0}</value>
+  </data>
+  <data name="Lock_NoOwner" xml:space="preserve">
+    <value>Похоже, файл уже освободился — ни одна программа его не держит.</value>
+  </data>
+  <data name="Lock_OwnerDetectionOff" xml:space="preserve">
+    <value>Настройка «Узнавать, какой процесс держит файл» выключена</value>
+  </data>
+  <data name="Lock_OwnerUnknown" xml:space="preserve">
+    <value>Определить программу-владельца не удалось.</value>
+  </data>
+  <data name="Lock_Skipped" xml:space="preserve">
+    <value>Файл занят другой программой и пропущен.</value>
+  </data>
+  <data name="Lock_WaitTimeout" xml:space="preserve">
+    <value>Файл оставался занят все {0} с ожидания — проверить его не удалось.</value>
+  </data>
+  <data name="Main_Back_Tip" xml:space="preserve">
+    <value>Вернуться к работе (Esc)</value>
+  </data>
+  <data name="Main_BassNotRunning" xml:space="preserve">
+    <value>BASS не запущена</value>
+  </data>
+  <data name="Main_BassRunning" xml:space="preserve">
+    <value>BASS запущена</value>
+  </data>
+  <data name="Main_CloseRequestTo" xml:space="preserve">
+    <value>Запрос на закрытие получит: {0}</value>
+  </data>
+  <data name="Main_ContinueScan" xml:space="preserve">
+    <value>Продолжить проверку</value>
+  </data>
+  <data name="Main_CopyNote" xml:space="preserve">
+    <value>{0} будет скопировано в %TEMP% и удалено после</value>
+  </data>
+  <data name="Main_DropHint" xml:space="preserve">
+    <value>Отпустите папку — подсчёт начнётся сразу</value>
+  </data>
+  <data name="Main_Exit" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="Main_ExitConfirm_Text" xml:space="preserve">
+    <value>Проверка ещё идёт. Если закрыть программу сейчас, она остановится, а результаты останутся непрочитанными: отчёт по неполной проверке можно выгрузить, только если сначала остановить её и не закрывать окно.</value>
+  </data>
+  <data name="Main_ExitConfirm_Title" xml:space="preserve">
+    <value>Прервать проверку и выйти?</value>
+  </data>
+  <data name="Main_FolderUnreadable_Text" xml:space="preserve">
+    <value>Обойти эту папку не получилось. Проверьте, что она существует и доступна.</value>
+  </data>
+  <data name="Main_FolderUnreadable_Title" xml:space="preserve">
+    <value>Папку не удалось прочитать</value>
+  </data>
+  <data name="Main_Inaccessible_Text" xml:space="preserve">
+    <value>{0} Файлы внутри останутся непроверенными.{1}</value>
+  </data>
+  <data name="Main_Inaccessible_Title" xml:space="preserve">
+    <value>Часть папок недоступна</value>
+  </data>
+  <data name="Main_InaccessibleMore" xml:space="preserve">
+    <value> Всего таких папок: {0}.</value>
+  </data>
+  <data name="Main_LiveWarningNote" xml:space="preserve">
+    <value>Показаны последние {0} — полный список на вкладке «Результаты»</value>
+  </data>
+  <data name="Main_NoDecoder_Text" xml:space="preserve">
+    <value>Проверить файлы нельзя: библиотеки BASS не найдены или не загрузились. Проверьте, что рядом с программой есть папка bass с bass.dll и плагинами формата.</value>
+  </data>
+  <data name="Main_NoDecoder_Title" xml:space="preserve">
+    <value>Механизм декодирования не запущен</value>
+  </data>
+  <data name="Main_NoFilesFound" xml:space="preserve">
+    <value>Подходящих файлов не нашлось</value>
+  </data>
+  <data name="Main_OfferReady" xml:space="preserve">
+    <value>Можно начинать — параметры проверки справа.</value>
+  </data>
+  <data name="Main_Pause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="Main_PickFolder_Tip" xml:space="preserve">
+    <value>Выбрать папку с музыкой (Ctrl+O)</value>
+  </data>
+  <data name="Main_PickFolderTitle" xml:space="preserve">
+    <value>Папка с музыкой</value>
+  </data>
+  <data name="Main_ProgressText" xml:space="preserve">
+    <value>{0} из {1}</value>
+  </data>
+  <data name="Main_QuestionsOneByOne" xml:space="preserve">
+    <value>Вопросы задаются по одному</value>
+  </data>
+  <data name="Main_QuestionsQueued" xml:space="preserve">
+    <value>Вопросы задаются по одному — ещё {0} в очереди</value>
+  </data>
+  <data name="Main_ReportNotSaved_Text" xml:space="preserve">
+    <value>Сохранить отчёт не получилось. Проверьте, что папка доступна на запись и на диске есть место.</value>
+  </data>
+  <data name="Main_ReportNotSaved_Title" xml:space="preserve">
+    <value>Отчёт не сохранён</value>
+  </data>
+  <data name="Main_Rescan_Tip" xml:space="preserve">
+    <value>Проверить ту же папку ещё раз (Ctrl+R)</value>
+  </data>
+  <data name="Main_Resume" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="Main_ScanAborted_Text" xml:space="preserve">
+    <value>Во время проверки произошла ошибка, из-за которой продолжать нельзя. Всё, что успели проверить, осталось в результатах.</value>
+  </data>
+  <data name="Main_ScanAborted_Title" xml:space="preserve">
+    <value>Проверка прервана</value>
+  </data>
+  <data name="Main_ScanStopped_Text" xml:space="preserve">
+    <value>{0} Всё, что успели проверить, сохранено и доступно на вкладке «Результаты».</value>
+  </data>
+  <data name="Main_ScanStopped_Title" xml:space="preserve">
+    <value>Проверка остановлена</value>
+  </data>
+  <data name="Main_Settings_Tip" xml:space="preserve">
+    <value>Настройки (Ctrl+,)</value>
+  </data>
+  <data name="Main_Show" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="Main_StatusCounts" xml:space="preserve">
+    <value>{0} · {1} проверено</value>
+  </data>
+  <data name="Main_Stay" xml:space="preserve">
+    <value>Остаться</value>
+  </data>
+  <data name="Main_StopConfirm_Text" xml:space="preserve">
+    <value>Проверено {0} из {1} файлов. Результаты уже найденных файлов сохранятся — отчёт можно будет выгрузить по неполной проверке. Продолжить с этого места позже не получится.</value>
+  </data>
+  <data name="Main_StopConfirm_Title" xml:space="preserve">
+    <value>Остановить проверку?</value>
+  </data>
+  <data name="Message_Confirm" xml:space="preserve">
+    <value>Подтверждение</value>
+  </data>
+  <data name="Message_CopyPath" xml:space="preserve">
+    <value>Скопировать путь</value>
+  </data>
+  <data name="Message_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Message_Message" xml:space="preserve">
+    <value>Сообщение</value>
+  </data>
+  <data name="Message_TechnicalCause" xml:space="preserve">
+    <value>ТЕХНИЧЕСКАЯ ПРИЧИНА</value>
+  </data>
+  <data name="Mojibake_ReplacementChars" xml:space="preserve">
+    <value>в тексте есть знаки, которые система не смогла прочитать</value>
+  </data>
+  <data name="Mojibake_Utf8Bytes" xml:space="preserve">
+    <value>похоже на UTF-8, прочитанный побайтно</value>
+  </data>
+  <data name="Mojibake_WesternTable" xml:space="preserve">
+    <value>похоже на кириллицу, прочитанную западноевропейской таблицей</value>
+  </data>
+  <data name="Mp3_FrameChecksum" xml:space="preserve">
+    <value>Контрольная сумма кадра {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished" xml:space="preserve">
+    <value>Файл обрывается на кадре {0}: он начат, но не дописан.</value>
+  </data>
+  <data name="Mp3_FrameUnfinished_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, нужно {1} Б, осталось {2} Б</value>
+  </data>
+  <data name="Mp3_Junk" xml:space="preserve">
+    <value>Между кадрами найден мусор — файл повреждён или склеен из кусков.</value>
+  </data>
+  <data name="Mp3_Junk_Detail" xml:space="preserve">
+    <value>Лишних байт: {0}, кадров: {1}</value>
+  </data>
+  <data name="Mp3_MissingFrames" xml:space="preserve">
+    <value>Файл обрывается: обещано кадров {0}, найдено {1}.</value>
+  </data>
+  <data name="Mp3_MissingFrames_Detail" xml:space="preserve">
+    <value>Заголовок Xing/Info объявляет {0} кадров</value>
+  </data>
+  <data name="Mp3_NoFrames" xml:space="preserve">
+    <value>В файле нет ни одного кадра MP3.</value>
+  </data>
+  <data name="Mp3_NoFrames_Detail" xml:space="preserve">
+    <value>Просмотрено {0} Б без единого заголовка кадра</value>
+  </data>
+  <data name="Mp3_StructureOnly" xml:space="preserve">
+    <value>Кадров {0}; контрольных сумм в файле нет — проверена только цепочка кадров</value>
+  </data>
+  <data name="Mp3_Verified_Detail" xml:space="preserve">
+    <value>Кадров {0}, с проверенной суммой {1}</value>
+  </data>
+  <data name="Mp4_BoxShort" xml:space="preserve">
+    <value>Файл обрывается: блок «{0}» короче обещанного.</value>
+  </data>
+  <data name="Mp4_BoxShort_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, обещано {1} Б, осталось {2} Б</value>
+  </data>
+  <data name="Mp4_ImpossibleLength" xml:space="preserve">
+    <value>Структура файла разрушена: блок объявляет невозможную длину.</value>
+  </data>
+  <data name="Mp4_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Блок «{0}» на {1} Б объявляет {2} Б</value>
+  </data>
+  <data name="Mp4_NoFtyp" xml:space="preserve">
+    <value>В файле нет блока с описанием формата — начало разрушено.</value>
+  </data>
+  <data name="Mp4_NoFtyp_Detail" xml:space="preserve">
+    <value>Блок «ftyp» не найден</value>
+  </data>
+  <data name="Mp4_NoMdat" xml:space="preserve">
+    <value>В файле нет самих аудиоданных.</value>
+  </data>
+  <data name="Mp4_NoMdat_Detail" xml:space="preserve">
+    <value>Блок «mdat» не найден</value>
+  </data>
+  <data name="Mp4_NoMoov" xml:space="preserve">
+    <value>В файле нет описания дорожек — без него он не проиграется.</value>
+  </data>
+  <data name="Mp4_NoMoov_Detail" xml:space="preserve">
+    <value>Блок «moov» не найден</value>
+  </data>
+  <data name="Mp4_StructureOnly" xml:space="preserve">
+    <value>Блоков {0}; контрольных сумм в MP4 нет — проверена только структура</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader" xml:space="preserve">
+    <value>Файл обрывается на заголовке блока.</value>
+  </data>
+  <data name="Mp4_TruncatedBoxHeader_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, осталось {1} Б</value>
+  </data>
+  <data name="Mp4_TruncatedInBox" xml:space="preserve">
+    <value>Файл обрывается внутри блока «{0}».</value>
+  </data>
+  <data name="Ogg_BadStart" xml:space="preserve">
+    <value>Файл не начинается страницей Ogg — заголовок разрушен.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream" xml:space="preserve">
+    <value>Файл обрывается: у потока нет страницы с признаком конца.</value>
+  </data>
+  <data name="Ogg_NoEndOfStream_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, страниц {1}</value>
+  </data>
+  <data name="Ogg_NoPages" xml:space="preserve">
+    <value>В файле нет ни одной страницы Ogg.</value>
+  </data>
+  <data name="Ogg_NoPages_Detail" xml:space="preserve">
+    <value>Файл пуст или это не Ogg</value>
+  </data>
+  <data name="Ogg_NotAPage" xml:space="preserve">
+    <value>После страницы {0} идут данные, которые страницей не являются.</value>
+  </data>
+  <data name="Ogg_NotAPage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидалась подпись «OggS»</value>
+  </data>
+  <data name="Ogg_PageChecksum" xml:space="preserve">
+    <value>Контрольная сумма страницы {0} не сошлась — файл повреждён.</value>
+  </data>
+  <data name="Ogg_PageChecksum_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, записано {1:X8}, получилось {2:X8}</value>
+  </data>
+  <data name="Ogg_SequenceGap" xml:space="preserve">
+    <value>Страницы идут не подряд — часть файла потеряна.</value>
+  </data>
+  <data name="Ogg_SequenceGap_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, ожидалась страница {1}, встретилась {2}</value>
+  </data>
+  <data name="Ogg_StartLost" xml:space="preserve">
+    <value>Начало файла потеряно: поток начинается не с первой страницы.</value>
+  </data>
+  <data name="Ogg_StartLost_Detail" xml:space="preserve">
+    <value>Поток {0:X8}, номер страницы {1}, смещение {2} Б</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage" xml:space="preserve">
+    <value>Файл обрывается внутри страницы: данных меньше, чем обещано заголовком.</value>
+  </data>
+  <data name="Ogg_TruncatedInsidePage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, нужно {1} Б</value>
+  </data>
+  <data name="Ogg_TruncatedPage" xml:space="preserve">
+    <value>Файл обрывается на середине страницы.</value>
+  </data>
+  <data name="Ogg_TruncatedPage_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, страниц проверено: {1}</value>
+  </data>
+  <data name="Ogg_TruncatedSegments" xml:space="preserve">
+    <value>Файл обрывается на таблице отрезков страницы.</value>
+  </data>
+  <data name="Ogg_UnknownVersion" xml:space="preserve">
+    <value>Неизвестная версия формата Ogg — файл повреждён или собран неверно.</value>
+  </data>
+  <data name="Ogg_UnknownVersion_Detail" xml:space="preserve">
+    <value>Версия страницы {0}, смещение {1} Б</value>
+  </data>
+  <data name="Option_Gigabytes" xml:space="preserve">
+    <value>{0} ГБ</value>
+  </data>
+  <data name="Option_Megabytes" xml:space="preserve">
+    <value>{0} МБ</value>
+  </data>
+  <data name="Option_Minutes" xml:space="preserve">
+    <value>{0} мин</value>
+  </data>
+  <data name="Option_NoLimit" xml:space="preserve">
+    <value>Без ограничений</value>
+  </data>
+  <data name="Option_Seconds" xml:space="preserve">
+    <value>{0} с</value>
+  </data>
+  <data name="Playlist_CueBeyondFile" xml:space="preserve">
+    <value>Разметка не подходит к файлу: дорожка {0} начинается позже, чем он заканчивается.</value>
+  </data>
+  <data name="Playlist_CueBeyondFile_Detail" xml:space="preserve">
+    <value>Метка {0:0.#} с, длительность файла {1:0.#} с</value>
+  </data>
+  <data name="Playlist_Unreadable" xml:space="preserve">
+    <value>Файл плейлиста не удалось прочитать.</value>
+  </data>
+  <data name="Playlist_Unsupported" xml:space="preserve">
+    <value>Формат плейлиста не поддерживается.</value>
+  </data>
+  <data name="Playlist_Unsupported_Detail" xml:space="preserve">
+    <value>Расширение {0}</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Few" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} местах: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_Many" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} местах: {1} — {2}.</value>
+  </data>
+  <data name="Plural_DuplicateElsewhere_One" xml:space="preserve">
+    <value>Тот же трек лежит ещё в {0} месте: {1} — {2}.</value>
+  </data>
+  <data name="Plural_Files_Few" xml:space="preserve">
+    <value>{0} файла</value>
+  </data>
+  <data name="Plural_Files_Many" xml:space="preserve">
+    <value>{0} файлов</value>
+  </data>
+  <data name="Plural_Files_One" xml:space="preserve">
+    <value>{0} файл</value>
+  </data>
+  <data name="Plural_Hours_Few" xml:space="preserve">
+    <value>{0} часа</value>
+  </data>
+  <data name="Plural_Hours_Many" xml:space="preserve">
+    <value>{0} часов</value>
+  </data>
+  <data name="Plural_Hours_One" xml:space="preserve">
+    <value>{0} час</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Few" xml:space="preserve">
+    <value>{0} файла проверено</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_Many" xml:space="preserve">
+    <value>{0} файлов проверено</value>
+  </data>
+  <data name="Plural_Html_FilesChecked_One" xml:space="preserve">
+    <value>{0} файл проверен</value>
+  </data>
+  <data name="Plural_Html_InFolders_Few" xml:space="preserve">
+    <value>в {0} папках</value>
+  </data>
+  <data name="Plural_Html_InFolders_Many" xml:space="preserve">
+    <value>в {0} папках</value>
+  </data>
+  <data name="Plural_Html_InFolders_One" xml:space="preserve">
+    <value>в {0} папке</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Few" xml:space="preserve">
+    <value>Показаны все {0} файла</value>
+  </data>
+  <data name="Plural_Html_ShownAll_Many" xml:space="preserve">
+    <value>Показаны все {0} файлов</value>
+  </data>
+  <data name="Plural_Html_ShownAll_One" xml:space="preserve">
+    <value>Показаны все {0} файл</value>
+  </data>
+  <data name="Plural_Main_FilesFound_Few" xml:space="preserve">
+    <value>Найдено {0} подходящих файла</value>
+  </data>
+  <data name="Plural_Main_FilesFound_Many" xml:space="preserve">
+    <value>Найдено {0} подходящих файлов</value>
+  </data>
+  <data name="Plural_Main_FilesFound_One" xml:space="preserve">
+    <value>Найден {0} подходящий файл</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_Few" xml:space="preserve">
+    <value>Ещё {0} плейлиста.</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_Many" xml:space="preserve">
+    <value>Ещё {0} плейлистов.</value>
+  </data>
+  <data name="Plural_Main_MorePlaylists_One" xml:space="preserve">
+    <value>Ещё {0} плейлист.</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_Few" xml:space="preserve">
+    <value>{1}, до {0} попыток</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_Many" xml:space="preserve">
+    <value>{1}, до {0} попыток</value>
+  </data>
+  <data name="Plural_Main_WaitAttempts_One" xml:space="preserve">
+    <value>{1}, до {0} попытки</value>
+  </data>
+  <data name="Plural_Minutes_Few" xml:space="preserve">
+    <value>{0} минуты</value>
+  </data>
+  <data name="Plural_Minutes_Many" xml:space="preserve">
+    <value>{0} минут</value>
+  </data>
+  <data name="Plural_Minutes_One" xml:space="preserve">
+    <value>{0} минута</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_Few" xml:space="preserve">
+    <value>{0} потока</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_Many" xml:space="preserve">
+    <value>{0} потоков</value>
+  </data>
+  <data name="Plural_ReportTab_Threads_One" xml:space="preserve">
+    <value>{0} поток</value>
+  </data>
+  <data name="Plural_Seconds_Few" xml:space="preserve">
+    <value>{0} секунды</value>
+  </data>
+  <data name="Plural_Seconds_Many" xml:space="preserve">
+    <value>{0} секунд</value>
+  </data>
+  <data name="Plural_Seconds_One" xml:space="preserve">
+    <value>{0} секунда</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_Few" xml:space="preserve">
+    <value>В истории {0} файла; база лежит в {1}</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_Many" xml:space="preserve">
+    <value>В истории {0} файлов; база лежит в {1}</value>
+  </data>
+  <data name="Plural_Settings_HistoryCount_One" xml:space="preserve">
+    <value>В истории {0} файл; база лежит в {1}</value>
+  </data>
+  <data name="Probe_AudioReadFailed" xml:space="preserve">
+    <value>Чтение аудиоданных прервалось ошибкой.</value>
+  </data>
+  <data name="Probe_DecodeStartFailed" xml:space="preserve">
+    <value>Не удалось начать декодирование файла.</value>
+  </data>
+  <data name="Probe_EmptyFile" xml:space="preserve">
+    <value>Файл пустой — аудиоданных в нём нет.</value>
+  </data>
+  <data name="Probe_EngineFailure" xml:space="preserve">
+    <value>Механизм декодирования аудио отказал.</value>
+  </data>
+  <data name="Probe_PasswordProtected" xml:space="preserve">
+    <value>Файл защищён паролем или лицензией.</value>
+  </data>
+  <data name="Probe_Unknown" xml:space="preserve">
+    <value>Неизвестная ошибка.</value>
+  </data>
+  <data name="Report_Attention" xml:space="preserve">
+    <value>Внимание</value>
+  </data>
+  <data name="Report_BrokenLinksNote" xml:space="preserve">
+    <value>(битых ссылок: {0})</value>
+  </data>
+  <data name="Report_BrokenPlaylistLinks" xml:space="preserve">
+    <value>Битых ссылок в плейлистах</value>
+  </data>
+  <data name="Report_Checked" xml:space="preserve">
+    <value>Проверено</value>
+  </data>
+  <data name="Report_Col_Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="Report_Col_FileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Report_Col_Format" xml:space="preserve">
+    <value>Формат</value>
+  </data>
+  <data name="Report_Col_Missing" xml:space="preserve">
+    <value>Не найдено</value>
+  </data>
+  <data name="Report_Col_MissingPath" xml:space="preserve">
+    <value>Отсутствующий путь</value>
+  </data>
+  <data name="Report_Col_Path" xml:space="preserve">
+    <value>Путь</value>
+  </data>
+  <data name="Report_Col_Playlist" xml:space="preserve">
+    <value>Плейлист</value>
+  </data>
+  <data name="Report_Col_SizeBytes" xml:space="preserve">
+    <value>Размер, байт</value>
+  </data>
+  <data name="Report_Col_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Report_Col_TechnicalCause" xml:space="preserve">
+    <value>Техническая причина</value>
+  </data>
+  <data name="Report_Col_TotalEntries" xml:space="preserve">
+    <value>Всего записей</value>
+  </data>
+  <data name="Report_CollectionFindings" xml:space="preserve">
+    <value>Замечаний по коллекции</value>
+  </data>
+  <data name="Report_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Report_CriticalFailure" xml:space="preserve">
+    <value>Критический сбой</value>
+  </data>
+  <data name="Report_DateTime" xml:space="preserve">
+    <value>{0:dd.MM.yyyy HH:mm}</value>
+  </data>
+  <data name="Report_Folder" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="Report_FormatUnsupported" xml:space="preserve">
+    <value>Формат отчёта {0} не поддерживается.</value>
+  </data>
+  <data name="Report_Generated" xml:space="preserve">
+    <value>Сформирован</value>
+  </data>
+  <data name="Report_Method" xml:space="preserve">
+    <value>Как проверяли</value>
+  </data>
+  <data name="Report_NotFound" xml:space="preserve">
+    <value>не найден: {0}</value>
+  </data>
+  <data name="Report_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Report_Playlists" xml:space="preserve">
+    <value>Плейлистов</value>
+  </data>
+  <data name="Report_Report" xml:space="preserve">
+    <value>Отчёт</value>
+  </data>
+  <data name="Report_ScanDuration" xml:space="preserve">
+    <value>Время проверки</value>
+  </data>
+  <data name="Report_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
+  <data name="Report_StoppedIncomplete" xml:space="preserve">
+    <value>Проверка была остановлена — отчёт неполный.</value>
+  </data>
+  <data name="Report_TextFooter" xml:space="preserve">
+    <value>Отчёт сформирован программой {0} {1:dd.MM.yyyy}</value>
+  </data>
+  <data name="Report_TextTitle" xml:space="preserve">
+    <value>{0} — отчёт о проверке коллекции</value>
+  </data>
+  <data name="Report_Threads" xml:space="preserve">
+    <value>Потоков</value>
+  </data>
+  <data name="Report_Title_BrokenPlaylists" xml:space="preserve">
+    <value>Плейлисты с проблемами</value>
+  </data>
+  <data name="Report_Title_CollectionFindings" xml:space="preserve">
+    <value>Замечания по коллекции</value>
+  </data>
+  <data name="Report_Title_Summary" xml:space="preserve">
+    <value>Сводка</value>
+  </data>
+  <data name="Report_Title_UnreadableFolders" xml:space="preserve">
+    <value>Папки, которые не удалось прочитать</value>
+  </data>
+  <data name="Report_TotalFiles" xml:space="preserve">
+    <value>Всего файлов</value>
+  </data>
+  <data name="Report_Warnings" xml:space="preserve">
+    <value>Предупреждений</value>
+  </data>
+  <data name="ReportTab_CollectionEmpty" xml:space="preserve">
+    <value>коллекция пуста</value>
+  </data>
+  <data name="ReportTab_CollectionFindings" xml:space="preserve">
+    <value>Замечания по коллекции</value>
+  </data>
+  <data name="ReportTab_Corrupted" xml:space="preserve">
+    <value>ПОВРЕЖДЕНО</value>
+  </data>
+  <data name="ReportTab_DefaultFormat" xml:space="preserve">
+    <value>ФОРМАТ ОТЧЁТА ПО УМОЛЧАНИЮ</value>
+  </data>
+  <data name="ReportTab_Distribution" xml:space="preserve">
+    <value>Распределение по статусам</value>
+  </data>
+  <data name="ReportTab_Empty" xml:space="preserve">
+    <value>Отчёт появится после первой проверки.</value>
+  </data>
+  <data name="ReportTab_FindingsCapped" xml:space="preserve">
+    <value>Показаны {0} замечаний из {1} — остальные попадут в отчёт</value>
+  </data>
+  <data name="ReportTab_Folder" xml:space="preserve">
+    <value>ПАПКА ДЛЯ ОТЧЁТОВ</value>
+  </data>
+  <data name="ReportTab_Folders" xml:space="preserve">
+    <value>Проверенные папки</value>
+  </data>
+  <data name="ReportTab_FoldersCapped" xml:space="preserve">
+    <value>Показаны {0} папок с наибольшим числом файлов из {1}</value>
+  </data>
+  <data name="ReportTab_NeedAttention" xml:space="preserve">
+    <value>ТРЕБУЮТ ВНИМАНИЯ</value>
+  </data>
+  <data name="ReportTab_NeedAttention_Note" xml:space="preserve">
+    <value>теги, занятость, расширение</value>
+  </data>
+  <data name="ReportTab_NotRunYet" xml:space="preserve">
+    <value>проверка не запускалась</value>
+  </data>
+  <data name="ReportTab_RootFolder" xml:space="preserve">
+    <value>· корень выбранной папки</value>
+  </data>
+  <data name="ReportTab_SaveEllipsis" xml:space="preserve">
+    <value>Сохранить…</value>
+  </data>
+  <data name="ReportTab_SaveReport" xml:space="preserve">
+    <value>Сохранить отчёт</value>
+  </data>
+  <data name="ReportTab_ScanTime" xml:space="preserve">
+    <value>ВРЕМЯ ПРОВЕРКИ</value>
+  </data>
+  <data name="ReportTab_TotalFiles" xml:space="preserve">
+    <value>ВСЕГО ФАЙЛОВ</value>
+  </data>
+  <data name="Result_Decoded" xml:space="preserve">
+    <value>Файл прочитан и декодирован без ошибок.</value>
+  </data>
+  <data name="Result_StructureOnly" xml:space="preserve">
+    <value>Файл прочитан, структура цела. Контрольных сумм в этом формате нет — проверены объявленные длины.</value>
+  </data>
+  <data name="Result_Unchanged" xml:space="preserve">
+    <value>Файл не изменился с прошлой проверки — проверен по отпечатку содержимого.</value>
+  </data>
+  <data name="Result_Verified" xml:space="preserve">
+    <value>Файл прочитан, контрольные суммы формата сошлись (проверено единиц: {0}).</value>
+  </data>
+  <data name="Results_BrokenLinks" xml:space="preserve">
+    <value>Битых ссылок</value>
+  </data>
+  <data name="Results_ClearSearch" xml:space="preserve">
+    <value>Очистить поиск</value>
+  </data>
+  <data name="Results_Col_Format" xml:space="preserve">
+    <value>ФОРМАТ</value>
+  </data>
+  <data name="Results_Col_Name" xml:space="preserve">
+    <value>ИМЯ</value>
+  </data>
+  <data name="Results_Col_Path" xml:space="preserve">
+    <value>ПУТЬ</value>
+  </data>
+  <data name="Results_Col_Size" xml:space="preserve">
+    <value>РАЗМЕР</value>
+  </data>
+  <data name="Results_Col_Status" xml:space="preserve">
+    <value>СТАТУС</value>
+  </data>
+  <data name="Results_CopyPath" xml:space="preserve">
+    <value>Копировать путь</value>
+  </data>
+  <data name="Results_Details" xml:space="preserve">
+    <value>ПОДРОБНОСТИ ВЫБРАННОГО ФАЙЛА</value>
+  </data>
+  <data name="Results_Empty" xml:space="preserve">
+    <value>Результатов пока нет — выберите папку и начните проверку.</value>
+  </data>
+  <data name="Results_Found" xml:space="preserve">
+    <value>Найдено</value>
+  </data>
+  <data name="Results_NoSelection" xml:space="preserve">
+    <value>Файл не выбран</value>
+  </data>
+  <data name="Results_NoSelection_Note" xml:space="preserve">
+    <value>Выберите строку в таблице, чтобы увидеть, что именно с файлом не так. Двойной клик открывает папку файла.</value>
+  </data>
+  <data name="Results_OpenFile" xml:space="preserve">
+    <value>Открыть файл</value>
+  </data>
+  <data name="Results_OpenFileFolder" xml:space="preserve">
+    <value>Открыть папку файла</value>
+  </data>
+  <data name="Results_PlaylistNote" xml:space="preserve">
+    <value>Файл, который встретился и в папке, и в плейлисте, показан одной строкой с одним статусом.</value>
+  </data>
+  <data name="Results_Playlists" xml:space="preserve">
+    <value>ПЛЕЙЛИСТЫ</value>
+  </data>
+  <data name="Results_Search" xml:space="preserve">
+    <value>Поиск по имени файла</value>
+  </data>
+  <data name="Results_SortFormat" xml:space="preserve">
+    <value>Сортировать по формату</value>
+  </data>
+  <data name="Results_SortName" xml:space="preserve">
+    <value>Сортировать по имени</value>
+  </data>
+  <data name="Results_SortPath" xml:space="preserve">
+    <value>Сортировать по пути</value>
+  </data>
+  <data name="Results_SortSize" xml:space="preserve">
+    <value>Сортировать по размеру</value>
+  </data>
+  <data name="Results_SortStatus" xml:space="preserve">
+    <value>Сортировать по статусу</value>
+  </data>
+  <data name="Riff_DataShort" xml:space="preserve">
+    <value>Файл обрывается: звуковых данных меньше, чем обещано заголовком.</value>
+  </data>
+  <data name="Riff_NoData" xml:space="preserve">
+    <value>В файле нет самих звуковых данных.</value>
+  </data>
+  <data name="Riff_NoData_Detail" xml:space="preserve">
+    <value>Часть «data» не найдена</value>
+  </data>
+  <data name="Riff_NoFmt" xml:space="preserve">
+    <value>В файле нет описания формата звука — заголовок разрушен.</value>
+  </data>
+  <data name="Riff_NoFmt_Detail" xml:space="preserve">
+    <value>Часть «fmt » не найдена</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared" xml:space="preserve">
+    <value>Файл обрывается: он короче, чем объявлено в его же заголовке.</value>
+  </data>
+  <data name="Riff_ShorterThanDeclared_Detail" xml:space="preserve">
+    <value>Объявлено {0} Б, на диске {1} Б</value>
+  </data>
+  <data name="Riff_StructureOnly" xml:space="preserve">
+    <value>Частей {0}; контрольных сумм в этом формате нет — проверены объявленные длины</value>
+  </data>
+  <data name="Riff_TooShort" xml:space="preserve">
+    <value>Файл слишком короткий: в нём нет даже заголовка.</value>
+  </data>
+  <data name="Riff_TruncatedInChunk" xml:space="preserve">
+    <value>Файл обрывается внутри части «{0}».</value>
+  </data>
+  <data name="Riff_TruncatedInChunk_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, обещано {1} Б, осталось {2} Б</value>
+  </data>
+  <data name="Scan_Browse" xml:space="preserve">
+    <value>Обзор…</value>
+  </data>
+  <data name="Scan_Browse_Name" xml:space="preserve">
+    <value>Обзор — выбрать папку</value>
+  </data>
+  <data name="Scan_DropZone" xml:space="preserve">
+    <value>Перетащите папку сюда или щёлкните, чтобы выбрать</value>
+  </data>
+  <data name="Scan_DropZone_Name" xml:space="preserve">
+    <value>Выбрать папку или перетащить её сюда</value>
+  </data>
+  <data name="Scan_DropZone_Tip" xml:space="preserve">
+    <value>Щёлкните, чтобы выбрать папку, или перетащите её сюда</value>
+  </data>
+  <data name="Scan_Locked_CloseOwner" xml:space="preserve">
+    <value>Закрыть программу-владельца</value>
+  </data>
+  <data name="Scan_Locked_Copy" xml:space="preserve">
+    <value>Проверить временную копию</value>
+  </data>
+  <data name="Scan_Locked_Retry" xml:space="preserve">
+    <value>Подождать и повторить</value>
+  </data>
+  <data name="Scan_Locked_Skip" xml:space="preserve">
+    <value>Пропустить файл</value>
+  </data>
+  <data name="Scan_Locked_Skip_Note" xml:space="preserve">
+    <value>Попадёт в отчёт со статусом «пропущен»</value>
+  </data>
+  <data name="Scan_Locked_Title" xml:space="preserve">
+    <value>Файл занят другой программой</value>
+  </data>
+  <data name="Scan_MusicFolder" xml:space="preserve">
+    <value>ПАПКА С МУЗЫКОЙ</value>
+  </data>
+  <data name="Scan_Options" xml:space="preserve">
+    <value>ПАРАМЕТРЫ ПРОВЕРКИ</value>
+  </data>
+  <data name="Scan_Running" xml:space="preserve">
+    <value>Проверка выполняется</value>
+  </data>
+  <data name="Scan_RunningWarnings" xml:space="preserve">
+    <value>Предупреждения по ходу проверки</value>
+  </data>
+  <data name="Scan_Start" xml:space="preserve">
+    <value>Начать</value>
+  </data>
+  <data name="Scan_Stop" xml:space="preserve">
+    <value>Остановить</value>
+  </data>
+  <data name="Scan_Summary" xml:space="preserve">
+    <value>СВОДКА</value>
+  </data>
+  <data name="Settings_Albums" xml:space="preserve">
+    <value>Проверять альбомы и искать копии</value>
+  </data>
+  <data name="Settings_Albums_Note" xml:space="preserve">
+    <value>пропуски в нумерации, разнобой форматов в папке, отсутствие обложки, один и тот же трек в разных местах - попадают на вкладку «Отчёт»</value>
+  </data>
+  <data name="Settings_Animations" xml:space="preserve">
+    <value>Анимации</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Внешний вид</value>
+  </data>
+  <data name="Settings_AutoThreads" xml:space="preserve">
+    <value>Подбирать нагрузку автоматически</value>
+  </data>
+  <data name="Settings_AutoThreads_Note" xml:space="preserve">
+    <value>по числу ядер, не больше 8</value>
+  </data>
+  <data name="Settings_Checksums" xml:space="preserve">
+    <value>Проверять контрольные суммы в файле</value>
+  </data>
+  <data name="Settings_Checksums_Note" xml:space="preserve">
+    <value>FLAC и Ogg сверяются по своим суммам, MP3 и MP4 - по структуре</value>
+  </data>
+  <data name="Settings_ClearHistory" xml:space="preserve">
+    <value>Очистить историю</value>
+  </data>
+  <data name="Settings_ClearHistory_Text" xml:space="preserve">
+    <value>Отпечатки всех файлов будут забыты. Следующая проверка прочитает коллекцию заново, а порча, случившаяся до этого момента, останется незамеченной — сравнивать будет не с чем.</value>
+  </data>
+  <data name="Settings_ClearHistory_Title" xml:space="preserve">
+    <value>Очистить историю проверок?</value>
+  </data>
+  <data name="Settings_Clipping" xml:space="preserve">
+    <value>Замечать перегрузку громкости и смещение нуля</value>
+  </data>
+  <data name="Settings_Clipping_Note" xml:space="preserve">
+    <value>выключено намеренно: у современных мастерингов звук упирается в предел шкалы сплошь и рядом</value>
+  </data>
+  <data name="Settings_DefaultReportFormat" xml:space="preserve">
+    <value>Формат отчёта по умолчанию</value>
+  </data>
+  <data name="Settings_Density" xml:space="preserve">
+    <value>Плотность списка результатов</value>
+  </data>
+  <data name="Settings_ExtensionMatch" xml:space="preserve">
+    <value>Сверять расширение с содержимым</value>
+  </data>
+  <data name="Settings_ExtensionMatch_Note" xml:space="preserve">
+    <value>MP3, который на деле FLAC, помечается предупреждением</value>
+  </data>
+  <data name="Settings_Extra" xml:space="preserve">
+    <value>Что ещё искать</value>
+  </data>
+  <data name="Settings_ExtraExtensions" xml:space="preserve">
+    <value>Дополнительные расширения файлов</value>
+  </data>
+  <data name="Settings_ExtraExtensions_Note" xml:space="preserve">
+    <value>Через запятую, например: .mpc, .tta</value>
+  </data>
+  <data name="Settings_File" xml:space="preserve">
+    <value>ФАЙЛ НАСТРОЕК</value>
+  </data>
+  <data name="Settings_FirstRunHint" xml:space="preserve">
+    <value>Показывать подсказку при первом запуске</value>
+  </data>
+  <data name="Settings_Formats" xml:space="preserve">
+    <value>Форматы</value>
+  </data>
+  <data name="Settings_Formats_Tip" xml:space="preserve">
+    <value>Нажмите, чтобы включить или выключить формат</value>
+  </data>
+  <data name="Settings_FormatsSummary" xml:space="preserve">
+    <value>{0} из {1}</value>
+  </data>
+  <data name="Settings_FullPaths" xml:space="preserve">
+    <value>Отображать полные пути к файлам</value>
+  </data>
+  <data name="Settings_Hdd" xml:space="preserve">
+    <value>Оптимизация для жёстких дисков</value>
+  </data>
+  <data name="Settings_Hdd_Note" xml:space="preserve">
+    <value>жёсткий диск читает быстрее, когда его не дёргают: восемь файлов разом заставляют головку метаться, и проверка идёт медленнее, чем в два</value>
+  </data>
+  <data name="Settings_HistoryEmpty" xml:space="preserve">
+    <value>История пока пуста — она заполнится при первой проверке.</value>
+  </data>
+  <data name="Settings_IncludeOk" xml:space="preserve">
+    <value>Включать в отчёт файлы без замечаний</value>
+  </data>
+  <data name="Settings_Iso" xml:space="preserve">
+    <value>Проверять образы дисков ISO (SACD)</value>
+  </data>
+  <data name="Settings_Iso_Note" xml:space="preserve">
+    <value>Экспериментально, работает не всегда</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Settings_LargeFrom" xml:space="preserve">
+    <value>Большим считается файл от</value>
+  </data>
+  <data name="Settings_Locked" xml:space="preserve">
+    <value>Занятые файлы (другим процессом)</value>
+  </data>
+  <data name="Settings_Locked_Action" xml:space="preserve">
+    <value>Что делать с занятым файлом</value>
+  </data>
+  <data name="Settings_Locked_ApplyAll" xml:space="preserve">
+    <value>Применять ответ ко всем занятым файлам</value>
+  </data>
+  <data name="Settings_Locked_ApplyAll_Note" xml:space="preserve">
+    <value>флажок в самом вопросе</value>
+  </data>
+  <data name="Settings_Locked_DetectOwner" xml:space="preserve">
+    <value>Узнавать, какой процесс держит файл</value>
+  </data>
+  <data name="Settings_Locked_OfferClose" xml:space="preserve">
+    <value>Предлагать закрыть эту программу</value>
+  </data>
+  <data name="Settings_Locked_OfferClose_Note" xml:space="preserve">
+    <value>потенциально опасно</value>
+  </data>
+  <data name="Settings_Locked_Retries" xml:space="preserve">
+    <value>Сколько раз повторить попытку</value>
+  </data>
+  <data name="Settings_Locked_Retries_Note" xml:space="preserve">
+    <value>затем файл помечается пропущенным</value>
+  </data>
+  <data name="Settings_Locked_Wait" xml:space="preserve">
+    <value>Сколько ждать освобождения файла, секунд</value>
+  </data>
+  <data name="Settings_Locked_Wait_Note" xml:space="preserve">
+    <value>перед повторной попыткой</value>
+  </data>
+  <data name="Settings_Mica" xml:space="preserve">
+    <value>Эффект Mica</value>
+  </data>
+  <data name="Settings_MicaUnavailable" xml:space="preserve">
+    <value>недоступно: подложку умеет рисовать только Windows 11</value>
+  </data>
+  <data name="Settings_MonoPaths" xml:space="preserve">
+    <value>Одинаковая ширина букв в путях</value>
+  </data>
+  <data name="Settings_OfferStart" xml:space="preserve">
+    <value>Предлагать начать сразу после выбора папки</value>
+  </data>
+  <data name="Settings_OpenFileFolder" xml:space="preserve">
+    <value>Открыть папку с файлом настроек</value>
+  </data>
+  <data name="Settings_OpenReport" xml:space="preserve">
+    <value>Открывать отчёт после сохранения</value>
+  </data>
+  <data name="Settings_Other" xml:space="preserve">
+    <value>Отчёты и другое</value>
+  </data>
+  <data name="Settings_PickColor" xml:space="preserve">
+    <value>Выбрать цвет</value>
+  </data>
+  <data name="Settings_PickColor_Name" xml:space="preserve">
+    <value>Цвет статуса {0}</value>
+  </data>
+  <data name="Settings_PickReportsFolder" xml:space="preserve">
+    <value>Куда сохранять отчёты</value>
+  </data>
+  <data name="Settings_Playlists" xml:space="preserve">
+    <value>Проверять плейлисты</value>
+  </data>
+  <data name="Settings_Playlists_Note" xml:space="preserve">
+    <value>ищет отсутствующие пути внутри M3U, PLS, CUE</value>
+  </data>
+  <data name="Settings_ReadMode" xml:space="preserve">
+    <value>Способ чтения файлов</value>
+  </data>
+  <data name="Settings_ReadMode_Note" xml:space="preserve">
+    <value>выборочно - конец и три места в середине; целиком надёжнее, но занимает больше времени</value>
+  </data>
+  <data name="Settings_RememberFolder" xml:space="preserve">
+    <value>Запоминать последнюю папку</value>
+  </data>
+  <data name="Settings_ReportsFolder" xml:space="preserve">
+    <value>Папка для отчётов</value>
+  </data>
+  <data name="Settings_ReportsFolder_Default" xml:space="preserve">
+    <value>Документы</value>
+  </data>
+  <data name="Settings_ResetAll" xml:space="preserve">
+    <value>Сбросить всё</value>
+  </data>
+  <data name="Settings_ResetAll_Name" xml:space="preserve">
+    <value>Сбросить все настройки</value>
+  </data>
+  <data name="Settings_ResetAll_Tip" xml:space="preserve">
+    <value>Вернуть все настройки к значениям по умолчанию</value>
+  </data>
+  <data name="Settings_ResetColor_Name" xml:space="preserve">
+    <value>Вернуть цвет темы: {0}</value>
+  </data>
+  <data name="Settings_ResetColor_Tip" xml:space="preserve">
+    <value>Вернуть цвет темы</value>
+  </data>
+  <data name="Settings_ResetConfirm_Text" xml:space="preserve">
+    <value>Все параметры вернутся к значениям по умолчанию, например: «Заходить в подпапки» — включено, «Проверять теги» — выключено, «Большим считается файл от» — 500 МБ, «Время ожидания файла» — 60 с, «Тема оформления» — как в системе.</value>
+  </data>
+  <data name="Settings_ResetConfirm_Title" xml:space="preserve">
+    <value>Сбросить все настройки?</value>
+  </data>
+  <data name="Settings_Silence" xml:space="preserve">
+    <value>Замечать тишину и провалы звука</value>
+  </data>
+  <data name="Settings_Silence_Note" xml:space="preserve">
+    <value>файл читается, но звучит тишиной</value>
+  </data>
+  <data name="Settings_Sound" xml:space="preserve">
+    <value>Звук по завершении проверки</value>
+  </data>
+  <data name="Settings_StatusBar" xml:space="preserve">
+    <value>Строка состояния</value>
+  </data>
+  <data name="Settings_StatusColors" xml:space="preserve">
+    <value>Цвета статусов</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>Тема оформления</value>
+  </data>
+  <data name="Settings_Theme_Dark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="Settings_Theme_Light" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="Settings_Theme_System" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="Settings_Threads" xml:space="preserve">
+    <value>Сколько файлов проверять разом</value>
+  </data>
+  <data name="Settings_Threads_Note" xml:space="preserve">
+    <value>работает, когда подбор выключен</value>
+  </data>
+  <data name="Settings_Timeout" xml:space="preserve">
+    <value>Время ожидания файла</value>
+  </data>
+  <data name="Settings_Timeout_Note" xml:space="preserve">
+    <value>дальше файл получает статус «Предупреждение»</value>
+  </data>
+  <data name="Settings_Transcodes" xml:space="preserve">
+    <value>Искать перекодированные файлы</value>
+  </data>
+  <data name="Settings_WarnLarge" xml:space="preserve">
+    <value>Предупреждать о больших файлах</value>
+  </data>
+  <data name="Settings_WarnLarge_Note" xml:space="preserve">
+    <value>до начала их проверки</value>
+  </data>
+  <data name="Settings_Watch" xml:space="preserve">
+    <value>Следить за порчей файлов</value>
+  </data>
+  <data name="Settings_Watch_Note" xml:space="preserve">
+    <value>запоминает отпечаток каждого файла и находит тихую порчу: содержимое изменилось, а размер и дата прежние. Первая проверка при этом читает каждый файл целиком</value>
+  </data>
+  <data name="Status_Corrupted" xml:space="preserve">
+    <value>Повреждён</value>
+  </data>
+  <data name="Status_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Status_Skipped" xml:space="preserve">
+    <value>Пропущен</value>
+  </data>
+  <data name="Status_Unknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="Status_Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Tag_Album" xml:space="preserve">
+    <value>альбом</value>
+  </data>
+  <data name="Tag_Artist" xml:space="preserve">
+    <value>исполнитель</value>
+  </data>
+  <data name="Tag_Field_Album" xml:space="preserve">
+    <value>Альбом</value>
+  </data>
+  <data name="Tag_Field_Artist" xml:space="preserve">
+    <value>Исполнитель</value>
+  </data>
+  <data name="Tag_Field_Title" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Tag_Title" xml:space="preserve">
+    <value>название</value>
+  </data>
+  <data name="Tags_Corrupt" xml:space="preserve">
+    <value>Теги повреждены: {0}</value>
+  </data>
+  <data name="Tags_Unreadable" xml:space="preserve">
+    <value>Файл недоступен для чтения тегов: {0}</value>
+  </data>
+  <data name="Tags_UnsupportedContainer" xml:space="preserve">
+    <value>TagLib не поддерживает контейнер: {0}</value>
+  </data>
+  <data name="Ui_About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Ui_All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Ui_Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="Ui_Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Ui_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Ui_Change" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="Ui_ChangeEllipsis" xml:space="preserve">
+    <value>Изменить…</value>
+  </data>
+  <data name="Ui_Checked" xml:space="preserve">
+    <value>Проверено</value>
+  </data>
+  <data name="Ui_CheckTags" xml:space="preserve">
+    <value>Проверять теги</value>
+  </data>
+  <data name="Ui_Clear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="Ui_Corrupted" xml:space="preserve">
+    <value>Повреждено</value>
+  </data>
+  <data name="Ui_GotIt" xml:space="preserve">
+    <value>Понятно</value>
+  </data>
+  <data name="Ui_Help" xml:space="preserve">
+    <value>Справка</value>
+  </data>
+  <data name="Ui_Ok" xml:space="preserve">
+    <value>В порядке</value>
+  </data>
+  <data name="Ui_PickFolder" xml:space="preserve">
+    <value>Выбрать папку</value>
+  </data>
+  <data name="Ui_Recurse" xml:space="preserve">
+    <value>Заходить в подпапки</value>
+  </data>
+  <data name="Ui_Report" xml:space="preserve">
+    <value>Отчёт</value>
+  </data>
+  <data name="Ui_Rescan" xml:space="preserve">
+    <value>Проверить заново</value>
+  </data>
+  <data name="Ui_Reset" xml:space="preserve">
+    <value>Сбросить</value>
+  </data>
+  <data name="Ui_Results" xml:space="preserve">
+    <value>Результаты</value>
+  </data>
+  <data name="Ui_Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="Ui_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Ui_Scan" xml:space="preserve">
+    <value>Проверка</value>
+  </data>
+  <data name="Ui_Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Ui_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
+  <data name="Ui_StartScan" xml:space="preserve">
+    <value>Начать проверку</value>
+  </data>
+  <data name="Ui_StopScan" xml:space="preserve">
+    <value>Остановить проверку</value>
+  </data>
+  <data name="Ui_TotalFiles" xml:space="preserve">
+    <value>Всего файлов</value>
+  </data>
+  <data name="Ui_Warnings" xml:space="preserve">
+    <value>Предупреждения</value>
+  </data>
+  <data name="Ui_WarningsCount" xml:space="preserve">
+    <value>Предупреждений</value>
+  </data>
+  <data name="Unit_B" xml:space="preserve">
+    <value>Б</value>
+  </data>
+  <data name="Unit_GB" xml:space="preserve">
+    <value>ГБ</value>
+  </data>
+  <data name="Unit_KB" xml:space="preserve">
+    <value>КБ</value>
+  </data>
+  <data name="Unit_MB" xml:space="preserve">
+    <value>МБ</value>
+  </data>
+  <data name="Unit_TB" xml:space="preserve">
+    <value>ТБ</value>
+  </data>
+  <data name="Valid_Offset" xml:space="preserve">
+    <value>Смещение {0} Б</value>
+  </data>
+  <data name="Valid_Size" xml:space="preserve">
+    <value>Размер {0} Б</value>
+  </data>
+  <data name="Valid_TagLongerThanFile" xml:space="preserve">
+    <value>Тег занимает {0} Б, а файл короче</value>
+  </data>
+  <data name="Valid_TruncatedInLeadingTag" xml:space="preserve">
+    <value>Файл обрывается внутри тега в начале.</value>
+  </data>
+  <data name="WavPack_BadStart" xml:space="preserve">
+    <value>Файл не начинается блоком WavPack — заголовок разрушен.</value>
+  </data>
+  <data name="WavPack_BlockUnfinished" xml:space="preserve">
+    <value>Файл обрывается на блоке {0}: он начат, но не дописан.</value>
+  </data>
+  <data name="WavPack_ImpossibleLength_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, объявлено {1} Б</value>
+  </data>
+  <data name="WavPack_NoBlocks" xml:space="preserve">
+    <value>В файле нет ни одного блока WavPack.</value>
+  </data>
+  <data name="WavPack_NoBlocks_Detail" xml:space="preserve">
+    <value>Файл пуст или это не WavPack</value>
+  </data>
+  <data name="WavPack_NotABlock" xml:space="preserve">
+    <value>После блока {0} идут данные, которые блоком не являются.</value>
+  </data>
+  <data name="WavPack_NotABlock_Detail" xml:space="preserve">
+    <value>Смещение {0} Б, ожидалась подпись «wvpk»</value>
+  </data>
+  <data name="WavPack_StructureOnly" xml:space="preserve">
+    <value>Блоков {0}; суммы WavPack считаются по распакованному звуку и здесь не сверяются</value>
+  </data>
+</root>

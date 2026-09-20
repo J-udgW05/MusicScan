@@ -1,0 +1,937 @@
+﻿<UserControl x:Class="MusicScanIntegrity.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:MusicScanIntegrity.App.Controls"
+             xmlns:vm="clr-namespace:MusicScanIntegrity.App.ViewModels"
+             xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
+             xmlns:core="clr-namespace:MusicScanIntegrity.Core.Settings;assembly=MusicScanIntegrity.Core"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:MainViewModel}"
+             Background="{DynamicResource Brush.Bg}"
+             c:Motion.Entrance="True">
+
+    <UserControl.Resources>
+        <!-- Setting row: label on the left, value on the right with a 104 px minimum
+             width so the right edge lines up across the section. -->
+        <Style x:Key="SettingRow" TargetType="Border">
+            <Setter Property="Padding" Value="18,13" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd2}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+
+        <Style x:Key="SectionHeader" TargetType="Border">
+            <Setter Property="Padding" Value="18,13" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Bd2}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+
+        <ObjectDataProvider x:Key="Themes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="core:AppTheme" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <!-- Horizontal scrolling off: columns stretch to fit, and the default Auto
+         showed a pointless scroll bar at the bottom. Spacing is a margin inside the
+         scroller, not its padding: padding shrinks the viewport and cut content off
+         22 px above the status bar. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="22" DataContext="{Binding Settings}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ══ Left column ════════════════════════════════════════════ -->
+            <StackPanel Grid.Row="0" Grid.Column="0">
+
+                <!-- Appearance -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Appearance}" />
+                        </Border>
+
+                        <StackPanel Margin="18,16">
+                            <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Theme}" Margin="0,0,0,10" />
+
+                            <UniformGrid Rows="1" Columns="3">
+                                <RadioButton GroupName="Theme" Margin="0,0,4,0"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_System}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.System}}" />
+                                <RadioButton GroupName="Theme" Margin="4,0"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_Light}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.Light}}" />
+                                <RadioButton GroupName="Theme" Margin="4,0,0,0"
+                                             Style="{StaticResource ThemeChoice}" Content="{svc:T Settings_Theme_Dark}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource Equals}, ConverterParameter={x:Static core:AppTheme.Dark}}" />
+                            </UniformGrid>
+
+                            <Grid Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource Text.Base}" VerticalAlignment="Center"
+                                           Text="{svc:T Settings_Language}" />
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                          AutomationProperties.Name="{svc:T Settings_Language}"
+                                          ItemsSource="{x:Static vm:SettingsViewModel.LanguageOptions}"
+                                          SelectedItem="{Binding Language}" />
+                            </Grid>
+
+                            <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_StatusColors}" Margin="0,18,0,2" />
+
+                            <ItemsControl ItemsSource="{Binding StatusColors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:StatusColorRow}">
+                                        <Border BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,0,0,1">
+                                            <!-- The whole row is clickable: the swatch is where the hand goes, and it used
+                                                 to be a plain image. -->
+                                            <Button Style="{StaticResource Row.Navigate}"
+                                                    AutomationProperties.Name="{Binding PickName}"
+                                                    ToolTip="{svc:T Settings_PickColor}"
+                                                    Command="{Binding DataContext.PickStatusColorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <DockPanel LastChildFill="False">
+                                                    <Border DockPanel.Dock="Left" Width="22" Height="22" CornerRadius="6"
+                                                            BorderBrush="#22000000" BorderThickness="1"
+                                                            VerticalAlignment="Center"
+                                                            Background="{Binding EffectiveHex, Converter={StaticResource HexToBrush}}" />
+
+                                                    <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                                               Margin="12,0,0,0" VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource Brush.Fg2}"
+                                                               Text="{Binding Label}" />
+
+                                                    <!-- Chevron as in Windows Settings: the row opens a picker. -->
+                                                    <c:MsIcon DockPanel.Dock="Right" Kind="chevron-down" Size="14"
+                                                              Margin="8,0,0,0" VerticalAlignment="Center"
+                                                              Foreground="{DynamicResource Brush.Fg3}"
+                                                              RenderTransformOrigin="0.5,0.5">
+                                                        <c:MsIcon.RenderTransform>
+                                                            <RotateTransform Angle="-90" />
+                                                        </c:MsIcon.RenderTransform>
+                                                    </c:MsIcon>
+
+                                                    <Button DockPanel.Dock="Right" Style="{StaticResource Button.Link}"
+                                                            Margin="12,0,0,0" VerticalAlignment="Center"
+                                                            Content="{svc:T Ui_Reset}"
+                                                            ToolTip="{svc:T Settings_ResetColor_Tip}"
+                                                            AutomationProperties.Name="{Binding ResetName}"
+                                                            Visibility="{Binding IsCustom, Converter={StaticResource BoolToVisibility}}"
+                                                            Command="{Binding DataContext.ResetStatusColorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}" />
+
+                                                    <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                               Style="{StaticResource Text.Tertiary}"
+                                                               FontFamily="{StaticResource Font.Mono}"
+                                                               Text="{Binding EffectiveHex}" />
+                                                </DockPanel>
+                                            </Button>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <DockPanel LastChildFill="False" Margin="0,14,0,0">
+                                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Density}" />
+                                </StackPanel>
+                                <ComboBox DockPanel.Dock="Right" Style="{StaticResource ComboBox.Pill}"
+                                          MinWidth="104" AutomationProperties.Name="{svc:T Settings_Density}"
+                                          SelectedItem="{Binding ListDensity}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}">
+                                    <core:ListDensity>Normal</core:ListDensity>
+                                    <core:ListDensity>Compact</core:ListDensity>
+                                </ComboBox>
+                            </DockPanel>
+
+                            <DockPanel LastChildFill="False" Margin="0,14,0,0">
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                           Text="{svc:T Settings_FullPaths}" VerticalAlignment="Center" />
+                                <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_FullPaths}"
+                                          IsChecked="{Binding ShowFullPaths}" />
+                            </DockPanel>
+
+                            <DockPanel LastChildFill="False" Margin="0,10,0,0">
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                           Text="{svc:T Settings_MonoPaths}" VerticalAlignment="Center" />
+                                <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_MonoPaths}"
+                                          IsChecked="{Binding MonospacePaths}" />
+                            </DockPanel>
+
+                            <DockPanel LastChildFill="False" Margin="0,10,0,0">
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Base}"
+                                           Text="{svc:T Settings_StatusBar}" VerticalAlignment="Center" />
+                                <CheckBox DockPanel.Dock="Right" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_StatusBar}"
+                                          IsChecked="{Binding ShowStatusBar}" />
+                            </DockPanel>
+
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Mica}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap" Text="{Binding MicaNote}"
+                                               Visibility="{Binding MicaNote, Converter={StaticResource NotEmptyToVisibility}}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          IsEnabled="{Binding IsMicaSupported}"
+                                          AutomationProperties.Name="{svc:T Settings_Mica}"
+                                          IsChecked="{Binding MicaEffect}" />
+                            </Grid>
+
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Animations}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Animations}"
+                                          IsChecked="{Binding Animations}" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Formats -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Formats}" />
+                                <TextBlock Grid.Column="1" Style="{StaticResource Text.Tertiary}"
+                                           VerticalAlignment="Center" Text="{Binding FormatsSummary}" />
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Margin="18,14">
+                            <ItemsControl ItemsSource="{Binding Formats}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:FormatChip}">
+                                        <ToggleButton Style="{StaticResource Chip.Format}" Margin="0,0,6,6"
+                                                      IsChecked="{Binding Enabled}"
+                                                      AutomationProperties.Name="{Binding Extension}"
+                                                      ToolTip="{svc:T Settings_Formats_Tip}"
+                                                      Content="{Binding Extension}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Border BorderBrush="{DynamicResource Brush.Bd2}" BorderThickness="0,1,0,0"
+                                    Margin="0,10,0,0" Padding="0,14,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                        <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Iso}" />
+                                        <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                                   Text="{svc:T Settings_Iso_Note}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                              AutomationProperties.Name="{svc:T Settings_Iso}"
+                                              IsChecked="{Binding EnableIsoSacd}" />
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Margin="0,14,0,0">
+                                <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ExtraExtensions}" />
+                                <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,6"
+                                           Text="{svc:T Settings_ExtraExtensions_Note}" />
+                                <TextBox Style="{StaticResource TextBox.Field}"
+                                         Text="{Binding CustomExtensions, UpdateSourceTrigger=LostFocus}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Locked files -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Locked}" />
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Action}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                          MinWidth="140" SelectedItem="{Binding LockedFileAction}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}">
+                                    <core:LockedFileAction>Ask</core:LockedFileAction>
+                                    <core:LockedFileAction>Skip</core:LockedFileAction>
+                                    <core:LockedFileAction>Wait</core:LockedFileAction>
+                                    <core:LockedFileAction>TempCopy</core:LockedFileAction>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Wait}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Locked_Wait_Note}" />
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
+                                         Width="68" Padding="10,5" TextAlignment="Center"
+                                         Text="{Binding LockedWaitSeconds}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_Retries}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Locked_Retries_Note}" />
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
+                                         Width="68" Padding="10,5" TextAlignment="Center"
+                                         Text="{Binding LockedRetryCount}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_DetectOwner}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_DetectOwner}"
+                                          IsChecked="{Binding DetectOwnerProcess}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}" BorderThickness="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_ApplyAll}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Locked_ApplyAll_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_ApplyAll}"
+                                          IsChecked="{Binding AllowApplyToAllLocked}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Locked_OfferClose}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Locked_OfferClose_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_Locked_OfferClose}"
+                                          IsChecked="{Binding OfferCloseOwner}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Additional checks: these look at how a file sounds and at the collection
+                     as a whole rather than file integrity. A separate card also keeps the
+                     right column from growing twice as tall as the left. -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Extra}" />
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Albums}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_Albums_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Albums}"
+                                          IsChecked="{Binding InspectCollection}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Silence}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_Silence_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Silence}"
+                                          IsChecked="{Binding DetectSilence}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Transcodes}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Transcodes}"
+                                          IsChecked="{Binding DetectTranscode}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Clipping}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_Clipping_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Clipping}"
+                                          IsChecked="{Binding DetectClipping}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="2">
+
+                <!-- Scanning -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Ui_Scan}" />
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_Recurse}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Ui_Recurse}"
+                                          IsChecked="{Binding Recursive}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Ui_CheckTags}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Ui_CheckTags}"
+                                          IsChecked="{Binding CheckMetadata}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Playlists}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Playlists_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_Playlists}"
+                                          IsChecked="{Binding CheckPlaylists}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ReadMode}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_ReadMode_Note}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                          MinWidth="128" VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_ReadMode}"
+                                          SelectedItem="{Binding CheckDepth}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}">
+                                    <core:CheckDepth>Quick</core:CheckDepth>
+                                    <core:CheckDepth>Sampled</core:CheckDepth>
+                                    <core:CheckDepth>Full</core:CheckDepth>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Checksums}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_Checksums_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Checksums}"
+                                          IsChecked="{Binding VerifyContainerIntegrity}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Hdd}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               Text="{svc:T Settings_Hdd_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.Name="{svc:T Settings_Hdd}"
+                                          IsChecked="{Binding RespectDriveType}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                        <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Watch}" />
+                                        <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                                   TextWrapping="Wrap"
+                                                   Text="{svc:T Settings_Watch_Note}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                              VerticalAlignment="Center"
+                                              AutomationProperties.Name="{svc:T Settings_Watch}"
+                                              IsChecked="{Binding TrackChanges}" />
+                                </Grid>
+
+                                <DockPanel LastChildFill="False" Margin="0,10,0,0"
+                                           Visibility="{Binding TrackChanges, Converter={StaticResource BoolToVisibility}}">
+                                    <Button DockPanel.Dock="Right" Style="{StaticResource Button.Outline}"
+                                            Padding="12,6" Content="{svc:T Settings_ClearHistory}"
+                                            AutomationProperties.Name="{svc:T Settings_ClearHistory}"
+                                            Command="{Binding ClearHistoryCommand}" />
+                                    <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Tertiary}"
+                                               VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
+                                               Text="{Binding HistoryNote}" />
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ExtensionMatch}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_ExtensionMatch_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_ExtensionMatch}"
+                                          IsChecked="{Binding VerifyExtension}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_LargeFrom}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}" AutomationProperties.Name="{svc:T Settings_LargeFrom}"
+                                          ItemsSource="{x:Static vm:SettingsViewModel.ThresholdOptions}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}"
+                                          SelectedItem="{Binding Threshold}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Timeout}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Timeout_Note}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}" AutomationProperties.Name="{svc:T Settings_Timeout}"
+                                          ItemsSource="{x:Static vm:SettingsViewModel.TimeoutOptions}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}"
+                                          SelectedItem="{Binding Timeout}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_AutoThreads}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_AutoThreads_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_AutoThreads}"
+                                          IsChecked="{Binding AutoParallelism}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Threads}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_Threads_Note}" />
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Style="{StaticResource TextBox.Field}"
+                                         Width="68" Padding="10,5" TextAlignment="Center"
+                                         IsEnabled="{Binding AutoParallelism, Converter={StaticResource InvertBool}}"
+                                         Text="{Binding ManualParallelism}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}" BorderThickness="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_WarnLarge}" />
+                                    <TextBlock Style="{StaticResource Text.Tertiary}" Margin="0,2,0,0"
+                                               Text="{svc:T Settings_WarnLarge_Note}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_WarnLarge}"
+                                          IsChecked="{Binding WarnAboutLargeFiles}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- General and reports -->
+                <Border Style="{StaticResource Card}" ClipToBounds="True" Margin="0,18,0,0">
+                    <StackPanel>
+                        <Border Style="{StaticResource SectionHeader}">
+                            <TextBlock Style="{StaticResource Text.BlockTitle}" Text="{svc:T Settings_Other}" />
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_RememberFolder}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_RememberFolder}"
+                                          IsChecked="{Binding RememberLastFolder}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_OfferStart}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_OfferStart}"
+                                          IsChecked="{Binding OfferStartAfterFolderSelected}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_FirstRunHint}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_FirstRunHint}"
+                                          IsChecked="{Binding ShowFirstRunTip}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_Sound}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_Sound}"
+                                          IsChecked="{Binding SoundOnFinish}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_DefaultReportFormat}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboBox.Pill}"
+                                          SelectedItem="{Binding DefaultReportFormat}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}">
+                                    <core:ReportFormat>Html</core:ReportFormat>
+                                    <core:ReportFormat>Csv</core:ReportFormat>
+                                    <core:ReportFormat>Text</core:ReportFormat>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_ReportsFolder}" />
+                                    <TextBlock Margin="0,2,0,0" TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Mono}">
+                                                <Setter Property="Text" Value="{Binding ReportsFolder}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ReportsFolder}" Value="{x:Null}">
+                                                        <Setter Property="Text" Value="{svc:T Settings_ReportsFolder_Default}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                                <Button Grid.Column="1" Style="{StaticResource Button.Outline}"
+                                        MinWidth="104" Padding="10,5" Content="{svc:T Ui_Change}"
+                                        FontSize="{StaticResource Size.Secondary}"
+                                        Background="{DynamicResource Brush.Card2}"
+                                        Command="{Binding PickReportsFolderCommand}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_IncludeOk}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_IncludeOk}"
+                                          IsChecked="{Binding IncludeOkFilesInReport}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingRow}" BorderThickness="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                    <TextBlock Style="{StaticResource Text.Base}" Text="{svc:T Settings_OpenReport}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Toggle}"
+                                          AutomationProperties.Name="{svc:T Settings_OpenReport}"
+                                          IsChecked="{Binding OpenReportAfterSave}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+
+            <!-- ══ Settings file and reset, spanning both columns ═══════════
+                 Left: a caption and the path, which is itself the link. Right: the reset
+                 button, centred on the row. -->
+            <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource Card}"
+                    Padding="18,15" Margin="0,18,0,0">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource Button.DangerOutline}"
+                            VerticalAlignment="Center" Margin="18,0,0,0"
+                            MinWidth="132"
+                            Content="{svc:T Settings_ResetAll}"
+                            ToolTip="{svc:T Settings_ResetAll_Tip}"
+                            AutomationProperties.Name="{svc:T Settings_ResetAll_Name}"
+                            Command="{Binding ResetAllCommand}" />
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Text.Eyebrow}" Text="{svc:T Settings_File}" />
+
+                        <!-- The path is the link; a separate "Open folder" line next to the same path
+                             would repeat it. -->
+                        <!-- The button stretches and the path sits in a star-sized column: only then
+                             does TextTrimming know where to cut. A left-aligned button was measured
+                             unbounded, no ellipsis appeared, and a long path ran under the card edge. -->
+                        <Button Style="{StaticResource Button.Link}" Margin="0,7,0,0"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                ToolTip="{svc:T Settings_OpenFileFolder}"
+                                AutomationProperties.Name="{svc:T Settings_OpenFileFolder}"
+                                Command="{Binding OpenSettingsFolderCommand}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <c:MsIcon Grid.Column="0" Kind="open-external" Size="14"
+                                          VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding SettingsFilePath}"
+                                           Margin="8,0,0,0" VerticalAlignment="Center"
+                                           FontFamily="{StaticResource Font.Mono}"
+                                           FontSize="{StaticResource Size.Mono}"
+                                           FontWeight="{StaticResource Weight.Body}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

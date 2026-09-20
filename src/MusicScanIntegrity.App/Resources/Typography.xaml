@@ -1,0 +1,106 @@
+<!--
+    Typography: size, weight and tracking scale. No UI text is smaller than 11 px.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Fonts: UI and monospaced (paths, logs, hex). -->
+    <FontFamily x:Key="Font.Ui">Segoe UI Variable Text, Segoe UI, Segoe UI Variable, sans-serif</FontFamily>
+    <FontFamily x:Key="Font.Mono">Cascadia Mono, Consolas, Courier New, monospace</FontFamily>
+
+    <!-- Sizes -->
+    <sys:Double x:Key="Size.SectionTitle">19</sys:Double>
+    <sys:Double x:Key="Size.Kpi">32</sys:Double>
+    <sys:Double x:Key="Size.DialogNumber">24</sys:Double>
+    <sys:Double x:Key="Size.CardTitle">14</sys:Double>
+    <sys:Double x:Key="Size.BlockTitle">13</sys:Double>
+    <sys:Double x:Key="Size.Body">13</sys:Double>
+    <sys:Double x:Key="Size.Tab">13.5</sys:Double>
+    <sys:Double x:Key="Size.Secondary">12.5</sys:Double>
+    <sys:Double x:Key="Size.Caption">11.5</sys:Double>
+    <sys:Double x:Key="Size.Mono">11</sys:Double>
+    <sys:Double x:Key="Size.TitleBar">12.5</sys:Double>
+
+    <!-- Weights. WPF has no 550/650, so the nearest named weights are used:
+         550 → Medium (500), 650 → SemiBold (600). Visually this matches the
+         mock-up: file names denser than body text, headings noticeably denser. -->
+    <FontWeight x:Key="Weight.Body">Normal</FontWeight>
+    <FontWeight x:Key="Weight.Medium">Medium</FontWeight>
+    <FontWeight x:Key="Weight.Semi">SemiBold</FontWeight>
+
+    <!--
+        Tracking, a deliberate deviation from the mock-up: WPF has no letter
+        spacing property (CharacterSpacing is WinUI). Positive tracking for
+        upper-case eyebrows comes from the OpenType Typography.CapitalSpacing
+        feature below. Negative tracking on large numbers cannot be reproduced, so
+        sizes and weights match exactly and the tightening is omitted.
+    -->
+
+    <!-- Base text style -->
+    <Style x:Key="Text.Base" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Ui}" />
+        <Setter Property="FontSize" Value="{StaticResource Size.Body}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Fg}" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+    </Style>
+
+    <Style x:Key="Text.Secondary" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.Secondary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Fg2}" />
+        <Setter Property="LineHeight" Value="18" />
+    </Style>
+
+    <Style x:Key="Text.Tertiary" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.Caption}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Fg3}" />
+        <Setter Property="LineHeight" Value="17" />
+    </Style>
+
+    <!-- Section eyebrow: 11.5 / 650 / uppercase / +0.08em tracking -->
+    <Style x:Key="Text.Eyebrow" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.Caption}" />
+        <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Fg3}" />
+        <Setter Property="Typography.CapitalSpacing" Value="True" />
+    </Style>
+
+    <Style x:Key="Text.CardTitle" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.CardTitle}" />
+        <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
+    </Style>
+
+    <Style x:Key="Text.BlockTitle" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.BlockTitle}" />
+        <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
+    </Style>
+
+
+    <!-- Large numbers: tabular figures -->
+    <Style x:Key="Text.Kpi" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.Kpi}" />
+        <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+
+    <Style x:Key="Text.DialogNumber" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="{StaticResource Size.DialogNumber}" />
+        <Setter Property="FontWeight" Value="{StaticResource Weight.Semi}" />
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+
+    <!-- Paths, logs, hex -->
+    <Style x:Key="Text.Mono" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Mono}" />
+        <Setter Property="FontSize" Value="{StaticResource Size.Mono}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Fg3}" />
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+
+    <!-- Table numbers: tabular figures so digits line up in columns -->
+    <Style x:Key="Text.Number" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+
+</ResourceDictionary>

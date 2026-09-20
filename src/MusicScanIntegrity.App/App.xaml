@@ -1,0 +1,48 @@
+﻿<Application x:Class="MusicScanIntegrity.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:MusicScanIntegrity.App.Converters"
+             xmlns:svc="clr-namespace:MusicScanIntegrity.App.Services"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Window templates and the Mica backdrop from WPF-UI. -->
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+
+                <!-- Theme tokens are swapped in by ThemeService at startup, which also
+                     switches them on a theme change without a restart. -->
+                <ResourceDictionary Source="Resources/Tokens.Light.xaml" />
+                <ResourceDictionary Source="Resources/Typography.xaml" />
+                <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary Source="Resources/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:NotEmptyToVisibilityConverter x:Key="NotEmptyToVisibility" />
+            <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <conv:EqualsConverter x:Key="Equals" />
+            <conv:SizeConverter x:Key="SizeFormat" />
+            <conv:NumberConverter x:Key="NumberFormat" />
+            <conv:ShareToWidthConverter x:Key="ShareToWidth" />
+            <conv:HexToBrushConverter x:Key="HexToBrush" />
+            <conv:InvertBoolConverter x:Key="InvertBool" />
+            <conv:EnumDisplayConverter x:Key="EnumDisplay" />
+            <conv:StatusBarVisibilityConverter x:Key="StatusBarVisibility" />
+            <conv:AllNotEmptyToVisibilityConverter x:Key="AllNotEmptyToVisibility" />
+
+            <!-- Display captions for enum values and options in drop-downs. The second
+                 binding re-runs the converter when the interface language changes. -->
+            <DataTemplate x:Key="EnumItemTemplate">
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource EnumDisplay}">
+                            <Binding />
+                            <Binding Path="[Settings_Language]" Source="{x:Static svc:Loc.Instance}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

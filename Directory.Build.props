@@ -1,0 +1,26 @@
+﻿<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <NeutralLanguage>ru-RU</NeutralLanguage>
+
+    <Product>Music Scan Integrity</Product>
+    <Company>Music Scan Integrity</Company>
+    <!-- Set once: MSBuild derives FileVersion and AssemblyVersion from
+         Version. Declared separately they drifted — release 1.5.2 showed
+         1.5.1 in the file properties. -->
+    <Version>1.0.0</Version>
+    <Copyright>© 2026 Music Scan Integrity</Copyright>
+
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- x64 only (64-bit Windows 10/11); the native BASS build is x64. -->
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+</Project>

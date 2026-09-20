@@ -1,0 +1,34 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Application">
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+    <PackageVersion Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Audio and metadata">
+    <!-- ManagedBass wraps native BASS; bass.dll and its plug-ins are
+         downloaded separately by tools/fetch-bass.ps1. -->
+    <PackageVersion Include="ManagedBass" Version="4.0.2" />
+    <PackageVersion Include="TagLibSharp" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Scan history">
+    <!-- SQLite for the history database, stored next to the executable to
+         stay portable. System.IO.Hashing provides XxHash3, several times faster
+         than SHA-256; the hash only has to detect change. -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+
+    <!-- Native SQLite pinned explicitly: the transitive default (2.1.11) is
+         flagged as vulnerable (GHSA-2m69-gcr7-jv3q) and the build warns. -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.core" Version="2.1.13" />
+    <PackageVersion Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.13" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.11" />
+  </ItemGroup>
+</Project>

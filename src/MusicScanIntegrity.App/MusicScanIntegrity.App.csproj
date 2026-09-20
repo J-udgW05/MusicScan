@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>MusicScanIntegrity.App</RootNamespace>
+    <AssemblyName>Music_Scan_Integrity</AssemblyName>
+    <AssemblyTitle>Music Scan Integrity</AssemblyTitle>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Windows x64 only. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+
+    <!-- Self-contained folder: runs as a portable copy and is what the installer ships. -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- Trimming off on purpose: WPF relies heavily on XAML reflection. -->
+    <PublishTrimmed>false</PublishTrimmed>
+
+    <SatelliteResourceLanguages>ru;en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="WPF-UI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicScanIntegrity.Core\MusicScanIntegrity.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Application mark: Assets\icon.png is the 512-pixel source, Assets\app.ico the
+       multi-size icon built from it. Windows takes the program icon from the .ico,
+       and windows pick a frame of the right size through Controls\AppMark.cs. -->
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <!-- Native BASS libraries go into bass\ next to the executable. They are
+       downloaded by tools\fetch-bass.ps1 and not committed, being distributed
+       under the un4seen licence. -->
+  <ItemGroup>
+    <None Include="..\..\native\bass\x64\**\*.dll"
+          Condition="Exists('..\..\native\bass\x64')"
+          Link="bass\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- The licence must accompany binary distributions, and the BASS terms must
+       reach whoever downloads a build, so both files ship with the program. -->
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt;..\..\THIRD-PARTY-NOTICES.md"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

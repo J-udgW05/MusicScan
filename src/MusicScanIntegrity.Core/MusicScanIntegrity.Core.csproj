@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>MusicScanIntegrity.Core</RootNamespace>
+    <AssemblyName>MusicScanIntegrity.Core</AssemblyName>
+    <UseWindowsForms>false</UseWindowsForms>
+    <UseWPF>false</UseWPF>
+    <!-- The core has no WPF dependency so it can be fully unit tested. The
+         Windows TFM is only needed for Restart Manager (P/Invoke into RstrtMgr.dll). -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ManagedBass" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="System.IO.Hashing" />
+    <PackageReference Include="TagLibSharp" />
+  </ItemGroup>
+
+  <!-- User-facing strings. The neutral resources are Russian; English lives in a
+       satellite assembly. A typed accessor class is generated at build time. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>MusicScanIntegrity.Core.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
